@@ -1,0 +1,92 @@
+<!-- templates/country_selection_block.html -->
+<div class="country-selection">
+    <h5>Location</h5>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" href="#">ALL</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">North America</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Europe</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Asia</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">South America</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Africa</a>
+        </li>
+    </ul>
+    <div class="row mt-3">
+        <div class="col-6 col-md-4 col-lg-3 mb-3">
+            <div class="card country-card">
+                <div class="card-body text-center">
+                    <img src="https://via.placeholder.com/30" alt="Washington" class="mb-2">
+                    <h6>Washington</h6>
+                    <p class="text-muted">USA</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3 mb-3">
+            <div class="card country-card">
+                <div class="card-body text-center">
+                    <img src="https://via.placeholder.com/30" alt="Silicon Valley" class="mb-2">
+                    <h6>Silicon Valley</h6>
+                    <p class="text-muted">USA</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3 mb-3">
+            <div class="card country-card">
+                <div class="card-body text-center">
+                    <img src="https://via.placeholder.com/30" alt="Frankfurt" class="mb-2">
+                    <h6>Frankfurt</h6>
+                    <p class="text-muted">Germany</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-md-4 col-lg-3 mb-3">
+            <div class="card country-card">
+                <div class="card-body text-center">
+                    <img src="https://via.placeholder.com/30" alt="Jakarta" class="mb-2">
+                    <h6>Jakarta</h6>
+                    <p class="text-muted">Indonesia</p>
+                </div>
+            </div>
+        </div>
+        <!-- Add more country blocks as needed -->
+        <div class="col-6 col-md-4 col-lg-3 mb-3">
+            <div class="card country-card sold-out">
+                <div class="card-body text-center">
+                    <img src="https://via.placeholder.com/30" alt="Sold Out" class="mb-2">
+                    <h6>Location</h6>
+                    <p class="text-muted">Sold Out</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .country-selection .nav-tabs .nav-link.active {
+        background-color: #f8f9fa;
+    }
+    .country-card {
+        border: 1px solid #ddd;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+    .country-card:hover {
+        transform: scale(1.05);
+    }
+    .country-card.sold-out {
+        opacity: 0.6;
+    }
+    .country-card.sold-out:hover {
+        transform: none;
+    }
+</style>

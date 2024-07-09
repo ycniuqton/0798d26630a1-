@@ -1,0 +1,51 @@
+<!-- templates/instance_configuration_block.html -->
+<div>
+    <h5>Instance</h5>
+    <div class="row">
+        <div class="col-12 mb-3">
+            <button class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center">
+                <img src="https://via.placeholder.com/30" alt="Intel" class="mr-2"> Intel
+            </button>
+        </div>
+        <div class="col-6 col-md-4 mb-3">
+            <button class="btn btn-outline-primary w-100">1 vCPU | 2 GB</button>
+        </div>
+        <div class="col-6 col-md-4 mb-3">
+            <button class="btn btn-outline-primary w-100">2 vCPU | 4 GB</button>
+        </div>
+        <div class="col-6 col-md-4 mb-3">
+            <button class="btn btn-outline-primary w-100">4 vCPU | 8 GB</button>
+        </div>
+        <div class="col-6 col-md-4 mb-3">
+            <button class="btn btn-outline-primary w-100">8 vCPU | 16 GB</button>
+        </div>
+        <div class="col-6 col-md-4 mb-3">
+            <button class="btn btn-outline-primary w-100">16 vCPU | 32 GB</button>
+        </div>
+    </div>
+
+    <h5>Network</h5>
+    <div class="mb-3">
+        <button class="btn btn-primary mr-2">Pay-By-Traffic</button>
+        <button class="btn btn-outline-primary">Pay-By-Bandwidth</button>
+    </div>
+    <div class="mb-3">
+        <button class="btn btn-primary w-100 mb-2">BGP</button>
+        <p class="text-muted small">Suitable for international routes to optimize overseas user access, but with slightly higher latency to China.</p>
+    </div>
+    <div class="row mb-3">
+        <div class="col-4">
+            <button class="btn btn-outline-primary w-100">1000 GB</button>
+        </div>
+        <div class="col-4">
+            <button class="btn btn-outline-primary w-100">2000 GB</button>
+        </div>
+        <div class="col-4">
+            <button class="btn btn-outline-primary w-100">3000 GB</button>
+        </div>
+    </div>
+
+    <h5>Storage</h5>
+    <p>Each instance will be configured with <strong>50G</strong> storage disks for Image.</p>
+    <button class="btn btn-outline-primary">+ Add a data disk</button>
+</div>
