@@ -1,0 +1,68 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block extrastyle %}
+
+<style>
+
+.iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+.parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+
+</style>
+
+{% endblock extrastyle %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h2>Link code</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Affiliate rule</h5>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-circle mr-2" style="color: blue;"></i>New users registered through the invitation link will bring you a 10% commission rebate;</li>
+                        <li><i class="fas fa-circle mr-2" style="color: blue;"></i>The rebate amount will arrive in the next month;</li>
+                        <li><i class="fas fa-circle mr-2" style="color: blue;"></i>When the invitees register and use the VPS, they can enjoy 95% off the original price;</li>
+                        <li><i class="fas fa-circle mr-2" style="color: blue;"></i>After completing account registration, any user can share the invitation link to invite new users;</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="exclusiveLink">Exclusive Link</label>
+                <input type="text" class="form-control" id="exclusiveLink" value="https://www.lightnode.com/?inviteCode=BC9XJI&promoteWay=LINK" readonly>
+                <button class="btn btn-outline-secondary mt-2"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <img src="https://via.placeholder.com/500x300" class="img-fluid" alt="Affiliate Promotion">
+        </div>
+    </div>
+</div>
+<style>
+    .card-title {
+        font-size: 1.25rem;
+        font-weight: 500;
+    }
+    .list-unstyled li {
+        margin-bottom: 10px;
+    }
+    .list-unstyled i {
+        font-size: 0.75rem;
+    }
+</style>
+<script>
+    document.querySelector('.btn-outline-secondary').addEventListener('click', function() {
+        var copyText = document.getElementById('exclusiveLink');
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); /* For mobile devices */
+        document.execCommand("copy");
+        alert("Copied the text: " + copyText.value);
+    });
+</script>
+
+
+{% endblock content %}

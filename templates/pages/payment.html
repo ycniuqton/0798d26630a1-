@@ -1,0 +1,173 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block extrastyle %}
+<style>
+.iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+.parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+.nav-tabs {
+    margin-bottom: 20px;
+}
+.tab-content {
+    padding: 20px;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+}
+.balance-block {
+    border: 1px solid #e9ecef;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    height: 100%;
+}
+.balance-block h5 {
+    margin-bottom: 10px;
+}
+.balance-block h2 {
+    color: #007bff;
+    font-size: 2.5em;
+}
+.balance-block .badge {
+    font-size: 0.8em;
+}
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Payments</h2>
+    <div class="row">
+        <div class="col-md">
+            <ul class="nav nav-tabs" id="paymentTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="make-payment-tab" data-bs-toggle="tab" href="#make-payment" role="tab" aria-controls="make-payment" aria-selected="true">Make Payment</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="balance-record-tab" data-bs-toggle="tab" href="#balance-record" role="tab" aria-controls="balance-record" aria-selected="false">Balance Record</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="paymentTabsContent">
+                <div class="tab-pane fade show active" id="make-payment" role="tabpanel" aria-labelledby="make-payment-tab">
+                    <h3>Make Payment</h3>
+                    <!-- Your Make Payment content here -->
+                    <h4 class="mt-3">Payment method :</h4>
+                    <div class="payment-methods">
+                        <button class="btn btn-outline-primary">Credit Card</button>
+                        <button class="btn btn-outline-primary">PayPal</button>
+                        <button class="btn btn-outline-primary">Alipay</button>
+                        <button class="btn btn-outline-primary">VietQR</button>
+                        <button class="btn btn-outline-primary">Gift Code</button>
+                    </div>
+                    <div class="alert alert-info mt-3">
+                        <p>🛈 If you choose the VietQR payment method, you will need to add an additional currency conversion fee, and the specific amount will be subject to deduction.</p>
+                    </div>
+                    <h4>Payment amount :</h4>
+                    <div class="payment-amounts">
+                        <button class="btn btn-outline-primary amount-btn">$ 10</button>
+                        <button class="btn btn-outline-primary amount-btn">$ 25</button>
+                        <button class="btn btn-outline-primary amount-btn">$ 50</button>
+                        <button class="btn btn-outline-primary amount-btn">$ 100</button>
+                        <button class="btn btn-outline-primary amount-btn">$ 200</button>
+                        <button class="btn btn-outline-primary amount-btn" id="other-btn">Other</button>
+                    </div>
+                    <div class="form-group mt-3" id="other-amount" style="display: none;">
+                        <input type="text" class="form-control" placeholder="$ 0.00">
+                    </div>
+                    <button class="btn btn-primary btn-block mt-3">To Pay</button>
+                </div>
+                <div class="tab-pane fade" id="balance-record" role="tabpanel" aria-labelledby="balance-record-tab">
+                    <h3>Balance Record</h3>
+                    <!-- Your Balance Record content here -->
+                    <div class="row mt-3">
+                        <div class="col">
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="col">
+                            <input type="date" class="form-control">
+                        </div>
+                        <div class="col">
+                            <button class="btn btn-outline-secondary"><i class="fas fa-sync-alt"></i></button>
+                        </div>
+                    </div>
+                    <table class="table table-hover mt-3">
+                        <thead>
+                            <tr>
+                                <th scope="col">Payment account</th>
+                                <th scope="col">Payment Type</th>
+                                <th scope="col">Payment method</th>
+                                <th scope="col">Time</th>
+                                <th scope="col">Recharge amount</th>
+                                <th scope="col">Operation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if balance_records %}
+                                {% for record in balance_records %}
+                                    <tr>
+                                        <td>{{ record.payment_account }}</td>
+                                        <td>{{ record.payment_type }}</td>
+                                        <td>{{ record.payment_method }}</td>
+                                        <td>{{ record.time }}</td>
+                                        <td>{{ record.recharge_amount }}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline-primary">{{ record.operation }}</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="no-records">
+                                        <img src="https://via.placeholder.com/150" alt="No Records">
+                                        <h4>No Records</h4>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-md" style="
+    max-width: 300px;
+    height: 200px;
+">
+            <div class="balance-block">
+                <h5>General Balance</h5>
+                <h2>$0.00</h2>
+                <span class="badge badge-secondary">Normal</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('other-btn').addEventListener('click', function() {
+        var otherAmountInput = document.getElementById('other-amount');
+        otherAmountInput.style.display = otherAmountInput.style.display === 'none' ? 'block' : 'none';
+    });
+
+    var amountButtons = document.querySelectorAll('.amount-btn');
+    amountButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var otherAmountInput = document.getElementById('other-amount');
+            otherAmountInput.style.display = 'none';
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var triggerTabList = [].slice.call(document.querySelectorAll('#paymentTabs a'))
+        triggerTabList.forEach(function (triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl)
+
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault()
+                tabTrigger.show()
+            })
+        })
+    });
+</script>
+{% endblock content %}

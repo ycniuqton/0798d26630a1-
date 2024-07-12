@@ -1,0 +1,95 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block extrastyle %}
+<style>
+.iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+.parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<style>
+.search-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.search-bar input {
+    flex: 1;
+}
+.search-bar select, .search-bar button {
+    margin-left: 10px;
+}
+.table thead th {
+    background-color: #f8f9fa;
+}
+.no-disks {
+    text-align: center;
+    padding: 50px 0;
+}
+.no-disks img {
+    max-width: 150px;
+    margin-bottom: 20px;
+}
+.no-disks button {
+    background-color: #007bff;
+    color: white;
+}
+.add-btn {
+    float: right;
+    margin-bottom: 10px;
+}
+</style>
+
+<div class="container mt-4">
+    <h2>Block Storage</h2>
+    <div class="search-bar">
+        <input type="text" class="form-control" placeholder="Please enter" aria-label="Search">
+        <select class="form-control">
+            <option selected>Block Storage ID</option>
+            <!-- Add more options here if needed -->
+        </select>
+        <button class="btn btn-outline-secondary"><i class="fas fa-sync-alt"></i></button>
+        <button class="btn btn-primary add-btn">+ Add</button>
+    </div>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Block Storage</th>
+                <th scope="col">Size</th>
+                <th scope="col">Instance</th>
+                <th scope="col">Location</th>
+                <th scope="col">Datetime</th>
+                <th scope="col">Operation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if storages %}
+                {% for storage in storages %}
+                <tr>
+                    <td>{{ storage.block_storage }}</td>
+                    <td>{{ storage.size }}</td>
+                    <td>{{ storage.instance }}</td>
+                    <td>{{ storage.location }}</td>
+                    <td>{{ storage.datetime }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary">Manage</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="6" class="no-disks">
+                        <img src="https://via.placeholder.com/150" alt="No Disks">
+                        <h4>No Disk</h4>
+                        <button class="btn btn-primary">+ Add</button>
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

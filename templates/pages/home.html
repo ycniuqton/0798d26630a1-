@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyVPS</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #1a202c;
+        }
+        .navbar-brand {
+            font-size: 1.5rem;
+            color: white;
+        }
+        .navbar-nav .nav-link {
+            color: white;
+        }
+        .jumbotron {
+            background: url('https://via.placeholder.com/1200x400') no-repeat center center;
+            background-size: cover;
+            color: white;
+            height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .jumbotron h1 {
+            font-size: 3rem;
+        }
+        .jumbotron p {
+            font-size: 1.2rem;
+        }
+        .form-inline input {
+            margin-right: 10px;
+        }
+        .form-inline button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="#">MyVPS</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Features</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Marketplace</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Pricing</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Partners</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Company</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-user-circle"></i></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <header class="jumbotron">
+        <h1 class="display-4">The Everywhere Cloud</h1>
+        <p class="lead">Global, automated cloud infrastructure from the broadest array of NVIDIA GPUs to virtual CPUs, bare metal, Kubernetes, storage, and networking solutions.</p>
+        <form class="form-inline">
+            <input type="email" class="form-control" placeholder="Email Address">
+            <input type="password" class="form-control" placeholder="Password">
+            <button type="submit" class="btn btn-primary">Create account</button>
+        </form>
+    </header>
+
+
+    <!-- Products Section -->
+<div class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-3">
+            <div class="card">
+                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Cloud GPU">
+                <div class="card-body">
+                    <h5 class="card-title">Cloud GPU</h5>
+                    <p class="card-text">Large-scale dedicated clusters and on-demand VMs with NVIDIA GPUs</p>
+                    <p class="card-text text-primary">Starting at $0.03/hour</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Cloud Compute">
+                <div class="card-body">
+                    <h5 class="card-title">Cloud Compute</h5>
+                    <p class="card-text">Easy-to-use, affordable VMs for many common workloads</p>
+                    <p class="card-text text-primary">Starting at $2.50/month</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Optimized Cloud Compute">
+                <div class="card-body">
+                    <h5 class="card-title">Optimized Cloud Compute</h5>
+                    <p class="card-text">No noisy neighbors on these powerful VMs with built-in NVMe SSD</p>
+                    <p class="card-text text-primary">Starting at $28.00/month</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Bare Metal">
+                <div class="card-body">
+                    <h5 class="card-title">Bare Metal</h5>
+                    <p class="card-text">Fully automated dedicated servers with zero virtualization layer</p>
+                    <p class="card-text text-primary">Starting at $120.00/month</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Locations Section -->
+<div class="container my-5 text-center">
+    <h2>Develop locally, deploy globally®</h2>
+    <p>32 worldwide locations</p>
+    <img src="https://via.placeholder.com/800x400" class="img-fluid" alt="World Map">
+    <button class="btn btn-primary mt-3">Explore locations</button>
+</div>
+
+<!-- Global Cloud GPUs Section -->
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Global Cloud GPUs</h3>
+            <p>Meet the state-of-the-art NVIDIA lineup available at any of our global datacenter locations.</p>
+            <button class="btn btn-primary">Learn more</button>
+        </div>
+        <div class="col-md-6">
+            <ul class="list-group">
+                <li class="list-group-item active">NVIDIA GH200</li>
+                <li class="list-group-item">NVIDIA HGX H100</li>
+                <li class="list-group-item">NVIDIA A100</li>
+                <li class="list-group-item">NVIDIA L40S</li>
+                <li class="list-group-item">NVIDIA A40</li>
+                <li class="list-group-item">NVIDIA A16</li>
+            </ul>
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">NVIDIA GH200</h5>
+                    <p class="card-text">Delivering breakthrough acceleration of large-scale AI, model training and inference, and high-performance computing (HPC) applications</p>
+                    <p class="card-text text-primary">Pricing starts at $4.335/hr</p>
+                    <button class="btn btn-primary">Learn more</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Next part of the home page will go here -->
+
+
+    <!-- Next part of the home page will go here -->
+    <!-- Products Section -->
+<div class="container my-5">
+    <div class="row text-center">
+        <div class="col-md-3">
+            <div class="card">
+                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Cloud GPU">
+                <div class="card-body">
+                    <h5 class="card-title">Cloud GPU</h5>
+                    <p class="card-text">Large-scale dedicated clusters and on-demand VMs with NVIDIA GPUs</p>
+                    <p class="card-text text-primary">Starting at $0.03/hour</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Cloud Compute">
+                <div class="card-body">
+                    <h5 class="card-title">Cloud Compute</h5>
+                    <p class="card-text">Easy-to-use, affordable VMs for many common workloads</p>
+                    <p class="card-text text-primary">Starting at $2.50/month</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Optimized Cloud Compute">
+                <div class="card-body">
+                    <h5 class="card-title">Optimized Cloud Compute</h5>
+                    <p class="card-text">No noisy neighbors on these powerful VMs with built-in NVMe SSD</p>
+                    <p class="card-text text-primary">Starting at $28.00/month</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Bare Metal">
+                <div class="card-body">
+                    <h5 class="card-title">Bare Metal</h5>
+                    <p class="card-text">Fully automated dedicated servers with zero virtualization layer</p>
+                    <p class="card-text text-primary">Starting at $120.00/month</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Locations Section -->
+<div class="container my-5 text-center">
+    <h2>Develop locally, deploy globally®</h2>
+    <p>32 worldwide locations</p>
+    <img src="https://via.placeholder.com/800x400" class="img-fluid" alt="World Map">
+    <button class="btn btn-primary mt-3">Explore locations</button>
+</div>
+
+<!-- Global Cloud GPUs Section -->
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Global Cloud GPUs</h3>
+            <p>Meet the state-of-the-art NVIDIA lineup available at any of our global datacenter locations.</p>
+            <button class="btn btn-primary">Learn more</button>
+        </div>
+        <div class="col-md-6">
+            <ul class="list-group">
+                <li class="list-group-item active">NVIDIA GH200</li>
+                <li class="list-group-item">NVIDIA HGX H100</li>
+                <li class="list-group-item">NVIDIA A100</li>
+                <li class="list-group-item">NVIDIA L40S</li>
+                <li class="list-group-item">NVIDIA A40</li>
+                <li class="list-group-item">NVIDIA A16</li>
+            </ul>
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">NVIDIA GH200</h5>
+                    <p class="card-text">Delivering breakthrough acceleration of large-scale AI, model training and inference, and high-performance computing (HPC) applications</p>
+                    <p class="card-text text-primary">Pricing starts at $4.335/hr</p>
+                    <button class="btn btn-primary">Learn more</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer Section -->
+<footer class="bg-dark text-light py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2">
+                <h5>Products</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-light">Cloud Compute</a></li>
+                    <li><a href="#" class="text-light">High Frequency Compute</a></li>
+                    <li><a href="#" class="text-light">Bare Metal</a></li>
+                    <li><a href="#" class="text-light">Object Storage</a></li>
+                    <li><a href="#" class="text-light">Block Storage</a></li>
+                    <li><a href="#" class="text-light">DDoS Protection</a></li>
+                    <li><a href="#" class="text-light">Direct Connect</a></li>
+                    <li><a href="#" class="text-light">Load Balancers</a></li>
+                    <li><a href="#" class="text-light">Kubernetes</a></li>
+                </ul>
+            </div>
+            <div class="col-md-2">
+                <h5>Features</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-light">Data Center Locations</a></li>
+                    <li><a href="#" class="text-light">Advanced Network</a></li>
+                    <li><a href="#" class="text-light">Control Panel</a></li>
+                    <li><a href="#" class="text-light">Operating Systems</a></li>
+                    <li><a href="#" class="text-light">Upload ISO</a></li>
+                    <li><a href="#" class="text-light">Bring your IP space</a></li>
+                    <li><a href="#" class="text-light">Vultr Compliance</a></li>
+                </ul>
+            </div>
+            <div class="col-md-2">
+                <h5>Marketplace</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-light">Browse Apps</a></li>
+                    <li><a href="#" class="text-light">Become a Vendor</a></li>
+                </ul>
+            </div>
+            <div class="col-md-2">
+                <h5>Resources</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-light">FAQ</a></li>
+                    <li><a href="#" class="text-light">Developers / APIs</a></li>
+                    <li><a href="#" class="text-light">Vultr Docs</a></li>
+                    <li><a href="#" class="text-light">Benchmarks</a></li>
+                    <li><a href="#" class="text-light">Server Status</a></li>
+                    <li><a href="#" class="text-light">Bug Bounty</a></li>
+                    <li><a href="#" class="text-light">Coupons</a></li>
+                    <li><a href="#" class="text-light">Solution Partners</a></li>
+                    <li><a href="#" class="text-light">Start-Up Programs</a></li>
+                </ul>
+            </div>
+            <div class="col-md-2">
+                <h5>Company</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-light">Our Team</a></li>
+                    <li><a href="#" class="text-light">News</a></li>
+                    <li><a href="#" class="text-light">Brand Assets</a></li>
+                    <li><a href="#" class="text-light">Referral Program</a></li>
+                    <li><a href="#" class="text-light">Creator Program</a></li>
+                    <li><a href="#" class="text-light">Careers</a></li>
+                    <li><a href="#" class="text-light">SLA</a></li>
+                    <li><a href="#" class="text-light">Legal</a></li>
+                    <li><a href="#" class="text-light">Contact</a></li>
+                </ul>
+            </div>
+            <div class="col-md-12 text-center mt-4">
+                <p class="small">Over 45,000,000 Cloud Servers Launched</p>
+                <p class="small">© Vultr 2024 VULTR is a registered trademark of The Constant Company, LLC.</p>
+                <ul class="list-inline">
+                    <li class="list-inline-item"><a href="#" class="text-light">Terms of Service</a></li>
+                    <li class="list-inline-item"><a href="#" class="text-light">AUP/DMCA</a></li>
+                    <li class="list-inline-item"><a href="#" class="text-light">Privacy Policy</a></li>
+                    <li class="list-inline-item"><a href="#" class="text-light">Cookie Policy</a></li>
+                </ul>
+                <ul class="list-inline mt-2">
+                    <li class="list-inline-item"><a href="#"><i class="fab fa-twitter text-light"></i></a></li>
+
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>

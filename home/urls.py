@@ -7,8 +7,10 @@ urlpatterns = [
   path(''       , views.index,  name='index'),
   path('tables/', views.tables, name='tables'),
 
+  path('home/', views.home, name='home'),
 
   path('instances/', views.instances, name='instances'),
+
   path('create_instances/', views.create_instances, name='create_instances'),
 
   path('network/', views.network, name='network'),
@@ -26,6 +28,12 @@ urlpatterns = [
 
   path('financial/', views.financial, name='financial'),
   path('support/', views.support, name='support'),
+  path('ticket/', views.ticket, name='ticket'),
   path('affiliate/', views.affiliate, name='affiliate'),
+  path('link_code/', views.link_code, name='link_code'),
+  path('affiliate_stats/', views.affiliate_stats, name='affiliate_stats'),
   path('account/', views.account, name='account'),
+  path('profile/', views.profile, name='profile'),
+  path('authentication/', views.authentication, name='authentication'),
+  path('notifications/', views.notifications, name='notifications'),
 ]

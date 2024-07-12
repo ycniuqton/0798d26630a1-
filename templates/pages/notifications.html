@@ -1,0 +1,68 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block extrastyle %}
+
+<style>
+
+.iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+.parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+
+</style>
+
+{% endblock extrastyle %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h2>Notifications</h2>
+    <div class="form-group">
+        <label for="receivingEmail">Receiving Email:</label>
+        <div class="d-flex">
+            <input type="email" class="form-control" id="receivingEmail" value="ngohongqui@gmail.com" readonly>
+            <button class="btn btn-primary ml-2">Change</button>
+        </div>
+        <small class="form-text text-muted">
+            The receiving email is used to receive notifications about the LightNode platform and resource status. Please set it carefully.
+        </small>
+    </div>
+    <h5>Notifications Settings</h5>
+    <div class="alert alert-warning">
+        💡 The default silence period for all notification configurations in the notification settings is 24 hours, which means that notifications are sent every 24 hours.
+    </div>
+    <div class="form-group">
+        <label for="balanceNotification">Notification based on account balance</label>
+        <div class="d-flex align-items-center">
+            <input type="number" class="form-control" id="balanceNotification" value="0">
+            <div class="custom-control custom-switch ml-2">
+                <input type="checkbox" class="custom-control-input" id="balanceSwitch">
+                <label class="custom-control-label" for="balanceSwitch"></label>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="resourceNotification">Notification based on resource usage</label>
+        <div class="d-flex align-items-center">
+            <div class="custom-control custom-switch">
+                <input type="checkbox" class="custom-control-input" id="resourceSwitch" checked>
+                <label class="custom-control-label" for="resourceSwitch"></label>
+            </div>
+            <small class="form-text text-muted ml-2">
+                Send notifications when usage reaches 75%, 90%, and 100%
+            </small>
+        </div>
+    </div>
+</div>
+<style>
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    .custom-switch .custom-control-input:checked ~ .custom-control-label::before {
+        background-color: #007bff;
+    }
+</style>
+
+
+{% endblock content %}

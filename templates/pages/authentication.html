@@ -1,0 +1,72 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block extrastyle %}
+
+<style>
+
+.iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+.parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+
+</style>
+
+{% endblock extrastyle %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <h2>Two Factor Authentication</h2>
+    <div class="alert alert-warning">
+        💡 Keep your account secure by enabling two-factor authentication. Each time you sign in, you'll be required to provide your password plus a randomly generated access code.
+    </div>
+    <h5>Configure Authentication</h5>
+    <div class="form-group">
+        <div class="d-flex">
+            <select class="form-control mr-2">
+                <option>Google Auth</option>
+                <!-- Add more options as needed -->
+            </select>
+            <input type="text" class="form-control mr-2" placeholder="Description">
+            <button class="btn btn-primary">Add 2FA</button>
+        </div>
+    </div>
+    <h5>Authentication List</h5>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Authentication mode</th>
+                <th scope="col">Description</th>
+                <th scope="col">Create time</th>
+                <th scope="col">Operation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td colspan="4" class="no-records text-center">
+                    <img src="https://via.placeholder.com/150" alt="No Records">
+                    <h4>No Records</h4>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<style>
+    .table thead th {
+        background-color: #f8f9fa;
+    }
+    .no-records {
+        text-align: center;
+        padding: 50px 0;
+    }
+    .no-records img {
+        max-width: 150px;
+        margin-bottom: 20px;
+    }
+    .no-records h4 {
+        margin-top: 20px;
+    }
+</style>
+
+{% endblock content %}
