@@ -1,4 +1,13 @@
 from django.shortcuts import render, redirect
+import requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
+from datetime import datetime, timedelta, date
+from django.shortcuts import render
+from django.core.paginator import Paginator
+import random
+
 from admin_datta.forms import RegistrationForm, LoginForm, UserPasswordChangeForm, UserPasswordResetForm, \
     UserSetPasswordForm
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordResetConfirmView, PasswordResetView
@@ -74,8 +83,141 @@ def home(request):
 
 
 def create_instances(request):
+    plans = [
+        {
+            "name": "VPS VN-1",
+            "vcpu": "1 vCPU",
+            "ram": "1GB RAM",
+            "bandwidth": "1TB băng thông",
+            "storage": "20GB SSD Enterprise",
+            "price": "60,000 đ",
+            "backup": "NO BACKUP",
+            "link": "#"
+        },
+        {
+            "name": "VPS VN-2",
+            "vcpu": "1 vCPU",
+            "ram": "2GB RAM",
+            "bandwidth": "3TB băng thông",
+            "storage": "20GB SSD Enterprise",
+            "price": "120,000 đ",
+            "backup": "NO BACKUP",
+            "link": "#"
+        },
+        {
+            "name": "VPS VN-3",
+            "vcpu": "2 vCPU",
+            "ram": "2GB RAM",
+            "bandwidth": "3TB băng thông",
+            "storage": "20GB SSD Enterprise",
+            "price": "140,000 đ",
+            "backup": "",
+            "link": "#"
+        },
+        {
+            "name": "VPS VN-4",
+            "vcpu": "2 vCPU",
+            "ram": "4GB RAM",
+            "bandwidth": "5TB băng thông",
+            "storage": "30GB SSD Enterprise",
+            "price": "200,000 đ",
+            "backup": "",
+            "link": "#"
+        },
+        {
+            "name": "VPS VN-6",
+            "vcpu": "3 vCPU",
+            "ram": "6GB RAM",
+            "bandwidth": "5TB băng thông",
+            "storage": "40GB SSD Enterprise",
+            "price": "300,000 đ",
+            "backup": "",
+            "link": "#"
+        },
+        {
+            "name": "VPS VN-8",
+            "vcpu": "4 vCPU",
+            "ram": "8GB RAM",
+            "bandwidth": "10TB băng thông",
+            "storage": "50GB SSD Enterprise",
+            "price": "400,000 đ",
+            "backup": "số lượng lớn ib giảm tới 10%",
+            "link": "#"
+        }
+    ]
+    ipv4_options = ["Standard", "Advanced", "Premium"]
+    bandwidth_options = ["Standard", "Advanced", "Premium"]
+    ram_options = ["Standard", "Advanced", "Premium"]
+    ssd_options = ["Standard", "Advanced", "Premium"]
+
+    # country
+    regions = [
+        "Asia", "North America", "Europe", "South America", "Africa", "Oceania", "Middle East", "ALL"
+    ]
+
+    locations = [
+        {"name": "Washington", "country": "USA", "region": "North America"},
+        {"name": "Silicon Valley", "country": "USA", "region": "North America"},
+        {"name": "Toronto", "country": "Canada", "region": "North America"},
+        {"name": "Vancouver", "country": "Canada", "region": "North America"},
+        {"name": "Frankfurt", "country": "Germany", "region": "Europe"},
+        {"name": "London", "country": "UK", "region": "Europe"},
+        {"name": "Paris", "country": "France", "region": "Europe"},
+        {"name": "Amsterdam", "country": "Netherlands", "region": "Europe"},
+        {"name": "Jakarta", "country": "Indonesia", "region": "Asia"},
+        {"name": "Singapore", "country": "Singapore", "region": "Asia"},
+        {"name": "Tokyo", "country": "Japan", "region": "Asia"},
+        {"name": "Seoul", "country": "South Korea", "region": "Asia"},
+        {"name": "São Paulo", "country": "Brazil", "region": "South America"},
+        {"name": "Buenos Aires", "country": "Argentina", "region": "South America"},
+        {"name": "Cape Town", "country": "South Africa", "region": "Africa"},
+        {"name": "Nairobi", "country": "Kenya", "region": "Africa"},
+        {"name": "Sydney", "country": "Australia", "region": "Oceania"},
+        {"name": "Melbourne", "country": "Australia", "region": "Oceania"},
+        {"name": "Dubai", "country": "UAE", "region": "Middle East"},
+        {"name": "Riyadh", "country": "Saudi Arabia", "region": "Middle East"},
+    ]
+    # Fetch flags using restcountries.com API
+    # for location in locations:
+    #     response = requests.get(f"https://restcountries.com/v3.1/name/{location['country']}?fields=flags")
+    #     if response.status_code == 200:
+    #         location_data = response.json()
+    #         if location_data:
+    #             location['flag'] = location_data[0]['flags']['png']
+    #     else:
+    #         location['flag'] = "https://via.placeholder.com/30"  # Fallback image
+
+    # OS
+    categories = ["ALL", "System Image"]
+    images = [
+        {"name": "Ubuntu", "versions": ["18.04", "19.04", "20.04", "22.04"], "category": "System Image",
+         "image_url": "https://via.placeholder.com/50"},
+        {"name": "Debian", "versions": ["9", "10", "11"], "category": "System Image",
+         "image_url": "https://via.placeholder.com/50"},
+        {"name": "AlmaLinux", "versions": ["8.4", "8.5", "8.6"], "category": "System Image",
+         "image_url": "https://via.placeholder.com/50"},
+        {"name": "Arch Linux", "versions": ["2020.05", "2021.06", "2022.07"], "category": "System Image",
+         "image_url": "https://via.placeholder.com/50"},
+        {"name": "CentOS", "versions": ["7", "8"], "category": "System Image",
+         "image_url": "https://via.placeholder.com/50"},
+        {"name": "FreeBSD", "versions": ["11", "12", "13"], "category": "System Image",
+         "image_url": "https://via.placeholder.com/50"},
+        {"name": "Rocky Linux", "versions": ["8.4", "8.5", "8.6"], "category": "System Image",
+         "image_url": "https://via.placeholder.com/50"},
+        {"name": "Windows", "versions": ["10", "Server 2016", "Server 2019"], "category": "System Image",
+         "image_url": "https://via.placeholder.com/50"},
+    ]
     context = {
-        'segment': 'create_instances'
+        'segment': 'create_instances',
+        'plans': plans,
+        'ipv4_options': ipv4_options,
+        'bandwidth_options': bandwidth_options,
+        'ram_options': ram_options,
+        'ssd_options': ssd_options,
+        'regions': regions,
+        'locations': locations,
+        'categories': categories,
+        'images': images,
     }
     return render(request, "pages/create-instances.html", context)
 
@@ -477,33 +619,6 @@ def support(request):
 
 
 def ticket(request):
-    tickets = [
-        {
-            "ticket_id": "TICKET001",
-            "subject": "Issue with login",
-            "ticket_type": "Technical",
-            "submission_time": "2024-07-01 14:30",
-            "status": "Open",
-            "operation": "View"
-        },
-        {
-            "ticket_id": "TICKET002",
-            "subject": "Billing discrepancy",
-            "ticket_type": "Billing",
-            "submission_time": "2024-07-02 09:20",
-            "status": "Closed",
-            "operation": "View"
-        },
-        {
-            "ticket_id": "TICKET003",
-            "subject": "Feature request",
-            "ticket_type": "General",
-            "submission_time": "2024-07-03 17:45",
-            "status": "In Progress",
-            "operation": "View"
-        }
-    ]
-
     context = {
         'segment': 'ticket',
         'tickets': tickets
@@ -516,6 +631,13 @@ def affiliate(request):
         'segment': 'affiliate'
     }
     return render(request, "pages/dynamic-tables.html", context)
+
+
+def your_introducer(request):
+    context = {
+        'segment': 'your_introducer'
+    }
+    return render(request, "pages/your_introducer.html", context)
 
 
 def link_code(request):
@@ -570,3 +692,251 @@ def notifications(request):
         'segment': 'notifications'
     }
     return render(request, "pages/notifications.html", context)
+
+
+@csrf_exempt
+def vps_calculator(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        # Extract configuration
+        plan = data.get('plan', {})
+        additional_ipv4 = data.get('ipv4', 'None')
+        additional_ram = data.get('ram', 'None')
+        additional_ssd = data.get('ssd', 'None')
+        bandwidth = data.get('bandwidth', 'None')
+
+        # Calculate total cost (example logic)
+        total_cost = float(plan.get('price', 0))
+        if additional_ipv4 != 'None':
+            total_cost += 2.00  # Example cost for additional IPv4
+        if additional_ram != 'None':
+            total_cost += 5.00  # Example cost for additional RAM
+        if additional_ssd != 'None':
+            total_cost += 10.00  # Example cost for additional SSD
+        if bandwidth != 'None':
+            total_cost += 3.00  # Example cost for additional bandwidth
+
+        return JsonResponse({'total_cost': total_cost})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+@csrf_exempt
+def create_vps(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+
+        # Extract configuration
+        location = data.get('location', {})
+        image = data.get('image', {})
+        plan = data.get('plan', {})
+        ipv4 = data.get('ipv4', 'None')
+        bandwidth = data.get('bandwidth', 'None')
+        ram = data.get('ram', 'None')
+        ssd = data.get('ssd', 'None')
+        login = data.get('login', {})
+
+        # Here you would add the logic to actually create the VPS.
+        # This might involve interacting with a VPS provider's API.
+
+        # For now, we'll just return the received configuration for demo purposes
+        response_data = {
+            'status': 'success',
+            'message': 'VPS created successfully',
+            'vpsConfiguration': data
+        }
+        return JsonResponse(response_data)
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+
+@csrf_exempt
+def user_profile(request):
+    if request.method == 'GET':
+        # Fetch user profile data from the database
+        profile = {
+            'email': 'ngohongqui@gmail.com',
+            'first_name': 'Ngô',
+            'last_name': 'Quí',
+            'address': 'Số 60 ngách 52/25 phú mỹ mỹ đình từ liêm hà nội',
+            'city': 'Hà Nội',
+            'country_region': 'Hong Kong (China)',
+            'zip_code': '100000',
+            'company_name': '',
+            'phone_country': 'Vietnam(84)',
+            'phone_number': '365046569',
+            'subscribe_email': True
+        }
+        return JsonResponse(profile)
+
+    elif request.method == 'PUT':
+        data = json.loads(request.body)
+        # Update the user profile in the database with the data received
+        # For demonstration, we just print the data to the console
+        print('Updated profile data:', data)
+        return JsonResponse({'status': 'success', 'message': 'Profile updated successfully'})
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+# In-memory storage for tokens (for demonstration purposes)
+tokens = []
+
+
+
+@csrf_exempt
+def manage_tokens(request):
+    if request.method == 'GET':
+        # List all tokens
+        return JsonResponse(tokens, safe=False)
+
+    elif request.method == 'POST':
+        # Generate a new token
+        data = json.loads(request.body)
+        ttl = int(data['ttl'])
+        expiry_time = 'Never' if ttl == -1 else (datetime.now() + timedelta(minutes=ttl)).isoformat()
+        token = {
+            'token': 'token-' + str(len(tokens) + 1),  # Simple token generation for demonstration
+            'description': data['description'],
+            'create_time': datetime.now().isoformat(),
+            'expiry_time': expiry_time,
+            'status': 'active'
+        }
+        tokens.append(token)
+        return JsonResponse(token)
+
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@csrf_exempt
+def delete_token(request, token_id):
+    global tokens
+    tokens = [token for token in tokens if token['token'] != token_id]
+    return JsonResponse({'status': 'success', 'message': 'Token deleted successfully'})
+
+
+
+# In-memory storage for demo purposes
+introducer_email_storage = {}
+
+
+def current_introducer(request):
+    user_id = request.user.id
+    introducer_email = introducer_email_storage.get(user_id, None)
+    return JsonResponse({'introducer_email': introducer_email})
+
+@csrf_exempt
+def set_introducer(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        introducer_email = data.get('introducer_email')
+        user_id = request.user.id
+
+        if introducer_email:
+            introducer_email_storage[user_id] = introducer_email
+            return JsonResponse({'success': True})
+    return JsonResponse({'success': False})
+
+
+# In-memory storage for tickets and FAQs
+tickets = [
+        {
+            "ticket_id": "TICKET001",
+            "subject": "Issue with login",
+            "ticket_type": "Technical",
+            "submission_time": "2024-07-01 14:30",
+            "status": "Open",
+            "operation": "View"
+        },
+        {
+            "ticket_id": "TICKET002",
+            "subject": "Billing discrepancy",
+            "ticket_type": "Billing",
+            "submission_time": "2024-07-02 09:20",
+            "status": "Closed",
+            "operation": "View"
+        },
+        {
+            "ticket_id": "TICKET003",
+            "subject": "Feature request",
+            "ticket_type": "General",
+            "submission_time": "2024-07-03 17:45",
+            "status": "In Progress",
+            "operation": "View"
+        }
+    ]
+faq_data = [
+    {"question": "How does LightNode turn on the machine?", "answer": "Newly registered users can get up to $20 as a bonus for the first recharge. They only need to complete three steps: register, fill in basic information, and recharge the platform, and then they can activate the host that needs to be configured as needed.<br><br>PS: As long as the account balance is sufficient, you can always use the machine, no need to renew."},
+    {"question": "What is the first charge of LightNode?", "answer": "The first charge of LightNode is the initial payment you make to start using the services."},
+    {"question": "Does the LightNode system disk need to be selected separately?", "answer": "Yes, you need to select the system disk separately according to your requirements."},
+    {"question": "What resource nodes does LightNode have?", "answer": "LightNode has resource nodes in various global locations including North America, Europe, Asia, and more."},
+    {"question": "What operating systems does LightNode support?", "answer": "LightNode supports a variety of operating systems including Windows, Linux distributions like Ubuntu, Debian, CentOS, and more."},
+    {"question": "What are the billing rules for LightNode?", "answer": "LightNode follows a pay-as-you-go billing model where you are billed based on the resources you use."}
+]
+
+
+@csrf_exempt
+def tickets_view(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            ticket_id = len(tickets) + 1
+            ticket = {
+                'ticket_id': ticket_id,
+                'subject': data['subject'],
+                'ticket_type': data['ticket_type'],
+                'description': data['description'],
+                'submission_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'status': 'Open',
+                'operation': 'View'
+            }
+            tickets.append(ticket)
+            return JsonResponse({'success': True, 'ticket': ticket})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)}, status=400)
+    elif request.method == 'GET':
+        return JsonResponse({'tickets': tickets})
+
+
+@csrf_exempt
+def faqs_view(request):
+    if request.method == 'GET':
+        return JsonResponse({'faqs': faq_data})
+
+
+statuses = ['paid', 'unpaid', 'overdue']
+invoices_data = [
+    {
+        'code': f'INV{str(i).zfill(3)}',
+        'created': (date(2024, 1, 1) + timedelta(days=i)).isoformat(),
+        'due_date': (date(2024, 1, 10) + timedelta(days=i)).isoformat(),
+        'status': random.choice(statuses),
+        'total': round(random.uniform(50, 500), 2)
+    } for i in range(1, 51)
+]
+
+def invoices_view(request):
+    search_query = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+    sort_order = request.GET.get('sort', 'created')
+    items_per_page = int(request.GET.get('items', 10))
+
+    invoices = invoices_data
+
+    if search_query:
+        invoices = [invoice for invoice in invoices if search_query.lower() in invoice['code'].lower()]
+
+    if status_filter:
+        invoices = [invoice for invoice in invoices if invoice['status'] == status_filter]
+
+    if sort_order.startswith('-'):
+        invoices = sorted(invoices, key=lambda x: x[sort_order[1:]], reverse=True)
+    else:
+        invoices = sorted(invoices, key=lambda x: x[sort_order])
+
+    paginator = Paginator(invoices, items_per_page)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, 'pages/invoices.html', {'invoices': page_obj, 'items_per_page': items_per_page})

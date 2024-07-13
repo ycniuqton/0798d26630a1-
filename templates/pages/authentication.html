@@ -4,47 +4,65 @@
 {% block breadcrumbs %}{% endblock breadcrumbs %}
 
 {% block extrastyle %}
-
 <style>
-
 .iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
 .parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
-
+.table thead th {
+    background-color: #f8f9fa;
+}
+.no-records {
+    text-align: center;
+    padding: 50px 0;
+}
+.no-records img {
+    max-width: 150px;
+    margin-bottom: 20px;
+}
+.no-records h4 {
+    margin-top: 20px;
+}
 </style>
-
 {% endblock extrastyle %}
 
 {% block content %}
-
 <div class="container mt-4">
-    <h2>Two Factor Authentication</h2>
+    <h2>Manage Tokens</h2>
     <div class="alert alert-warning">
-        💡 Keep your account secure by enabling two-factor authentication. Each time you sign in, you'll be required to provide your password plus a randomly generated access code.
+        💡 Generate tokens with custom TTL for secure access.
     </div>
-    <h5>Configure Authentication</h5>
-    <div class="form-group">
-        <div class="d-flex">
-            <select class="form-control mr-2">
-                <option>Google Auth</option>
-                <!-- Add more options as needed -->
-            </select>
-            <input type="text" class="form-control mr-2" placeholder="Description">
-            <button class="btn btn-primary">Add 2FA</button>
+    <h5>Create Token</h5>
+    <form id="create-token-form">
+        <div class="form-group">
+            <div class="d-flex">
+                <input type="text" class="form-control mr-2" id="description" placeholder="Description" required>
+                <select class="form-control mr-2" id="ttl" required>
+                    <option value="10">10 minutes</option>
+                    <option value="60">1 hour</option>
+                    <option value="1440">1 day</option>
+                    <option value="10080">1 week</option>
+                    <option value="43200">1 month</option>
+                    <option value="525600">1 year</option>
+                    <option value="-1">Never</option>
+                </select>
+                <button type="submit" class="btn btn-primary">Generate Token</button>
+            </div>
         </div>
-    </div>
-    <h5>Authentication List</h5>
+    </form>
+    <h5>Token List</h5>
     <table class="table table-hover">
         <thead>
             <tr>
-                <th scope="col">Authentication mode</th>
+                <th scope="col">Token</th>
                 <th scope="col">Description</th>
-                <th scope="col">Create time</th>
+                <th scope="col">Create Time</th>
+                <th scope="col">Expiry Time</th>
+                <th scope="col">Status</th>
                 <th scope="col">Operation</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="token-list">
             <tr>
-                <td colspan="4" class="no-records text-center">
+                <td colspan="6" class="no-records text-center">
                     <img src="https://via.placeholder.com/150" alt="No Records">
                     <h4>No Records</h4>
                 </td>
@@ -52,21 +70,109 @@
         </tbody>
     </table>
 </div>
-<style>
-    .table thead th {
-        background-color: #f8f9fa;
-    }
-    .no-records {
-        text-align: center;
-        padding: 50px 0;
-    }
-    .no-records img {
-        max-width: 150px;
-        margin-bottom: 20px;
-    }
-    .no-records h4 {
-        margin-top: 20px;
-    }
-</style>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchTokens();
+
+        document.getElementById('create-token-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            createToken();
+        });
+    });
+
+    function fetchTokens() {
+        fetch('/api/tokens/')
+            .then(response => response.json())
+            .then(data => renderTokenList(data))
+            .catch(error => console.error('Error fetching tokens:', error));
+    }
+
+    function renderTokenList(tokens) {
+        const tokenList = document.getElementById('token-list');
+        tokenList.innerHTML = '';
+
+        if (tokens.length === 0) {
+            tokenList.innerHTML = `
+                <tr>
+                    <td colspan="6" class="no-records text-center">
+                        <img src="https://via.placeholder.com/150" alt="No Records">
+                        <h4>No Records</h4>
+                    </td>
+                </tr>`;
+            return;
+        }
+
+        tokens.forEach(token => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${token.token}</td>
+                <td>${token.description}</td>
+                <td>${new Date(token.create_time).toLocaleString()}</td>
+                <td>${token.expiry_time === 'Never' ? 'Never' : new Date(token.expiry_time).toLocaleString()}</td>
+                <td>${token.status}</td>
+                <td>
+                    <button class="btn btn-danger btn-sm" onclick="deleteToken('${token.token}')">Delete</button>
+                    <button class="btn btn-secondary btn-sm" onclick="copyToken('${token.token}')">Copy</button>
+                    <button class="btn btn-success btn-sm" onclick="downloadToken('${token.token}')">Download</button>
+                </td>`;
+            tokenList.appendChild(row);
+        });
+    }
+
+    function createToken() {
+        const description = document.getElementById('description').value;
+        const ttl = document.getElementById('ttl').value;
+
+        fetch('/api/tokens/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ description, ttl })
+        })
+        .then(response => response.json())
+        .then(data => {
+            fetchTokens();
+            alert('Token generated successfully!');
+        })
+        .catch(error => console.error('Error creating token:', error));
+    }
+
+    function deleteToken(token) {
+        fetch(`/api/tokens/${token}/`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                fetchTokens();
+                alert('Token deleted successfully!');
+            } else {
+                alert('Failed to delete token.');
+            }
+        })
+        .catch(error => console.error('Error deleting token:', error));
+    }
+
+    function copyToken(token) {
+        navigator.clipboard.writeText(token).then(function() {
+            alert('Token copied to clipboard!');
+        }, function(err) {
+            console.error('Could not copy text: ', err);
+        });
+    }
+
+    function downloadToken(token) {
+        const element = document.createElement('a');
+        const file = new Blob([token], {type: 'text/plain'});
+        element.href = URL.createObjectURL(file);
+        element.download = 'token.txt';
+        document.body.appendChild(element); // Required for this to work in FireFox
+        element.click();
+    }
+</script>
 {% endblock content %}

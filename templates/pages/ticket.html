@@ -4,39 +4,64 @@
 {% block breadcrumbs %}{% endblock breadcrumbs %}
 
 {% block extrastyle %}
-
 <style>
-
-.iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
-.parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
-
+    .iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+    .parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+    .search-bar { display: flex; align-items: center; margin-bottom: 20px; }
+    .search-bar input, .search-bar select, .search-bar button { margin-right: 10px; }
+    .table thead th { background-color: #f8f9fa; }
+    .no-records { text-align: center; padding: 50px 0; }
+    .no-records img { max-width: 150px; margin-bottom: 20px; }
+    .no-records h4 { margin-top: 20px; }
+    .ticket-form { margin-bottom: 20px; }
+    .ticket-form textarea { resize: none; }
 </style>
-
 {% endblock extrastyle %}
 
 {% block content %}
 <div class="container mt-4">
     <h2>Support Tickets</h2>
+    <div class="ticket-form mb-4">
+        <h5>Submit a Ticket</h5>
+        <form id="ticket-form">
+            <div class="form-group">
+                <label for="ticket-subject">Subject</label>
+                <input type="text" class="form-control" id="ticket-subject" required>
+            </div>
+            <div class="form-group">
+                <label for="ticket-type">Ticket Type</label>
+                <select class="form-control" id="ticket-type" required>
+                    <option value="Technical">Technical</option>
+                    <option value="Billing">Billing</option>
+                    <option value="General">General</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="ticket-description">Description</label>
+                <textarea class="form-control" id="ticket-description" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Ticket</button>
+        </form>
+    </div>
     <div class="search-bar mb-4">
         <input type="text" class="form-control" placeholder="Please enter" aria-label="Search">
-        <select class="form-control ml-2">
+        <select class="form-control">
             <option selected>Subject</option>
         </select>
-        <button class="btn btn-outline-secondary ml-2"><i class="fas fa-sync-alt"></i></button>
-        <button class="btn btn-primary ml-2">+ Add</button>
+        <button class="btn btn-outline-secondary"><i class="fas fa-sync-alt"></i></button>
     </div>
     <table class="table table-hover">
         <thead>
             <tr>
                 <th scope="col">Ticket ID</th>
                 <th scope="col">Subject</th>
-                <th scope="col">Ticket type</th>
-                <th scope="col">Submission time</th>
+                <th scope="col">Ticket Type</th>
+                <th scope="col">Submission Time</th>
                 <th scope="col">Status</th>
                 <th scope="col">Operation</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody id="ticket-list">
             {% if tickets %}
                 {% for ticket in tickets %}
                     <tr>
@@ -64,117 +89,89 @@
 <div class="container mt-4">
     <h2>Frequently Asked Questions</h2>
     <div id="faq-accordion">
-        <div class="card">
-            <div class="card-header" id="headingOne">
-                <h5 class="mb-0">
-                    <button class="btn btn-link" data-toggle="collapse" data-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                        How does LightNode turn on the machine?
-                    </button>
-                </h5>
-            </div>
-            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#faq-accordion">
-                <div class="card-body">
-                    Newly registered users can get up to $20 as a bonus for the first recharge. They only need to complete three steps: register, fill in basic information, and recharge the platform, and then they can activate the host that needs to be configured as needed.
-                    <br><br>
-                    PS: As long as the account balance is sufficient, you can always use the machine, no need to renew.
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header" id="headingTwo">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        What is the first charge of LightNode?
-                    </button>
-                </h5>
-            </div>
-            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#faq-accordion">
-                <div class="card-body">
-                    <!-- Add content for this FAQ -->
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header" id="headingThree">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                        Does the LightNode system disk need to be selected separately?
-                    </button>
-                </h5>
-            </div>
-            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#faq-accordion">
-                <div class="card-body">
-                    <!-- Add content for this FAQ -->
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header" id="headingFour">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
-                        What resource nodes does LightNode have?
-                    </button>
-                </h5>
-            </div>
-            <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#faq-accordion">
-                <div class="card-body">
-                    <!-- Add content for this FAQ -->
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header" id="headingFive">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
-                        What operating systems does LightNode support?
-                    </button>
-                </h5>
-            </div>
-            <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#faq-accordion">
-                <div class="card-body">
-                    <!-- Add content for this FAQ -->
-                </div>
-            </div>
-        </div>
-        <div class="card">
-            <div class="card-header" id="headingSix">
-                <h5 class="mb-0">
-                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-                        What are the billing rules for LightNode?
-                    </button>
-                </h5>
-            </div>
-            <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-parent="#faq-accordion">
-                <div class="card-body">
-                    <!-- Add content for this FAQ -->
-                </div>
-            </div>
-        </div>
+        <!-- FAQ items will be inserted here -->
     </div>
 </div>
-<style>
-    .search-bar {
-        display: flex;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-    .search-bar input, .search-bar select, .search-bar button {
-        margin-right: 10px;
-    }
-    .table thead th {
-        background-color: #f8f9fa;
-    }
-    .no-records {
-        text-align: center;
-        padding: 50px 0;
-    }
-    .no-records img {
-        max-width: 150px;
-        margin-bottom: 20px;
-    }
-    .no-records h4 {
-        margin-top: 20px;
-    }
-</style>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ticketForm = document.getElementById('ticket-form');
+        ticketForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            submitTicket();
+        });
+
+        fetchFaqs();
+    });
+
+    function submitTicket() {
+        const subject = document.getElementById('ticket-subject').value;
+        const ticketType = document.getElementById('ticket-type').value;
+        const description = document.getElementById('ticket-description').value;
+
+        fetch('/api/tickets/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ subject, ticket_type: ticketType, description })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                addTicketToTable(data.ticket);
+                ticketForm.reset();
+            } else {
+                alert('Failed to submit ticket. Please try again.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function addTicketToTable(ticket) {
+        const ticketList = document.getElementById('ticket-list');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td>${ticket.ticket_id}</td>
+            <td>${ticket.subject}</td>
+            <td>${ticket.ticket_type}</td>
+            <td>${ticket.submission_time}</td>
+            <td>${ticket.status}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary">${ticket.operation}</button>
+            </td>
+        `;
+        ticketList.appendChild(newRow);
+    }
+
+    function fetchFaqs() {
+        fetch('/api/faqs/')
+        .then(response => response.json())
+        .then(data => {
+            const faqAccordion = document.getElementById('faq-accordion');
+            faqAccordion.innerHTML = '';
+            data.faqs.forEach((faq, index) => {
+                const faqItem = `
+                    <div class="card">
+                        <div class="card-header" id="heading${index}">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse${index}" aria-expanded="${index === 0}" aria-controls="collapse${index}">
+                                    ${faq.question}
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapse${index}" class="collapse ${index === 0 ? 'show' : ''}" aria-labelledby="heading${index}" data-parent="#faq-accordion">
+                            <div class="card-body">
+                                ${faq.answer}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                faqAccordion.innerHTML += faqItem;
+            });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
 {% endblock content %}

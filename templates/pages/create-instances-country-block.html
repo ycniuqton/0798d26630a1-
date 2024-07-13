@@ -1,77 +1,6 @@
-<!-- templates/country_selection_block.html -->
-<div class="country-selection">
-    <h5>Location</h5>
-    <ul class="nav nav-tabs">
-        <li class="nav-item">
-            <a class="nav-link active" href="#">ALL</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">North America</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">Europe</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">Asia</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">South America</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="#">Africa</a>
-        </li>
-    </ul>
-    <div class="row mt-3">
-        <div class="col-6 col-md-4 col-lg-3 mb-3">
-            <div class="card country-card">
-                <div class="card-body text-center">
-                    <img src="https://via.placeholder.com/30" alt="Washington" class="mb-2">
-                    <h6>Washington</h6>
-                    <p class="text-muted">USA</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4 col-lg-3 mb-3">
-            <div class="card country-card">
-                <div class="card-body text-center">
-                    <img src="https://via.placeholder.com/30" alt="Silicon Valley" class="mb-2">
-                    <h6>Silicon Valley</h6>
-                    <p class="text-muted">USA</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4 col-lg-3 mb-3">
-            <div class="card country-card">
-                <div class="card-body text-center">
-                    <img src="https://via.placeholder.com/30" alt="Frankfurt" class="mb-2">
-                    <h6>Frankfurt</h6>
-                    <p class="text-muted">Germany</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-6 col-md-4 col-lg-3 mb-3">
-            <div class="card country-card">
-                <div class="card-body text-center">
-                    <img src="https://via.placeholder.com/30" alt="Jakarta" class="mb-2">
-                    <h6>Jakarta</h6>
-                    <p class="text-muted">Indonesia</p>
-                </div>
-            </div>
-        </div>
-        <!-- Add more country blocks as needed -->
-        <div class="col-6 col-md-4 col-lg-3 mb-3">
-            <div class="card country-card sold-out">
-                <div class="card-body text-center">
-                    <img src="https://via.placeholder.com/30" alt="Sold Out" class="mb-2">
-                    <h6>Location</h6>
-                    <p class="text-muted">Sold Out</p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <style>
+    .iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+    .parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
     .country-selection .nav-tabs .nav-link.active {
         background-color: #f8f9fa;
     }
@@ -89,4 +18,83 @@
     .country-card.sold-out:hover {
         transform: none;
     }
+    .country-card.selected {
+        border: 2px solid #007bff;
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    }
 </style>
+
+<div class="country-selection">
+    <h5>Location</h5>
+    <ul class="nav nav-tabs" id="countryTab" role="tablist">
+        {% for region in regions %}
+        <li class="nav-item" role="presentation">
+            <a class="nav-link {% if forloop.first %}active{% endif %}" id="{{ region|slugify }}-tab"
+               data-bs-toggle="tab" href="#{{ region|slugify }}" role="tab" aria-controls="{{ region|slugify }}"
+               aria-selected="{% if forloop.first %}true{% else %}false{% endif %}">{{ region }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    <div class="tab-content mt-3" id="countryTabContent">
+        {% for region in regions %}
+        <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="{{ region|slugify }}"
+             role="tabpanel" aria-labelledby="{{ region|slugify }}-tab">
+            <div class="row">
+                {% for location in locations %}
+                {% if region == "ALL" or location.region == region %}
+                <div class="col-6 col-md-4 col-lg-3 mb-3">
+                    <div class="card country-card {% if location.sold_out %}sold-out{% endif %}"
+                         data-name="{{ location.name }}" data-country="{{ location.country }}">
+                        <div class="card-body text-center">
+                            <img src="{{ location.flag }}" alt="{{ location.name }}" class="mb-2">
+                            <h6>{{ location.name }}</h6>
+                            <p class="text-muted">{{ location.country }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var triggerTabList = [].slice.call(document.querySelectorAll('#countryTab a'));
+        triggerTabList.forEach(function (triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl);
+
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault();
+                tabTrigger.show();
+            });
+        });
+
+        // Handle card selection
+        var countryCards = document.querySelectorAll('.country-card');
+
+        countryCards.forEach(function(card) {
+            card.addEventListener('click', function() {
+                // Deselect all other cards
+                countryCards.forEach(function(otherCard) {
+                    otherCard.classList.remove('selected');
+                });
+
+                // Select the clicked card
+                card.classList.add('selected');
+
+                // Update vpsConfiguration
+                vpsConfiguration.location = {
+                    name: card.getAttribute('data-name'),
+                    country: card.getAttribute('data-country')
+                };
+
+                // Trigger configuration update
+                document.getElementById('config_updated').value = 'true';
+                document.getElementById('config_updated').dispatchEvent(new Event('change'));
+            });
+        });
+    });
+</script>

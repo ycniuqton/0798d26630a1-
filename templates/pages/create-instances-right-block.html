@@ -1,17 +1,145 @@
-<!-- templates/pages/create-instances-right-block.html -->
 <div class="card">
     <div class="card-body">
         <h5 class="card-title">Summary</h5>
+        <div class="mb-3">
+            <h6>Current Balance: <span id="current-balance">$0.00</span></h6>
+        </div>
         <ul class="list-unstyled">
-            <li><strong>Location:</strong> Washington</li>
-            <li><strong>Image:</strong> Ubuntu 22.04</li>
-            <li><strong>Instance:</strong> 1 vCPU 2 GB</li>
-            <li><strong>Network:</strong> Pay-By-Traffic BGP 1000 GB</li>
-            <li><strong>Storage:</strong> 50 GB</li>
+            <li><strong>Location:</strong> <span id="summary-location">None</span></li>
+            <li><strong>Country:</strong> <span id="summary-country">None</span></li>
+            <li><strong>Image:</strong> <span id="summary-image">None</span></li>
+            <li><strong>Instance:</strong> <span id="summary-instance">None</span></li>
+            <li><strong>vCPU:</strong> <span id="summary-vcpu">None</span></li>
+            <li><strong>RAM:</strong> <span id="summary-ram">None</span></li>
+            <li><strong>Network:</strong> <span id="summary-network">None</span></li>
+            <li><strong>Storage:</strong> <span id="summary-storage">None</span></li>
+            <li><strong>Additional IPv4:</strong> <span id="summary-ipv4">None</span></li>
+            <li><strong>Additional RAM:</strong> <span id="summary-ram-add">None</span></li>
+            <li><strong>Additional SSD:</strong> <span id="summary-ssd">None</span></li>
+            <li><strong>Bandwidth (TB) - Network Usage:</strong> <span id="summary-bandwidth">None</span></li>
         </ul>
-        <h6>Total: $7.71/mo</h6>
-        <p class="text-muted">($0.012/h)</p>
-        <p class="text-warning">The deployment host requires you to <a href="#">recharge</a> your account first!</p>
-        <button class="btn btn-primary btn-block" disabled>Submit</button>
+        <div class="mb-3">
+            <label for="coupon-code">Add Coupon or Voucher:</label>
+            <input type="text" class="form-control" id="coupon-code">
+            <button class="btn btn-secondary mt-2" id="apply-coupon">Apply</button>
+        </div>
+        <h6>Total: <span id="summary-total">$0.00</span>/mo</h6>
+        <p class="text-muted">(<span id="summary-hourly">$0.0000</span>/h)</p>
+        <button class="btn btn-primary btn-block" id="submit-vps" disabled>Submit</button>
+        <input type="hidden" id="config_updated" value="false">
     </div>
 </div>
+
+<script>
+    // Global configuration object
+    var vpsConfiguration = {
+        location: {},
+        image: {},
+        plan: {},
+        ipv4: 'None',
+        bandwidth: 'None',
+        ram: 'None',
+        ssd: 'None',
+        login: {
+            username: '',
+            password: ''
+        },
+        coupon: ''
+    };
+
+    function render_summary_block() {
+        // Update summary block with current configuration
+        document.getElementById('summary-location').innerText = vpsConfiguration.location.name || 'None';
+        document.getElementById('summary-country').innerText = vpsConfiguration.location.country || 'None';
+        document.getElementById('summary-image').innerText = (vpsConfiguration.image.name || 'None') + ' ' + (vpsConfiguration.image.version || '');
+        document.getElementById('summary-instance').innerText = vpsConfiguration.plan.name || 'None';
+        document.getElementById('summary-vcpu').innerText = vpsConfiguration.plan.vcpu || 'None';
+        document.getElementById('summary-ram').innerText = vpsConfiguration.plan.ram || 'None';
+        document.getElementById('summary-network').innerText = vpsConfiguration.plan.bandwidth || 'None';
+        document.getElementById('summary-storage').innerText = vpsConfiguration.plan.storage || 'None';
+        document.getElementById('summary-ipv4').innerText = vpsConfiguration.ipv4;
+        document.getElementById('summary-ram-add').innerText = vpsConfiguration.ram;
+        document.getElementById('summary-ssd').innerText = vpsConfiguration.ssd;
+        document.getElementById('summary-bandwidth').innerText = vpsConfiguration.bandwidth;
+
+        // Fetch the total cost from the calculator API
+        fetch('/api/vps-calculator/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(vpsConfiguration)
+        })
+        .then(response => response.json())
+        .then(data => {
+            var totalCost = data.total_cost;
+            document.getElementById('summary-total').innerText = '$' + totalCost.toFixed(2) + '/mo';
+            document.getElementById('summary-hourly').innerText = '$' + (totalCost / 730).toFixed(4) + '/h';
+            document.getElementById('submit-vps').disabled = false;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('summary-total').innerText = '$0.00/mo';
+            document.getElementById('summary-hourly').innerText = '$0.0000/h';
+        });
+    }
+
+    document.getElementById('submit-vps').addEventListener('click', function() {
+        fetch('/vps/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify(vpsConfiguration)
+        })
+        .then(response => {
+            if (response.ok) {
+                alert('VPS created successfully!');
+            } else {
+                alert('Failed to create VPS.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    // Monitor changes to the hidden input field
+    document.getElementById('config_updated').addEventListener('change', function() {
+        if (this.value === 'true') {
+            render_summary_block();
+            this.value = 'false'; // Reset the trigger
+        }
+    });
+
+    // Apply coupon
+    document.getElementById('apply-coupon').addEventListener('click', function() {
+        var couponCode = document.getElementById('coupon-code').value;
+        vpsConfiguration.coupon = couponCode;
+        document.getElementById('config_updated').value = 'true';
+        document.getElementById('config_updated').dispatchEvent(new Event('change'));
+    });
+
+    // Fetch current balance
+    function fetchCurrentBalance() {
+        fetch('/api/current-balance/', {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            var currentBalance = data.current_balance;
+            document.getElementById('current-balance').innerText = '$' + currentBalance.toFixed(2);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('current-balance').innerText = '$0.00';
+        });
+    }
+
+    // Initialize
+    fetchCurrentBalance();
+    render_summary_block();
+</script>
