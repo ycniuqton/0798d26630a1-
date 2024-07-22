@@ -1,0 +1,74 @@
+
+<div class="card card-custom">
+    <div class="card-header">
+        <h4>Instance Information</h4>
+        <span class="float-right">Instance ID: {{ instance.id }}</span>
+    </div>
+    <div class="card-body">
+        <table class="table table-borderless">
+            <tr>
+                <th>Server Name</th>
+                <td>{{ instance.server_name }}</td>
+            </tr>
+            <tr>
+                <th>IP Address</th>
+                <td>{{ instance.ip_address }}</td>
+            </tr>
+            <tr>
+                <th>Location</th>
+                <td>{{ instance.detailed_location }}</td>
+            </tr>
+            <tr>
+                <th>Country</th>
+                <td>{{ instance.country }}</td>
+            </tr>
+            <tr>
+                <th>Image</th>
+                <td>
+                    <span id="os-text">{{ instance.image }}</span>
+                    <i class="fas fa-edit" id="change-os-icon" style="cursor: pointer;" onclick="showOsDropdown()"></i>
+                    <select id="os-dropdown" class="form-control d-none">
+                        {% for os in os_options %}
+                        <option value="{{ os }}">{{ os }}</option>
+                        {% endfor %}
+                    </select>
+                    <button id="update-os-btn" class="btn btn-primary d-none" onclick="updateOs()">Update</button>
+                    <button id="cancel-os-btn" class="btn btn-secondary d-none" onclick="cancelOsChange()">Cancel</button>
+                </td>
+            </tr>
+            <tr>
+                <th>Created At</th>
+                <td>{{ instance.created_at }}</td>
+            </tr>
+            <tr>
+                <th>Last Modified</th>
+                <td>{{ instance.last_modified }}</td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<script>
+    function showOsDropdown() {
+        document.getElementById('os-text').classList.add('d-none');
+        document.getElementById('change-os-icon').classList.add('d-none');
+        document.getElementById('os-dropdown').classList.remove('d-none');
+        document.getElementById('update-os-btn').classList.remove('d-none');
+        document.getElementById('cancel-os-btn').classList.remove('d-none');
+    }
+
+    function updateOs() {
+        const newOs = document.getElementById('os-dropdown').value;
+        document.getElementById('os-text').textContent = newOs;
+        cancelOsChange();
+        // Optionally, you can add code here to make an API call to update the OS on the server
+    }
+
+    function cancelOsChange() {
+        document.getElementById('os-text').classList.remove('d-none');
+        document.getElementById('change-os-icon').classList.remove('d-none');
+        document.getElementById('os-dropdown').classList.add('d-none');
+        document.getElementById('update-os-btn').classList.add('d-none');
+        document.getElementById('cancel-os-btn').classList.add('d-none');
+    }
+</script>

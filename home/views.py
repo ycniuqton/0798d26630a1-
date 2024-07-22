@@ -701,20 +701,44 @@ def notifications(request):
 
 def instance_detail(request, instance_id):
     instance = {
-        'id': '123',
+        'id': 123,
         'server_name': 'Server-01',
-        'location': 'New York',
         'ip_address': '192.168.1.1',
-        'status': 'Running',
-        'cpu_cores': 4,
-        'ram': '8 GB',
-        'storage': '100 GB SSD',
+        'location': 'New York',
         'os': 'Ubuntu 20.04 LTS',
         'created_at': '2024-07-20 12:34:56',
-        'last_backup': '2024-07-18 08:23:45'
+        'last_modified': '2024-07-20 12:34:56',
+        'detailed_location': 'Seoul',
+        'country': 'South Korea',
+        'image': 'AlmaLinux 8.4',
+        'instance_type': 'VPS VN-3',
+        'vcpu': '2 vCPU',
+        'ram': '2GB RAM',
+        'network': '3TB băng thông',
+        'storage': '20GB SSD Enterprise',
+        'additional_ipv4': '1 IPv4',
+        'additional_ram': '+ 3GB',
+        'additional_ssd': '+ 50GB',
+        'bandwidth': '',
+        'hostname': '2024071001535329714',
+        'login': 'root',
+        'password': 'password123'
     }
 
-    return render(request, 'pages/instances/detail.html', {'instance': instance})
+    os_options = ['Ubuntu 20.04 LTS', 'AlmaLinux 8.4', 'CentOS 7', 'Debian 10']
+    instance_types = [
+        {'name': 'VPS VN-3', 'vcpu': '2 vCPU', 'ram': '2GB RAM'},
+        {'name': 'VPS VN-4', 'vcpu': '4 vCPU', 'ram': '4GB RAM'},
+        {'name': 'VPS VN-5', 'vcpu': '8 vCPU', 'ram': '8GB RAM'},
+    ]
+
+    context = {
+        'instance': instance,
+        'os_options': os_options,
+        'instance_types': instance_types,
+    }
+
+    return render(request, 'pages/instances/detail.html', context)
 
 
 @csrf_exempt
@@ -969,3 +993,27 @@ def invoices_view(request):
     page_obj = paginator.get_page(page_number)
 
     return render(request, 'pages/invoices.html', {'invoices': page_obj, 'items_per_page': items_per_page})
+
+
+def get_vnc_link(request, instance_id):
+    # Fetch the instance to ensure it exists
+
+    # Sample data for VNC link (you should replace this with actual logic)
+    vnc_link = {
+        "link": f"https://vnc.example.com/{instance_id}"
+    }
+
+    return JsonResponse(vnc_link)
+
+
+def get_snapshots(request, instance_id):
+    # Fetch the instance to ensure it exists
+
+    # Sample data for snapshots (you should replace this with actual logic)
+    snapshots = [
+        {"id": 1, "name": "Snapshot 1"},
+        {"id": 2, "name": "Snapshot 2"},
+        {"id": 3, "name": "Snapshot 3"}
+    ]
+
+    return JsonResponse({"snapshots": snapshots})
