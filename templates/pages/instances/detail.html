@@ -36,8 +36,13 @@
 
 {% block content %}
 
+<script>
+        var instanceData = {{ instance|safe }};
+    </script>
+
 <div class="container detail-container">
-    <h2 style="display:flex;align-items: center;">Server-01 <span class="badge badge-success status-badge">{{ instance.status }}</span></h2>
+    <h2 style="display:flex;align-items: center;">Server-01 <span class="badge badge-success status-badge">{{ instance.status }}</span>
+    </h2>
 
     <div style="display:flex" class="mt-3 mb-3 ">
 
@@ -63,205 +68,16 @@
 
 
     <!-- Instance Information -->
-    <div class="card card-custom">
-        <div class="card-header">
-            <h4>Instance Information</h4>
-            <span class="float-right">Instance ID: {{ instance.id }}</span>
+    {% include 'pages/instances/details/info_block.html' %}
+    {% include 'pages/instances/details/resources.html' %}
+    {% include 'pages/instances/details/login.html' %}
+    {% include 'pages/instances/details/monitor.html' %}
+    {% include 'pages/instances/details/modal.html' %}
 
-        </div>
-        <div class="card-body">
 
-            <table class="table table-borderless">
-                <tr>
-                    <th>Server Name</th>
-                    <td>{{ instance.server_name }}</td>
-                </tr>
-                <tr>
-                    <th>IP Address</th>
-                    <td>{{ instance.ip_address }}</td>
-                </tr>
-                <tr>
-                    <th>Region</th>
-                    <td>{{ instance.location }}</td>
-                </tr>
-                <tr>
-                    <th>Operating System</th>
-                    <td>{{ instance.os }}</td>
-                </tr>
-                <tr>
-                    <th>Created At</th>
-                    <td>{{ instance.created_at }}</td>
-                </tr>
-                <tr>
-                    <th>Last Modified</th>
-                    <td>{{ instance.last_modified }}</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-    <!-- Resource Allocation -->
-    <div class="card card-custom">
-        <div class="card-header">
-            <h4>Resource Allocation</h4>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <h5>CPU</h5>
-                    <p>{{ instance.cpu_cores }} cores</p>
-                </div>
-                <div class="col-md-3">
-                    <h5>RAM</h5>
-                    <p>{{ instance.ram }} GB</p>
-                </div>
-                <div class="col-md-3">
-                    <h5>Storage</h5>
-                    <p>{{ instance.storage }} GB</p>
-                </div>
-                <div class="col-md-3">
-                    <h5>Network</h5>
-                    <p>{{ instance.network_usage }} / {{ instance.network_limit }} GB</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Monitoring Information -->
-    <div class="card card-custom">
-        <div class="card-header">
-            <h4>Monitoring</h4>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <h5>CPU Usage</h5>
-                    <canvas id="cpuUsageChart" style="max-height:400px"></canvas>
-                </div>
-                <div class="col-md-6">
-                    <h5>Memory Usage</h5>
-                    <canvas id="memoryUsageChart" style="max-height:400px"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <a class="action-button" data-color="#154BFF" href="{% url 'instances' %}" class="btn btn-primary mt-4">Back to Instances</a>
+    <a class="action-button" data-color="#154BFF" href="{% url 'instances' %}" class="btn btn-primary mt-4">Back to
+        Instances</a>
 </div>
-
-<!-- Modal -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="confirmationModalLabel">Action Confirmation</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p id="confirmationMessage">Are you sure you want to perform this action?</p>
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Instance Name</th>
-                    </tr>
-                    </thead>
-                    <tbody id="selectedInstancesList">
-                    <!-- Selected instances will be listed here -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="confirmAction">Confirm</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Sample data for charts
-    var cpuUsageData = {
-        labels: Array.from({length: 20}, (_, i) => `Point ${i+1}`),
-        datasets: [{
-            label: 'CPU Usage (%)',
-            data: [30, 45, 50, 60, 70, 65, 55, 60, 70, 75, 80, 85, 90, 85, 80, 75, 70, 65, 60, 55],
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
-            borderWidth: 1
-        }]
-    };
-
-    var memoryUsageData = {
-        labels: Array.from({length: 20}, (_, i) => `Point ${i+1}`),
-        datasets: [{
-            label: 'Memory Usage (%)',
-            data: [20, 25, 30, 40, 50, 45, 40, 35, 30, 25, 20, 30, 40, 50, 60, 55, 50, 45, 40, 35],
-            backgroundColor: 'rgba(153, 102, 255, 0.2)',
-            borderColor: 'rgba(153, 102, 255, 1)',
-            borderWidth: 1
-        }]
-    };
-
-    var ctx = document.getElementById('cpuUsageChart').getContext('2d');
-    var cpuUsageChart = new Chart(ctx, {
-        type: 'line',
-        data: cpuUsageData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-
-    var ctx2 = document.getElementById('memoryUsageChart').getContext('2d');
-    var memoryUsageChart = new Chart(ctx2, {
-        type: 'line',
-        data: memoryUsageData,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
-        }
-    });
-
-    function performAction(action) {
-        let confirmationMessage = `Are you sure you want to ${action} this instance?`;
-        document.getElementById('confirmationModalLabel').textContent = `${action.charAt(0).toUpperCase() + action.slice(1)} Confirmation`;
-        document.getElementById('confirmationMessage').textContent = confirmationMessage;
-
-        // Show modal
-        $('#confirmationModal').modal('show');
-
-        // Handle confirm action
-        document.getElementById('confirmAction').onclick = function() {
-            $('#confirmationModal').modal('hide');
-
-            // Make API call
-            fetch(`/api/vps/${action}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({ instance_id: {{ instance.id }} })
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert(`Instance ${action}ed successfully!`);
-                    location.reload();
-                } else {
-                    alert(`Failed to ${action} instance.`);
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        };
-    }
-
-
-</script>
-
 
 
 {% endblock content %}

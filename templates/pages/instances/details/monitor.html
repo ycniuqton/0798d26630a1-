@@ -1,0 +1,67 @@
+<!-- Monitoring Information -->
+    <div class="card card-custom">
+        <div class="card-header">
+            <h4>Monitoring</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>CPU Usage</h5>
+                    <canvas id="cpuUsageChart" style="max-height:400px"></canvas>
+                </div>
+                <div class="col-md-6">
+                    <h5>Memory Usage</h5>
+                    <canvas id="memoryUsageChart" style="max-height:400px"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Sample data for charts
+    var cpuUsageData = {
+        labels: Array.from({length: 20}, (_, i) => `Point ${i+1}`),
+        datasets: [{
+            label: 'CPU Usage (%)',
+            data: [30, 45, 50, 60, 70, 65, 55, 60, 70, 75, 80, 85, 90, 85, 80, 75, 70, 65, 60, 55],
+            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    var memoryUsageData = {
+        labels: Array.from({length: 20}, (_, i) => `Point ${i+1}`),
+        datasets: [{
+            label: 'Memory Usage (%)',
+            data: [20, 25, 30, 40, 50, 45, 40, 35, 30, 25, 20, 30, 40, 50, 60, 55, 50, 45, 40, 35],
+            backgroundColor: 'rgba(153, 102, 255, 0.2)',
+            borderColor: 'rgba(153, 102, 255, 1)',
+            borderWidth: 1
+        }]
+    };
+
+    var ctx = document.getElementById('cpuUsageChart').getContext('2d');
+    var cpuUsageChart = new Chart(ctx, {
+        type: 'line',
+        data: cpuUsageData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    var ctx2 = document.getElementById('memoryUsageChart').getContext('2d');
+    var memoryUsageChart = new Chart(ctx2, {
+        type: 'line',
+        data: memoryUsageData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+
+    </script>

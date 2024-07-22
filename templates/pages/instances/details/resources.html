@@ -1,0 +1,96 @@
+<div class="card card-custom">
+    <div class="card-header">
+        <h4>Resource Allocation</h4>
+    </div>
+    <div class="card-body">
+        <table class="table table-borderless">
+            <tr>
+                <th>Instance</th>
+                <td>
+                    <span id="instance-text">{{ instance.instance_type }}</span>
+                    <i class="fas fa-edit" id="change-instance-icon" style="cursor: pointer;" onclick="showInstanceDropdown()"></i>
+                    <select id="instance-dropdown" class="form-control d-none" onchange="updateInstanceDetails()">
+                        {% for instance_type in instance_types %}
+                        <option value="{{ instance_type.name }}" data-vcpu="{{ instance_type.vcpu }}" data-ram="{{ instance_type.ram }}">
+                            {{ instance_type.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    <button id="update-instance-btn" class="btn btn-primary d-none" onclick="updateInstance()">Update</button>
+                    <button id="cancel-instance-btn" class="btn btn-secondary d-none" onclick="cancelInstanceChange()">Cancel</button>
+                </td>
+            </tr>
+            <tr>
+                <th>vCPU</th>
+                <td id="vcpu-text">{{ instance.vcpu }}</td>
+            </tr>
+            <tr>
+                <th>RAM</th>
+                <td id="ram-text">{{ instance.ram }}</td>
+            </tr>
+            <tr>
+                <th>Network</th>
+                <td>{{ instance.network }}</td>
+            </tr>
+            <tr>
+                <th>Storage</th>
+                <td>{{ instance.storage }}</td>
+            </tr>
+            {% if instance.additional_ipv4 %}
+            <tr>
+                <th>Additional IPv4</th>
+                <td>{{ instance.additional_ipv4 }}</td>
+            </tr>
+            {% endif %}
+            {% if instance.additional_ram %}
+            <tr>
+                <th>Additional RAM</th>
+                <td>{{ instance.additional_ram }}</td>
+            </tr>
+            {% endif %}
+            {% if instance.additional_ssd %}
+            <tr>
+                <th>Additional SSD</th>
+                <td>{{ instance.additional_ssd }}</td>
+            </tr>
+            {% endif %}
+            {% if instance.bandwidth %}
+            <tr>
+                <th>Bandwidth (TB)</th>
+                <td>{{ instance.bandwidth }}</td>
+            </tr>
+            {% endif %}
+        </table>
+    </div>
+</div>
+
+<script>
+    function showInstanceDropdown() {
+        document.getElementById('instance-text').classList.add('d-none');
+        document.getElementById('change-instance-icon').classList.add('d-none');
+        document.getElementById('instance-dropdown').classList.remove('d-none');
+        document.getElementById('update-instance-btn').classList.remove('d-none');
+        document.getElementById('cancel-instance-btn').classList.remove('d-none');
+    }
+
+    function updateInstanceDetails() {
+        const selectedOption = document.getElementById('instance-dropdown').selectedOptions[0];
+        document.getElementById('vcpu-text').textContent = selectedOption.getAttribute('data-vcpu');
+        document.getElementById('ram-text').textContent = selectedOption.getAttribute('data-ram');
+    }
+
+    function updateInstance() {
+        const newInstance = document.getElementById('instance-dropdown').value;
+        document.getElementById('instance-text').textContent = newInstance;
+        cancelInstanceChange();
+        // Optionally, you can add code here to make an API call to update the instance type on the server
+    }
+
+    function cancelInstanceChange() {
+        document.getElementById('instance-text').classList.remove('d-none');
+        document.getElementById('change-instance-icon').classList.remove('d-none');
+        document.getElementById('instance-dropdown').classList.add('d-none');
+        document.getElementById('update-instance-btn').classList.add('d-none');
+        document.getElementById('cancel-instance-btn').classList.add('d-none');
+    }
+</script>
