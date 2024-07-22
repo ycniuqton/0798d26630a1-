@@ -16,6 +16,8 @@
 
 {% block content %}
 
+{% load i18n %}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -51,7 +53,7 @@
 </head>
 <body>
     <div class="container mt-4">
-        <h2>Deploy New Instance</h2>
+        <h2>{% trans "Deploy New Instance" %}</h2>
         <div class="container-main">
             <div class="left-block">
                 {% include 'pages/create-instances-left-block.html' %}
