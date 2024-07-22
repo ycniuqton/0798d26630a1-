@@ -2,7 +2,7 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 
 from home import views
-from .views import vps_calculator, user_profile, manage_tokens, delete_token, set_introducer, \
+from .views import vps_calculator, manage_tokens, delete_token, set_introducer, \
     current_introducer, tickets_view, faqs_view
 from home.views.instances import instances, create_instances, instance_detail
 from home.views.statics import FlagAPI, OSIconAPI
@@ -50,7 +50,6 @@ urlpatterns = [
     path('notifications/', views.notifications, name='notifications'),
     path('api/vps-calculator/', vps_calculator, name='vps-calculator'),
 
-    path('api/user/profile/', user_profile, name='user-profile'),
     path('api/tokens/', manage_tokens, name='manage-tokens'),
     path('api/tokens/<str:token_id>/', delete_token, name='delete-token'),
     path('api/set-introducer/', set_introducer, name='set_introducer'),

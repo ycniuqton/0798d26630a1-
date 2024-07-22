@@ -11,11 +11,6 @@ def gen_uuid():
     return str(uuid.uuid4())
 
 
-class User(AbstractUser):
-    id = models.CharField(primary_key=True, default=gen_uuid, editable=False)
-    pass
-
-
 class BaseModel(models.Model):
     id = models.CharField(primary_key=True, default=gen_uuid, editable=False)
     _created = models.DateTimeField(auto_now_add=True)
@@ -49,6 +44,17 @@ class BaseModel(models.Model):
             return str(value)
 
         return {field.name: convert_build_in_types(getattr(self, field.name)) for field in self._meta.fields}
+
+
+class User(AbstractUser, BaseModel):
+    id = models.CharField(primary_key=True, default=gen_uuid, editable=False)
+    address = models.CharField(max_length=200, null=True, blank=True)
+    city = models.CharField(max_length=200, null=True, blank=True)
+    country_region = models.CharField(max_length=200, null=True, blank=True)
+    zip_code = models.CharField(max_length=200, null=True, blank=True)
+    company_name = models.CharField(max_length=200, null=True, blank=True)
+    phone_number = models.CharField(max_length=200, null=True, blank=True)
+    subscribe_email = models.BooleanField(default=True)
 
 
 class VpsStatus:

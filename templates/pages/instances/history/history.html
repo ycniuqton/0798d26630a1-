@@ -32,30 +32,6 @@
         .width-auto{
             width: auto;
         }
-
-    .loader-line {
-            display: none; /* Hidden by default */
-            height: 4px;
-            width: 100%;
-            background-color: #3498db; /* Blue color for the loader */
-            position: fixed;
-            top: 0;
-            left: 0;
-            animation: loading 2s linear infinite; /* Loading animation */
-        }
-
-    /* Animation keyframes for the loader */
-        @keyframes loading {
-            0% {
-                transform: translateX(-100%);
-            }
-            50% {
-                transform: translateX(0%);
-            }
-            100% {
-                transform: translateX(100%);
-            }
-        }
 </style>
 {% endblock extrastyle %}
 
@@ -93,8 +69,7 @@
             <th scope="col">Details</th>
         </tr>
         </thead>
-        <div class="loader-line" id="loader"></div>
-        <tbody id="logs-tbody">
+        <tbody id="general-tbody">
         <!-- Logs will be loaded here via AJAX -->
         </tbody>
     </table>
@@ -114,7 +89,7 @@
         let currentFilter = {};
         let currentSearch = '';
 
-        window.loadLogs = function(page = 1, sort = '-datetime', filter = {}, search = '') {
+        window.load_table = function(page = 1, sort = '-datetime', filter = {}, search = '') {
 
         document.getElementById('loader').style.display = 'block';
 
@@ -123,7 +98,7 @@
             fetch(`/api/vps/logs/?page=${page}&page_size=10&sort_by=${sort}&${filter_str}&search=${search}`)
                 .then(response => response.json())
                 .then(data => {
-                    const tbody = document.getElementById('logs-tbody');
+                    const tbody = document.getElementById('general-tbody');
                     tbody.innerHTML = '';
                     data.logs.forEach(log => {
                         const row = document.createElement('tr');
@@ -143,7 +118,7 @@
                     for (let i = 1; i <= data.total_pages; i++) {
                         const pageItem = document.createElement('li');
                         pageItem.className = 'page-item' + (i === data.current_page ? ' active' : '');
-                        pageItem.innerHTML = `<a class="page-link" onclick="loadLogs(${i}, '${sort}', '${filter}')">${i}</a>`;
+                        pageItem.innerHTML = `<a class="page-link" onclick="load_table(${i}, '${sort}', '${filter}')">${i}</a>`;
                         pagination.appendChild(pageItem);
                     }
                     document.getElementById('loader').style.display = 'none';
@@ -153,35 +128,35 @@
 
         document.getElementById('search-button').addEventListener('click', () => {
             currentSearch = document.getElementById('search-input').value.toLowerCase();
-            loadLogs(currentPage, currentSort, currentFilter, currentSearch);
+            load_table(currentPage, currentSort, currentFilter, currentSearch);
         });
 
         document.getElementById('search-input').addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
                 currentSearch = document.getElementById('search-input').value.toLowerCase();
-                loadLogs(currentPage, currentSort, currentFilter, currentSearch);
+                load_table(currentPage, currentSort, currentFilter, currentSearch);
             }
         });
 
         document.getElementById('action-filter-select').addEventListener('change', (event) => {
             currentFilter["action"] = event.target.value.toLowerCase();
-            loadLogs(currentPage, currentSort, currentFilter, currentSearch);
+            load_table(currentPage, currentSort, currentFilter, currentSearch);
         });
 
         document.getElementById('status-filter-select').addEventListener('change', (event) => {
             currentFilter["status"] = event.target.value.toLowerCase();
-            loadLogs(currentPage, currentSort, currentFilter, currentSearch);
+            load_table(currentPage, currentSort, currentFilter, currentSearch);
         });
 
         document.querySelectorAll('th[data-sort]').forEach(th => {
             th.addEventListener('click', () => {
                 const sortField = th.getAttribute('data-sort');
                 currentSort = currentSort === sortField ? `-${sortField}` : sortField;
-                loadLogs(currentPage, currentSort, currentFilter, currentSearch);
+                load_table(currentPage, currentSort, currentFilter, currentSearch);
             });
         });
 
-        loadLogs();
+        load_table();
     });
 </script>
 {% endblock content %}

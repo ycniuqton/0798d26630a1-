@@ -25,9 +25,10 @@
 <div class="container">
     <div class="top-bar my-4">
         <h2>Instances</h2>
-        <button class="action-button" data-color="#007bff" onclick="location.href='/instances/create/';"><span>+ Create</span></button>
+        <button class="action-button" data-color="#007bff" onclick="location.href='/instances/create/';">
+            <span>+ Create</span></button>
     </div>
-    <div class="mb-3 float-right-buttons" style="display:flex" >
+    <div class="mb-3 float-right-buttons" style="display:flex">
         <button class="action-button" data-color="#28a745" onclick="handleAction('start')"><i
                 class="fas fa-play"></i><span>Start</span></button>
         <button class="action-button" data-color="#dc3545" onclick="handleAction('stop')"><i
@@ -40,7 +41,8 @@
                 class="fas fa-user-plus"></i><span>Give to Other User</span></button>
     </div>
     <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Please enter" aria-label="Server Name" aria-describedby="basic-addon2">
+        <input type="text" class="form-control" placeholder="Please enter" aria-label="Server Name"
+               aria-describedby="basic-addon2">
         <div class="input-group-append">
             <button class="btn btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
             <select class="custom-select">
@@ -52,41 +54,46 @@
     </div>
     <table class="table table-hover table-custom">
         <thead>
-            <tr>
-                <th scope="col"><input type="checkbox" id="check-all"></th>
-                <th scope="col">Server</th>
-                <th scope="col">Location</th>
-                <th scope="col">IP Address</th>
-                <th scope="col">Status</th>
-                <th scope="col">Operation</th>
-            </tr>
+        <tr>
+            <th scope="col"><input type="checkbox" id="check-all"></th>
+            <th scope="col">Server</th>
+            <th scope="col">Location</th>
+            <th scope="col">IP Address</th>
+            <th scope="col">Status</th>
+            <th scope="col">Operation</th>
+        </tr>
         </thead>
-        <tbody>
-            {% if instances %}
-                {% for instance in instances %}
-                <tr>
-                    <td><input type="checkbox" class="instance-checkbox" data-instance-id="{{ instance.id }}"></td>
-                    <td>{{ instance.hostname }}</td>
-                    <td>{{ instance.location }}</td>
-                    <td>{{ instance.ip_address }}</td>
-                    <td>{{ instance.status }}</td>
-                    <td>
-                        <a href="{% url 'instance_detail' instance.id %}" class="btn btn-sm btn-outline-primary">Manage</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="6" class="no-instances">
-                        <img src="/static/assets/images/custom/vps.png" alt="No Instances">
-                        <h4>No Instances</h4>
-                        <p>Deploy a new server at any of our worldwide datacenter locations</p>
-                        <button class="btn btn-primary" onclick="location.href='/instances/create/';" >Deploy Instance</button>
-                    </td>
-                </tr>
-            {% endif %}
+        <tbody id="general-tbody">
+<!--        {% if instances %}-->
+<!--        {% for instance in instances %}-->
+<!--        <tr>-->
+<!--            <td><input type="checkbox" class="instance-checkbox" data-instance-id="{{ instance.id }}"></td>-->
+<!--            <td>{{ instance.hostname }}</td>-->
+<!--            <td>{{ instance.location }}</td>-->
+<!--            <td>{{ instance.ip }}</td>-->
+<!--            <td>{{ instance.status }}</td>-->
+<!--            <td>-->
+<!--                <a href="{% url 'instance_detail' instance.id %}" class="btn btn-sm btn-outline-primary">Manage</a>-->
+<!--            </td>-->
+<!--        </tr>-->
+<!--        {% endfor %}-->
+<!--        {% else %}-->
+<!--        <tr>-->
+<!--            <td colspan="6" class="no-instances">-->
+<!--                <img src="/static/assets/images/custom/vps.png" alt="No Instances">-->
+<!--                <h4>No Instances</h4>-->
+<!--                <p>Deploy a new server at any of our worldwide datacenter locations</p>-->
+<!--                <button class="btn btn-primary" onclick="location.href='/instances/create/';">Deploy Instance</button>-->
+<!--            </td>-->
+<!--        </tr>-->
+<!--        {% endif %}-->
         </tbody>
     </table>
+    <nav>
+        <ul class="pagination" id="pagination">
+            <!-- Pagination will be loaded here via AJAX -->
+        </ul>
+    </nav>
 </div>
 
 <!-- Confirmation Popup Modal -->
@@ -111,12 +118,85 @@
             'action-backup': 'Backup'
         };
 
-        for (var id in actionButtons) {
-            document.getElementById(id).addEventListener('click', function(event) {
-                var action = actionButtons[event.target.id];
-                handleAction(action);
-            });
-        }
+<!--        for (var id in actionButtons) {-->
+<!--            document.getElementById(id).addEventListener('click', function(event) {-->
+<!--                var action = actionButtons[event.target.id];-->
+<!--                handleAction(action);-->
+<!--            });-->
+<!--        }-->
     });
 </script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentPage = 1;
+        let currentSort = '-_created';
+        let currentActionFilter = '';
+        let currentStatusFilter = '';
+        let currentFilter = {};
+        let currentSearch = '';
+        let api_url = '/api/vps/';
+
+        window.load_table = function(page = 1, sort = '-_created', filter = {}, search = '') {
+
+        document.getElementById('loader').style.display = 'block';
+            filter_str = Object.keys(filter).map(key => key + "=" + filter[key]).join('&');
+            fetch(`${api_url}?page=${page}&page_size=10&sort_by=${sort}&${filter_str}&search=${search}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('general-tbody');
+                    if (data.data.length === 0) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td colspan="6" class="no-instances">
+                                <img src="/static/assets/images/custom/vps.png" alt="No Instances">
+                                <h4>No Instances</h4>
+                                <p>Deploy a new server at any of our worldwide datacenter locations</p>
+                                <button class="btn btn-primary" onclick="location.href='/instances/create/';" >Deploy Instance</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    }
+                    else{
+                        tbody.innerHTML = '';
+                        data.data.forEach(item => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td><input type="checkbox" class="instance-checkbox" data-instance-id="{{ item.id }}"></td>
+                                <td>${ item.hostname }</td>
+                                <td>${item.location }</td>
+                                <td>${ item.ip }</td>
+                                <td>${ item.status }</td>
+                                <td>
+                                    <a href="/instance/${item.id}" class="btn btn-sm btn-outline-primary">Manage</a>
+                                </td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    }
+
+                    const pagination = document.getElementById('pagination');
+                    pagination.innerHTML = '';
+                    for (let i = 1; i <= data.total_pages; i++) {
+                        const pageItem = document.createElement('li');
+                        pageItem.className = 'page-item' + (i === data.current_page ? ' active' : '');
+                        pageItem.innerHTML = `<a class="page-link" onclick="load_table(${i}, '${sort}', '${filter}')">${i}</a>`;
+                        pagination.appendChild(pageItem);
+                    }
+                    document.getElementById('loader').style.display = 'none';
+                })
+        }
+
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const sortField = th.getAttribute('data-sort');
+                currentSort = currentSort === sortField ? `-${sortField}` : sortField;
+                load_table(currentPage, currentSort, currentFilter, currentSearch);
+            });
+        });
+
+        load_table();
+    });
+</script>
+
 {% endblock content %}

@@ -55,12 +55,9 @@
             <input type="text" class="form-control" id="companyName" placeholder="Company name">
         </div>
         <div class="form-row">
-            <div class="form-group col-md-4">
-                <label for="phoneCountry">Phone number</label>
-                <input type="text" class="form-control" id="phoneCountry">
-            </div>
-            <div class="form-group col-md-8">
-                <label for="phoneNumber">&nbsp;</label>
+
+            <div class="form-group col-md-6">
+                <label for="phoneNumber">&nbsp;Phone number</label>
                 <input type="text" class="form-control" id="phoneNumber">
             </div>
         </div>
@@ -86,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function fetchUserProfile() {
-    fetch('/api/user/profile/')
+    fetch('/api/account/profile/')
     .then(response => response.json())
     .then(data => {
         document.getElementById('emailAddress').value = data.email;
@@ -97,7 +94,6 @@ function fetchUserProfile() {
         document.getElementById('countryRegion').value = data.country_region;
         document.getElementById('zipCode').value = data.zip_code;
         document.getElementById('companyName').value = data.company_name;
-        document.getElementById('phoneCountry').value = data.phone_country;
         document.getElementById('phoneNumber').value = data.phone_number;
         document.getElementById('subscribeEmail').checked = data.subscribe_email;
     })
@@ -118,12 +114,11 @@ function saveProfile() {
         country_region: document.getElementById('countryRegion').value,
         zip_code: document.getElementById('zipCode').value,
         company_name: document.getElementById('companyName').value,
-        phone_country: document.getElementById('phoneCountry').value,
         phone_number: document.getElementById('phoneNumber').value,
         subscribe_email: document.getElementById('subscribeEmail').checked
     };
 
-    fetch('/api/user/profile/', {
+    fetch('/api/account/profile/', {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',

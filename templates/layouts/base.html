@@ -44,9 +44,34 @@
         font-size: 14px;
         font-weight: bold;
     }
+
+    .loader-line {
+            display: none; /* Hidden by default */
+            height: 4px;
+            width: 100%;
+            background-color: #3498db; /* Blue color for the loader */
+            position: fixed;
+            top: 0;
+            left: 0;
+            animation: loading 2s linear infinite; /* Loading animation */
+        }
+
+    /* Animation keyframes for the loader */
+        @keyframes loading {
+            0% {
+                transform: translateX(-100%);
+            }
+            50% {
+                transform: translateX(0%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
   </style>
 </head>
 <body>
+  <div class="loader-line" id="loader"></div>
 
   {% block pre_loader %}
     {% include 'includes/pre-loader.html' %}

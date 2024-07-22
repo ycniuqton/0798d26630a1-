@@ -647,36 +647,6 @@ def vps_calculator(request):
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-
-@csrf_exempt
-def user_profile(request):
-    if request.method == 'GET':
-        # Fetch user profile data from the database
-        profile = {
-            'email': 'ngohongqui@gmail.com',
-            'first_name': 'Ngô',
-            'last_name': 'Quí',
-            'address': 'Số 60 ngách 52/25 phú mỹ mỹ đình từ liêm hà nội',
-            'city': 'Hà Nội',
-            'country_region': 'Hong Kong (China)',
-            'zip_code': '100000',
-            'company_name': '',
-            'phone_country': 'Vietnam(84)',
-            'phone_number': '365046569',
-            'subscribe_email': True
-        }
-        return JsonResponse(profile)
-
-    elif request.method == 'PUT':
-        data = json.loads(request.body)
-        # Update the user profile in the database with the data received
-        # For demonstration, we just print the data to the console
-        print('Updated profile data:', data)
-        return JsonResponse({'status': 'success', 'message': 'Profile updated successfully'})
-
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
 # In-memory storage for tokens (for demonstration purposes)
 tokens = []
 
