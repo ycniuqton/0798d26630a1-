@@ -12,6 +12,7 @@ urlpatterns = [
   path('home/', views.home, name='home'),
 
   path('instances/', views.instances, name='instances'),
+  path('instance/<int:instance_id>/', views.instance_detail, name='instance_detail'),
 
   path('create_instances/', views.create_instances, name='create_instances'),
 

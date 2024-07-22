@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, date
 from django.shortcuts import render
 from django.core.paginator import Paginator
 import random
-
+from django.shortcuts import render, get_object_or_404
 from admin_datta.forms import RegistrationForm, LoginForm, UserPasswordChangeForm, UserPasswordResetForm, \
     UserSetPasswordForm
 from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordResetConfirmView, PasswordResetView
@@ -37,30 +37,35 @@ def tables(request):
 def instances(request):
     instances_data = [
         {
+            "id": 1,
             "server_name": "Server 1",
             "location": "New York, USA",
             "ip_address": "192.168.1.1",
             "status": "Active"
         },
         {
+            "id": 2,
             "server_name": "Server 2",
             "location": "London, UK",
             "ip_address": "192.168.1.2",
             "status": "Inactive"
         },
         {
+            "id": 3,
             "server_name": "Server 3",
             "location": "Tokyo, Japan",
             "ip_address": "192.168.1.3",
             "status": "Active"
         },
         {
+            "id": 4,
             "server_name": "Server 4",
             "location": "Sydney, Australia",
             "ip_address": "192.168.1.4",
             "status": "Inactive"
         },
         {
+            "id": 5,
             "server_name": "Server 5",
             "location": "Berlin, Germany",
             "ip_address": "192.168.1.5",
@@ -145,10 +150,10 @@ def create_instances(request):
             "link": "#"
         }
     ]
-    ipv4_options = ["Standard", "Advanced", "Premium"]
-    bandwidth_options = ["Standard", "Advanced", "Premium"]
-    ram_options = ["Standard", "Advanced", "Premium"]
-    ssd_options = ["Standard", "Advanced", "Premium"]
+    ipv4_options = ["1 IPv4", "2 IPv4", "5 IPv4"]
+    bandwidth_options = ["Default", "+ 5TB", "+ 10TB"]
+    ram_options = ["Default", "+ 3GB", "+ 6GB"]
+    ssd_options = ["Default", "+ 50GB", "+ 100GB"]
 
     # country
     regions = [
@@ -694,6 +699,24 @@ def notifications(request):
     return render(request, "pages/notifications.html", context)
 
 
+def instance_detail(request, instance_id):
+    instance = {
+        'id': '123',
+        'server_name': 'Server-01',
+        'location': 'New York',
+        'ip_address': '192.168.1.1',
+        'status': 'Running',
+        'cpu_cores': 4,
+        'ram': '8 GB',
+        'storage': '100 GB SSD',
+        'os': 'Ubuntu 20.04 LTS',
+        'created_at': '2024-07-20 12:34:56',
+        'last_backup': '2024-07-18 08:23:45'
+    }
+
+    return render(request, 'pages/instances/detail.html', {'instance': instance})
+
+
 @csrf_exempt
 def vps_calculator(request):
     if request.method == 'POST':
@@ -751,7 +774,6 @@ def create_vps(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-
 @csrf_exempt
 def user_profile(request):
     if request.method == 'GET':
@@ -785,7 +807,6 @@ def user_profile(request):
 tokens = []
 
 
-
 @csrf_exempt
 def manage_tokens(request):
     if request.method == 'GET':
@@ -809,12 +830,12 @@ def manage_tokens(request):
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+
 @csrf_exempt
 def delete_token(request, token_id):
     global tokens
     tokens = [token for token in tokens if token['token'] != token_id]
     return JsonResponse({'status': 'success', 'message': 'Token deleted successfully'})
-
 
 
 # In-memory storage for demo purposes
@@ -825,6 +846,7 @@ def current_introducer(request):
     user_id = request.user.id
     introducer_email = introducer_email_storage.get(user_id, None)
     return JsonResponse({'introducer_email': introducer_email})
+
 
 @csrf_exempt
 def set_introducer(request):
@@ -841,38 +863,44 @@ def set_introducer(request):
 
 # In-memory storage for tickets and FAQs
 tickets = [
-        {
-            "ticket_id": "TICKET001",
-            "subject": "Issue with login",
-            "ticket_type": "Technical",
-            "submission_time": "2024-07-01 14:30",
-            "status": "Open",
-            "operation": "View"
-        },
-        {
-            "ticket_id": "TICKET002",
-            "subject": "Billing discrepancy",
-            "ticket_type": "Billing",
-            "submission_time": "2024-07-02 09:20",
-            "status": "Closed",
-            "operation": "View"
-        },
-        {
-            "ticket_id": "TICKET003",
-            "subject": "Feature request",
-            "ticket_type": "General",
-            "submission_time": "2024-07-03 17:45",
-            "status": "In Progress",
-            "operation": "View"
-        }
-    ]
+    {
+        "ticket_id": "TICKET001",
+        "subject": "Issue with login",
+        "ticket_type": "Technical",
+        "submission_time": "2024-07-01 14:30",
+        "status": "Open",
+        "operation": "View"
+    },
+    {
+        "ticket_id": "TICKET002",
+        "subject": "Billing discrepancy",
+        "ticket_type": "Billing",
+        "submission_time": "2024-07-02 09:20",
+        "status": "Closed",
+        "operation": "View"
+    },
+    {
+        "ticket_id": "TICKET003",
+        "subject": "Feature request",
+        "ticket_type": "General",
+        "submission_time": "2024-07-03 17:45",
+        "status": "In Progress",
+        "operation": "View"
+    }
+]
 faq_data = [
-    {"question": "How does LightNode turn on the machine?", "answer": "Newly registered users can get up to $20 as a bonus for the first recharge. They only need to complete three steps: register, fill in basic information, and recharge the platform, and then they can activate the host that needs to be configured as needed.<br><br>PS: As long as the account balance is sufficient, you can always use the machine, no need to renew."},
-    {"question": "What is the first charge of LightNode?", "answer": "The first charge of LightNode is the initial payment you make to start using the services."},
-    {"question": "Does the LightNode system disk need to be selected separately?", "answer": "Yes, you need to select the system disk separately according to your requirements."},
-    {"question": "What resource nodes does LightNode have?", "answer": "LightNode has resource nodes in various global locations including North America, Europe, Asia, and more."},
-    {"question": "What operating systems does LightNode support?", "answer": "LightNode supports a variety of operating systems including Windows, Linux distributions like Ubuntu, Debian, CentOS, and more."},
-    {"question": "What are the billing rules for LightNode?", "answer": "LightNode follows a pay-as-you-go billing model where you are billed based on the resources you use."}
+    {"question": "How does LightNode turn on the machine?",
+     "answer": "Newly registered users can get up to $20 as a bonus for the first recharge. They only need to complete three steps: register, fill in basic information, and recharge the platform, and then they can activate the host that needs to be configured as needed.<br><br>PS: As long as the account balance is sufficient, you can always use the machine, no need to renew."},
+    {"question": "What is the first charge of LightNode?",
+     "answer": "The first charge of LightNode is the initial payment you make to start using the services."},
+    {"question": "Does the LightNode system disk need to be selected separately?",
+     "answer": "Yes, you need to select the system disk separately according to your requirements."},
+    {"question": "What resource nodes does LightNode have?",
+     "answer": "LightNode has resource nodes in various global locations including North America, Europe, Asia, and more."},
+    {"question": "What operating systems does LightNode support?",
+     "answer": "LightNode supports a variety of operating systems including Windows, Linux distributions like Ubuntu, Debian, CentOS, and more."},
+    {"question": "What are the billing rules for LightNode?",
+     "answer": "LightNode follows a pay-as-you-go billing model where you are billed based on the resources you use."}
 ]
 
 
@@ -915,6 +943,7 @@ invoices_data = [
         'total': round(random.uniform(50, 500), 2)
     } for i in range(1, 51)
 ]
+
 
 def invoices_view(request):
     search_query = request.GET.get('search', '')
