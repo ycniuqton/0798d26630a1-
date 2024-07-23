@@ -31,6 +31,8 @@ urlpatterns = [
     path('financial/', views.financial, name='financial'),
     path('support/', views.support, name='support'),
     path('ticket/', views.ticket, name='ticket'),
+    path('your_tickets/', views.your_tickets, name='your_tickets'),
+    path('api/your_tickets/', views.api_your_tickets, name='api_your_tickets'),
     path('affiliate/', views.affiliate, name='affiliate'),
     path('your_introducer/', views.your_introducer, name='your_introducer'),
     path('link_code/', views.link_code, name='link_code'),
@@ -51,4 +53,6 @@ urlpatterns = [
     path('invoices/', views.invoices_view, name='invoices'),
     path('api/vps/<int:instance_id>/vnc-link/', views.get_vnc_link, name='get_vnc_link'),
     path('api/vps/<int:instance_id>/snapshots/', views.get_snapshots, name='get_snapshots'),
+    path('api/vps/history/', views.vps_history, name='vps_history'),
+    path('api/vps/logs/', views.get_vps_logs, name='get_vps_logs'),
 ]

@@ -34,25 +34,32 @@
                 <span class="pcoded-mtext">Instances</span>
             </a>
             </li>
-            <li class=""><a href="{% url 'network' %}" class="">
-                <span class="pcoded-micon"><i class="feather icon-globe text-c-green"></i></span>
-                <span class="pcoded-mtext">Network</span>
-                </a></li>
-            <li class=""><a href="{% url 'block_storage' %}" class="">
-                <span class="pcoded-micon"><i class="feather icon-layers text-c-green"></i></span>
-                <span class="pcoded-mtext">Block Storage</span></a></li>
+
+            <li class=""><a href="{% url 'vps_history' %}" class="">
+              <span class="pcoded-micon"><i class="feather icon-globe text-c-green"></i></span>
+              <span class="pcoded-mtext">VPS History</span>
+            </a></li>
+
+
+<!--            <li class=""><a href="{% url 'network' %}" class="">-->
+<!--                <span class="pcoded-micon"><i class="feather icon-globe text-c-green"></i></span>-->
+<!--                <span class="pcoded-mtext">Network</span>-->
+<!--                </a></li>-->
+<!--            <li class=""><a href="{% url 'block_storage' %}" class="">-->
+<!--                <span class="pcoded-micon"><i class="feather icon-layers text-c-green"></i></span>-->
+<!--                <span class="pcoded-mtext">Block Storage</span></a></li>-->
             <li class=""><a href="{% url 'snapshot' %}" class="">
                 <span class="pcoded-micon"><i class="feather icon-copy text-c-green"></i></span>
                 <span class="pcoded-mtext">Snapshot</span></a></li>
-            <li class=""><a href="{% url 'firewall' %}" class="">
-                <span class="pcoded-micon"><i class="feather icon-alert-triangle text-c-green"></i></span>
-                <span class="pcoded-mtext">Firewall</span></a></li>
-            <li class=""><a href="{% url 'image' %}" class="">
-                <span class="pcoded-micon"><i class="feather icon-inbox text-c-green"></i></span>
-                <span class="pcoded-mtext">Image</span></a></li>
-            <li class=""><a href="{% url 'monitoring' %}" class="">
-                <span class="pcoded-micon"><i class="feather icon-activity text-c-green"></i></span>
-                <span class="pcoded-mtext">Monitoring</span></a></li>
+<!--            <li class=""><a href="{% url 'firewall' %}" class="">-->
+<!--                <span class="pcoded-micon"><i class="feather icon-alert-triangle text-c-green"></i></span>-->
+<!--                <span class="pcoded-mtext">Firewall</span></a></li>-->
+<!--            <li class=""><a href="{% url 'image' %}" class="">-->
+<!--                <span class="pcoded-micon"><i class="feather icon-inbox text-c-green"></i></span>-->
+<!--                <span class="pcoded-mtext">Image</span></a></li>-->
+<!--            <li class=""><a href="{% url 'monitoring' %}" class="">-->
+<!--                <span class="pcoded-micon"><i class="feather icon-activity text-c-green"></i></span>-->
+<!--                <span class="pcoded-mtext">Monitoring</span></a></li>-->
           </ul>
         </li>
         <li
@@ -79,6 +86,8 @@
           <ul class="pcoded-submenu">
             <li class=""><a href="{% url 'ticket' %}" class="">
                 <span class="pcoded-mtext">Ticket</span></a></li>
+            <li class=""><a href="{% url 'your_tickets' %}" class="">
+                <span class="pcoded-mtext">Your Tickets</span></a></li>
           </ul>
         </li>
 
