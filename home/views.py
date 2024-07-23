@@ -224,7 +224,7 @@ def create_instances(request):
         'categories': categories,
         'images': images,
     }
-    return render(request, "pages/create-instances.html", context)
+    return render(request, "pages/instances/create/create-instances.html", context)
 
 
 def network(request):
@@ -628,7 +628,45 @@ def ticket(request):
         'segment': 'ticket',
         'tickets': tickets
     }
-    return render(request, "pages/ticket.html", context)
+    return render(request, "pages/supports/ticket.html", context)
+
+
+def your_tickets(request):
+    context = {
+        'segment': 'ticket',
+        'tickets': tickets
+    }
+    return render(request, "pages/supports/your_tickets.html", context)
+
+
+def api_your_tickets(request):
+    # tickets = Ticket.objects.all()
+    #
+    # search_query = request.GET.get('search', '')
+    # if search_query:
+    #     tickets = tickets.filter(subject__icontains(search_query))
+    #
+    # action_filter = request.GET.get('subject', '')
+    # if action_filter:
+    #     tickets = tickets.filter(subject=action_filter)
+    #
+    # sort_by = request.GET.get('sort_by', '-submission_time')
+    # tickets = tickets.order_by(sort_by)
+
+    paginator = Paginator(tickets, 1)  # 10 tickets per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    ticket_list = list(
+        page_obj.object_list)
+
+    data = {
+        'tickets': ticket_list,
+        'total_pages': paginator.num_pages,
+        'current_page': page_obj.number
+    }
+
+    return JsonResponse(data)
 
 
 def affiliate(request):
@@ -993,6 +1031,301 @@ def invoices_view(request):
     page_obj = paginator.get_page(page_number)
 
     return render(request, 'pages/invoices.html', {'invoices': page_obj, 'items_per_page': items_per_page})
+
+
+def vps_history(request):
+    context = {
+        'logs': []
+    }
+    return render(request, 'pages/instances/history/history.html', context)
+
+
+def get_vps_logs(request):
+    filterable_fields = ['instance_name']
+    page = request.GET.get('page', 1)
+    page_size = request.GET.get('page_size', 10)
+    sort_by = request.GET.get('sort_by', '-datetime')
+    filters = {field: request.GET.get(field) for field in filterable_fields if request.GET.get(field)}
+
+    logs = [
+        {
+            "id": 1,
+            "instance_name": "VPS-001",
+            "action": "Create",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-21 14:30:00",
+            "details": "VPS created successfully."
+        },
+        {
+            "id": 2,
+            "instance_name": "VPS-002",
+            "action": "Delete",
+            "status": "Failed",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-22 10:15:00",
+            "details": "Failed to delete VPS due to insufficient permissions."
+        },
+        {
+            "id": 3,
+            "instance_name": "VPS-003",
+            "action": "Suspend",
+            "status": "Success",
+            "performed_by": "admin@example.com",
+            "datetime": "2024-07-23 08:45:00",
+            "details": "VPS suspended due to non-payment."
+        },
+        {
+            "id": 4,
+            "instance_name": "VPS-004",
+            "action": "Upgrade",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-24 12:30:00",
+            "details": "VPS upgraded to a higher plan."
+        },
+        {
+            "id": 1,
+            "instance_name": "VPS-001",
+            "action": "Create",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-21 14:30:00",
+            "details": "VPS created successfully."
+        },
+        {
+            "id": 2,
+            "instance_name": "VPS-002",
+            "action": "Delete",
+            "status": "Failed",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-22 10:15:00",
+            "details": "Failed to delete VPS due to insufficient permissions."
+        },
+        {
+            "id": 3,
+            "instance_name": "VPS-003",
+            "action": "Suspend",
+            "status": "Success",
+            "performed_by": "admin@example.com",
+            "datetime": "2024-07-23 08:45:00",
+            "details": "VPS suspended due to non-payment."
+        },
+        {
+            "id": 4,
+            "instance_name": "VPS-004",
+            "action": "Upgrade",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-24 12:30:00",
+            "details": "VPS upgraded to a higher plan."
+        },
+        {
+            "id": 1,
+            "instance_name": "VPS-001",
+            "action": "Create",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-21 14:30:00",
+            "details": "VPS created successfully."
+        },
+        {
+            "id": 2,
+            "instance_name": "VPS-002",
+            "action": "Delete",
+            "status": "Failed",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-22 10:15:00",
+            "details": "Failed to delete VPS due to insufficient permissions."
+        },
+        {
+            "id": 3,
+            "instance_name": "VPS-003",
+            "action": "Suspend",
+            "status": "Success",
+            "performed_by": "admin@example.com",
+            "datetime": "2024-07-23 08:45:00",
+            "details": "VPS suspended due to non-payment."
+        },
+        {
+            "id": 4,
+            "instance_name": "VPS-004",
+            "action": "Upgrade",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-24 12:30:00",
+            "details": "VPS upgraded to a higher plan."
+        },
+        {
+            "id": 1,
+            "instance_name": "VPS-001",
+            "action": "Create",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-21 14:30:00",
+            "details": "VPS created successfully."
+        },
+        {
+            "id": 2,
+            "instance_name": "VPS-002",
+            "action": "Delete",
+            "status": "Failed",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-22 10:15:00",
+            "details": "Failed to delete VPS due to insufficient permissions."
+        },
+        {
+            "id": 3,
+            "instance_name": "VPS-003",
+            "action": "Suspend",
+            "status": "Success",
+            "performed_by": "admin@example.com",
+            "datetime": "2024-07-23 08:45:00",
+            "details": "VPS suspended due to non-payment."
+        },
+        {
+            "id": 4,
+            "instance_name": "VPS-004",
+            "action": "Upgrade",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-24 12:30:00",
+            "details": "VPS upgraded to a higher plan."
+        },
+        {
+            "id": 1,
+            "instance_name": "VPS-001",
+            "action": "Create",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-21 14:30:00",
+            "details": "VPS created successfully."
+        },
+        {
+            "id": 2,
+            "instance_name": "VPS-002",
+            "action": "Delete",
+            "status": "Failed",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-22 10:15:00",
+            "details": "Failed to delete VPS due to insufficient permissions."
+        },
+        {
+            "id": 3,
+            "instance_name": "VPS-003",
+            "action": "Suspend",
+            "status": "Success",
+            "performed_by": "admin@example.com",
+            "datetime": "2024-07-23 08:45:00",
+            "details": "VPS suspended due to non-payment."
+        },
+        {
+            "id": 4,
+            "instance_name": "VPS-004",
+            "action": "Upgrade",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-24 12:30:00",
+            "details": "VPS upgraded to a higher plan."
+        },
+        {
+            "id": 1,
+            "instance_name": "VPS-001",
+            "action": "Create",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-21 14:30:00",
+            "details": "VPS created successfully."
+        },
+        {
+            "id": 2,
+            "instance_name": "VPS-002",
+            "action": "Delete",
+            "status": "Failed",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-22 10:15:00",
+            "details": "Failed to delete VPS due to insufficient permissions."
+        },
+        {
+            "id": 3,
+            "instance_name": "VPS-003",
+            "action": "Suspend",
+            "status": "Success",
+            "performed_by": "admin@example.com",
+            "datetime": "2024-07-23 08:45:00",
+            "details": "VPS suspended due to non-payment."
+        },
+        {
+            "id": 4,
+            "instance_name": "VPS-004",
+            "action": "Upgrade",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-24 12:30:00",
+            "details": "VPS upgraded to a higher plan."
+        },
+        {
+            "id": 1,
+            "instance_name": "VPS-001",
+            "action": "Create",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-21 14:30:00",
+            "details": "VPS created successfully."
+        },
+        {
+            "id": 2,
+            "instance_name": "VPS-002",
+            "action": "Delete",
+            "status": "Failed",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-22 10:15:00",
+            "details": "Failed to delete VPS due to insufficient permissions."
+        },
+        {
+            "id": 3,
+            "instance_name": "VPS-003",
+            "action": "Suspend",
+            "status": "Success",
+            "performed_by": "admin@example.com",
+            "datetime": "2024-07-23 08:45:00",
+            "details": "VPS suspended due to non-payment."
+        },
+        {
+            "id": 4,
+            "instance_name": "VPS-004",
+            "action": "Upgrade",
+            "status": "Success",
+            "performed_by": "user@example.com",
+            "datetime": "2024-07-24 12:30:00",
+            "details": "VPS upgraded to a higher plan."
+        }
+    ]
+
+    paginator = Paginator(logs, page_size)
+    page_obj = paginator.get_page(page)
+
+    logs_data = [data for data in page_obj]
+    # logs_data = [
+    #     {
+    #         'id': log.id,
+    #         'instance_name': log.instance_name,
+    #         'action': log.action,
+    #         'status': log.status,
+    #         'performed_by': log.performed_by,
+    #         'datetime': log.datetime,
+    #         'details': log.details,
+    #     }
+    #     for log in page_obj
+    # ]
+
+    return JsonResponse({
+        'logs': logs_data,
+        'total_pages': paginator.num_pages,
+        'current_page': page_obj.number,
+        'has_next': page_obj.has_next(),
+        'has_previous': page_obj.has_previous(),
+    })
 
 
 def get_vnc_link(request, instance_id):

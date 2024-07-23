@@ -1,6 +1,5 @@
-<!-- Confirmation Popup Modal -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel"
-     aria-hidden="true">
+<!-- Modal -->
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -10,17 +9,12 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p id="confirmationMessage">Are you sure you want to perform this action?</p>
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>Instance Name</th>
-                    </tr>
-                    </thead>
-                    <tbody id="selectedInstancesList">
-                    <!-- Selected instances will be listed here -->
-                    </tbody>
-                </table>
+                <p id="confirmationMessage">Are you sure you want to perform this action on the following instances?</p>
+                <div id="giveUserInput" class="d-none">
+                    <p>Enter the email of the user to give these instances to:</p>
+                    <input type="email" id="userEmail" class="form-control" placeholder="user@example.com">
+                </div>
+                <div id="selectedInstancesList"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -30,67 +24,77 @@
     </div>
 </div>
 
-
-
-
 <script>
-    // Handle action
-        function handleAction(action) {
-            var selectedInstances = document.querySelectorAll('.instance-checkbox:checked');
-            if (selectedInstances.length === 0) {
-                alert('Please select at least one instance.');
-                return;
-            }
-
-            var selectedInstanceIds = [];
-            var selectedInstanceNames = [];
-            selectedInstances.forEach(function(instance) {
-                selectedInstanceIds.push(instance.getAttribute('data-instance-id'));
-                selectedInstanceNames.push(instance.closest('tr').children[1].textContent);
-            });
-
-            // Show confirmation modal
-            var confirmationMessage = `Are you sure you want to ${action.toLowerCase()} the selected instances?`;
-            document.getElementById('confirmationModalLabel').textContent = `${action} Confirmation`;
-            document.getElementById('confirmationMessage').textContent = confirmationMessage;
-
-            // Populate selected instances in modal
-            var selectedInstancesList = document.getElementById('selectedInstancesList');
-            selectedInstancesList.innerHTML = '';
-            selectedInstanceNames.forEach(function(name) {
-                var row = document.createElement('tr');
-                var cell = document.createElement('td');
-                cell.textContent = name;
-                row.appendChild(cell);
-                selectedInstancesList.appendChild(row);
-            });
-
-            // Show modal
-            $('#confirmationModal').modal('show');
-
-            // Handle confirm action
-            document.getElementById('confirmAction').onclick = function() {
-                $('#confirmationModal').modal('hide');
-
-                // Make API call
-                fetch(`/api/vps/${action.toLowerCase()}/`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'
-                    },
-                    body: JSON.stringify({ instance_ids: selectedInstanceIds })
-                })
-                .then(response => {
-                    if (response.ok) {
-                        alert(`Instances ${action.toLowerCase()}ed successfully!`);
-                        location.reload();
-                    } else {
-                        alert(`Failed to ${action.toLowerCase()} instances.`);
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            };
+    function handleAction(action) {
+        var selectedInstances = document.querySelectorAll('.instance-checkbox:checked');
+        if (selectedInstances.length === 0) {
+            alert('Please select at least one instance.');
+            return;
         }
 
+        var selectedInstanceIds = [];
+        var selectedInstanceNames = [];
+        selectedInstances.forEach(function(instance) {
+            selectedInstanceIds.push(instance.getAttribute('data-instance-id'));
+            selectedInstanceNames.push(instance.closest('tr').children[1].textContent);
+        });
+
+        // Show confirmation modal
+        var confirmationMessage = `Are you sure you want to ${action.toLowerCase()} the selected instances?`;
+        document.getElementById('confirmationModalLabel').textContent = `${action} Confirmation`;
+        document.getElementById('confirmationMessage').textContent = confirmationMessage;
+
+        // Populate selected instances in modal
+        var selectedInstancesList = document.getElementById('selectedInstancesList');
+        selectedInstancesList.innerHTML = '<ul class="list-group">';
+        selectedInstanceNames.forEach(function(name) {
+            var listItem = document.createElement('li');
+            listItem.className = 'list-group-item';
+            listItem.textContent = name;
+            selectedInstancesList.appendChild(listItem);
+        });
+        selectedInstancesList.innerHTML += '</ul>';
+
+        // Handle "Give to Other User" action
+        var giveUserInput = document.getElementById('giveUserInput');
+        if (action.toLowerCase() === 'give') {
+            giveUserInput.classList.remove('d-none');
+            document.getElementById('confirmAction').textContent = 'Give';
+        } else {
+            giveUserInput.classList.add('d-none');
+            document.getElementById('confirmAction').textContent = 'Confirm';
+        }
+
+        // Show modal
+        $('#confirmationModal').modal('show');
+
+        // Handle confirm action
+        document.getElementById('confirmAction').onclick = function() {
+            $('#confirmationModal').modal('hide');
+
+            var body = { instance_ids: selectedInstanceIds };
+            if (action.toLowerCase() === 'give') {
+                body.user_email = document.getElementById('userEmail').value;
+            }
+
+            // Make API call
+            fetch(`/api/vps/${action.toLowerCase()}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(body)
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert(`Instances ${action.toLowerCase()}ed successfully!`);
+                    location.reload();
+                } else {
+                    alert(`Failed to ${action.toLowerCase()} instances.`);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        };
+    }
 </script>
