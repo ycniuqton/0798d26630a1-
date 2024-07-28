@@ -669,6 +669,76 @@ def api_your_tickets(request):
     return JsonResponse(data)
 
 
+def ticket_detail_view(request, ticket_id):
+    # ticket = get_object_or_404(Ticket, pk=ticket_id)
+    # replies = TicketReply.objects.filter(ticket=ticket).order_by('created_at')
+
+    # Sample data
+    ticket = {
+        'id': 1,
+        'subject': 'Sample Ticket Subject',
+        'ticket_type': 'Issue',
+        'submission_time': '2024-07-28 12:34:56',
+        'status': 'Open',
+        'description': 'This is a sample description of the ticket.',
+        'user': {
+            'profile': {
+                'avatar': {'url': '/media/avatars/sample_avatar.png'},
+                'role': 'Admin'
+            },
+            'username': 'sampleuser'
+        }
+    }
+    replies = [
+        {
+            'user': {
+                'profile': {
+                    'avatar': {'url': '/media/avatars/reply_avatar1.png'},
+                    'role': 'Support'
+                },
+                'username': 'supportuser1'
+            },
+            'created_at': '2024-07-28 13:45:00',
+            'message': 'This is a sample reply message 1.'
+        },
+        {
+            'user': {
+                'profile': {
+                    'avatar': {'url': '/media/avatars/reply_avatar2.png'},
+                    'role': 'User'
+                },
+                'username': 'sampleuser'
+            },
+            'created_at': '2024-07-28 14:00:00',
+            'message': 'This is a sample reply message 2.'
+        }
+    ]
+
+    ticket_data = {
+        'ticket_id': ticket['id'],
+        'subject': ticket['subject'],
+        'ticket_type': ticket['ticket_type'],
+        'submission_time': ticket['submission_time'],
+        'status': ticket['status'],
+        'description': ticket['description'],
+        'user_avatar': ticket['user']['profile']['avatar']['url'] if ticket['user']['profile']['avatar'] else '',
+        'username': ticket['user']['username'],
+        'user_role': ticket['user']['profile']['role'],
+        'replies': [
+            {
+                'username': reply['user']['username'],
+                'user_avatar': reply['user']['profile']['avatar']['url'] if reply['user']['profile']['avatar'] else '',
+                'user_role': reply['user']['profile']['role'],
+                'date': reply['created_at'],
+                'message': reply['message'],
+            }
+            for reply in replies
+        ]
+    }
+    return JsonResponse(ticket_data)
+
+
+
 def affiliate(request):
     context = {
         'segment': 'affiliate'
