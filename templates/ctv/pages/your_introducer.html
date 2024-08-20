@@ -1,0 +1,92 @@
+{% extends 'ctv/layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block extrastyle %}
+<style>
+    .iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+    .parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+    .form-section {
+        margin-top: 20px;
+    }
+    .form-section .btn-primary {
+        width: 100%;
+    }
+    .current-introducer {
+        margin-top: 20px;
+    }
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Introducer Information</h2>
+    <div class="alert alert-info">
+        💡 If you were introduced to this website by someone, please set their email address below. This will help them receive a bonus gift.
+    </div>
+    <div class="form-section" id="set-introducer-section" style="display: none;">
+        <h5>Set Introducer</h5>
+        <form id="set-introducer-form">
+            <div class="form-group">
+                <label for="introducerEmail">Introducer's Email</label>
+                <input type="email" class="form-control" id="introducerEmail" placeholder="Enter introducer's email" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Set Introducer</button>
+        </form>
+    </div>
+    <div class="current-introducer" id="current-introducer-section" style="display: none;">
+        <h5>Current Introducer</h5>
+        <p><strong>Email:</strong> <span id="current-introducer-email">None</span></p>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchCurrentIntroducer();
+
+        document.getElementById('set-introducer-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            setIntroducer();
+        });
+    });
+
+    function fetchCurrentIntroducer() {
+        fetch('/api/current-introducer/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.introducer_email) {
+                document.getElementById('current-introducer-email').innerText = data.introducer_email;
+                document.getElementById('current-introducer-section').style.display = 'block';
+            } else {
+                document.getElementById('set-introducer-section').style.display = 'block';
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function setIntroducer() {
+        const introducerEmail = document.getElementById('introducerEmail').value;
+
+        fetch('/api/set-introducer/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ introducer_email: introducerEmail })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('current-introducer-email').innerText = introducerEmail;
+                document.getElementById('current-introducer-section').style.display = 'block';
+                document.getElementById('set-introducer-section').style.display = 'none';
+            } else {
+                alert('Failed to set introducer. Please try again.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+{% endblock content %}

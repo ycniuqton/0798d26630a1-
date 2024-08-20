@@ -1,0 +1,63 @@
+<div class="login-info">
+    <h5>Login Information</h5>
+    <div class="form-group">
+        <label for="hostname">Hostname</label>
+        <input type="text" class="form-control" id="hostname" value="2024071001535329714">
+    </div>
+    <div class="form-group">
+        <label for="login">Login</label>
+        <input type="text" class="form-control" id="login" value="root">
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <div class="input-group">
+            <input type="password" class="form-control" id="password">
+            <div class="input-group-append">
+                <span class="input-group-text" id="toggle-password"><i class="fas fa-eye-slash"></i></span>
+            </div>
+        </div>
+        <small class="form-text text-muted">
+            <i class="fas fa-lightbulb"></i> Please set the password carefully to ensure the password strength. Weak password instances are easy to be invaded and used.
+        </small>
+    </div>
+</div>
+
+<style>
+    .login-info {
+        margin-top: 20px;
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var passwordInput = document.getElementById('password');
+    var togglePassword = document.getElementById('toggle-password');
+    var hostnameInput = document.getElementById('hostname');
+    var loginInput = document.getElementById('login');
+
+    togglePassword.addEventListener('click', function() {
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            togglePassword.innerHTML = '<i class="fas fa-eye"></i>';
+        } else {
+            passwordInput.type = 'password';
+            togglePassword.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        }
+    });
+
+    var configUpdated = document.getElementById('config_updated');
+
+    function updateConfiguration() {
+        vpsConfiguration.login.hostname = hostnameInput.value;
+        vpsConfiguration.login.username = loginInput.value;
+        vpsConfiguration.login.password = passwordInput.value;
+
+        configUpdated.value = 'true';
+        configUpdated.dispatchEvent(new Event('change'));
+    }
+
+    hostnameInput.addEventListener('change', updateConfiguration);
+    loginInput.addEventListener('change', updateConfiguration);
+    passwordInput.addEventListener('change', updateConfiguration);
+});
+</script>

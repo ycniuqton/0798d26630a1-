@@ -1,0 +1,177 @@
+{% extends 'user/layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block extrastyle %}
+<style>
+    .iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+    .parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+    .search-bar { display: flex; align-items: center; margin-bottom: 20px; }
+    .search-bar input, .search-bar select, .search-bar button { margin-right: 10px; }
+    .table thead th { background-color: #f8f9fa; }
+    .no-records { text-align: center; padding: 50px 0; }
+    .no-records img { max-width: 150px; margin-bottom: 20px; }
+    .no-records h4 { margin-top: 20px; }
+    .ticket-form { margin-bottom: 20px; }
+    .ticket-form textarea { resize: none; }
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Support Tickets</h2>
+    <div class="ticket-form mb-4">
+        <h5>Submit a Ticket</h5>
+        <form id="ticket-form">
+            <div class="form-group">
+                <label for="ticket-subject">Subject</label>
+                <input type="text" class="form-control" id="ticket-subject" required>
+            </div>
+            <div class="form-group">
+                <label for="ticket-type">Ticket Type</label>
+                <select class="form-control" id="ticket-type" required>
+                    <option value="Technical">Technical</option>
+                    <option value="Billing">Billing</option>
+                    <option value="General">General</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="ticket-description">Description</label>
+                <textarea class="form-control" id="ticket-description" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Ticket</button>
+        </form>
+    </div>
+    <div class="search-bar mb-4">
+        <input type="text" class="form-control" placeholder="Please enter" aria-label="Search">
+        <select class="form-control">
+            <option selected>Subject</option>
+        </select>
+        <button class="btn btn-outline-secondary"><i class="fas fa-sync-alt"></i></button>
+    </div>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Ticket ID</th>
+                <th scope="col">Subject</th>
+                <th scope="col">Ticket Type</th>
+                <th scope="col">Submission Time</th>
+                <th scope="col">Status</th>
+                <th scope="col">Operation</th>
+            </tr>
+        </thead>
+        <tbody id="ticket-list">
+            {% if tickets %}
+                {% for ticket in tickets %}
+                    <tr>
+                        <td>{{ ticket.ticket_id }}</td>
+                        <td>{{ ticket.subject }}</td>
+                        <td>{{ ticket.ticket_type }}</td>
+                        <td>{{ ticket.submission_time }}</td>
+                        <td>{{ ticket.status }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">{{ ticket.operation }}</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="6" class="no-records text-center">
+                        <img src="https://via.placeholder.com/150" alt="No Records">
+                        <h4>No Tickets</h4>
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+<div class="container mt-4">
+    <h2>Frequently Asked Questions</h2>
+    <div id="faq-accordion">
+        <!-- FAQ items will be inserted here -->
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ticketForm = document.getElementById('ticket-form');
+        ticketForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            submitTicket();
+        });
+
+        fetchFaqs();
+    });
+
+    function submitTicket() {
+        const subject = document.getElementById('ticket-subject').value;
+        const ticketType = document.getElementById('ticket-type').value;
+        const description = document.getElementById('ticket-description').value;
+
+        fetch('/api/tickets/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ subject, ticket_type: ticketType, description })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                addTicketToTable(data.ticket);
+                ticketForm.reset();
+            } else {
+                alert('Failed to submit ticket. Please try again.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    function addTicketToTable(ticket) {
+        const ticketList = document.getElementById('ticket-list');
+        const newRow = document.createElement('tr');
+        newRow.innerHTML = `
+            <td>${ticket.ticket_id}</td>
+            <td>${ticket.subject}</td>
+            <td>${ticket.ticket_type}</td>
+            <td>${ticket.submission_time}</td>
+            <td>${ticket.status}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary">${ticket.operation}</button>
+            </td>
+        `;
+        ticketList.appendChild(newRow);
+    }
+
+    function fetchFaqs() {
+        fetch('/api/faqs/')
+        .then(response => response.json())
+        .then(data => {
+            const faqAccordion = document.getElementById('faq-accordion');
+            faqAccordion.innerHTML = '';
+            data.faqs.forEach((faq, index) => {
+                const faqItem = `
+                    <div class="card">
+                        <div class="card-header" id="heading${index}">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse${index}" aria-expanded="${index === 0}" aria-controls="collapse${index}">
+                                    ${faq.question}
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapse${index}" class="collapse ${index === 0 ? 'show' : ''}" aria-labelledby="heading${index}" data-parent="#faq-accordion">
+                            <div class="card-body">
+                                ${faq.answer}
+                            </div>
+                        </div>
+                    </div>
+                `;
+                faqAccordion.innerHTML += faqItem;
+            });
+        })
+        .catch(error => console.error('Error:', error));
+    }
+</script>
+{% endblock content %}

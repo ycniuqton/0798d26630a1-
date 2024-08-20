@@ -1,0 +1,226 @@
+{% extends 'user/layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block extrastyle %}
+<style>
+    .iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+    .parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+    .search-bar { display: flex; align-items: center; margin-bottom: 20px; }
+    .search-bar input, .search-bar select, .search-bar button { margin-right: 10px; }
+    .table thead th { background-color: #f8f9fa; cursor: pointer; }
+    .no-records { text-align: center; padding: 50px 0; }
+    .no-records img { max-width: 150px; margin-bottom: 20px; }
+    .no-records h4 { margin-top: 20px; }
+    .ticket-form { margin-bottom: 20px; }
+    .ticket-form textarea { resize: none; }
+
+    .post { background: #fff; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 20px; padding: 15px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
+    .user { display: flex; align-items: center; margin-bottom: 10px; }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
+    .username { font-weight: bold; margin-right: 10px; }
+    .role { color: #888; }
+    .content .date { color: #555; font-size: 0.9em; margin-bottom: 5px; display: block; }
+    .content p { margin: 0; line-height: 1.5; }
+    .reply-section { margin-top: 10px; }
+    .reply-input { width: 100%; height: 50px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 5px; }
+    .reply-button { padding: 10px 20px; background: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
+    .reply-button:hover { background: #0056b3; }
+
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="search-bar mb-4">
+        <input type="text" class="form-control" id="search-input" placeholder="Please enter" aria-label="Search">
+        <select class="form-control" id="subject-filter-select">
+            <option value="">Subject</option>
+            <!-- Add more options here if needed -->
+        </select>
+        <button class="btn btn-outline-secondary" id="search-button"><i class="fas fa-sync-alt"></i></button>
+    </div>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col" data-sort="ticket_id">Ticket ID</th>
+            <th scope="col" data-sort="subject">Subject</th>
+            <th scope="col" data-sort="ticket_type">Ticket Type</th>
+            <th scope="col" data-sort="submission_time">Submission Time</th>
+            <th scope="col" data-sort="status">Status</th>
+            <th scope="col">Operation</th>
+        </tr>
+        </thead>
+        <tbody id="ticket-list">
+        <!-- Tickets will be loaded here via AJAX -->
+        </tbody>
+    </table>
+    <nav>
+        <ul class="pagination" id="pagination">
+            <!-- Pagination will be loaded here via AJAX -->
+        </ul>
+    </nav>
+</div>
+
+<!-- Modal for ticket details -->
+<div class="modal fade" id="ticketModal" tabindex="-1" role="dialog" aria-labelledby="ticketModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ticketModalLabel">Ticket Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="ticket-details-content">
+                    <!-- Ticket details will be loaded here via AJAX -->
+                </div>
+                <div class="post">
+                    <div class="reply-section">
+                        <textarea class="reply-input" id="reply-input" placeholder="Type your message here..."></textarea>
+                        <button class="reply-button" id="reply-button">Reply</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentPage = 1;
+        let currentSort = '-submission_time';
+        let currentFilter = '';
+        let ticketsData = [];
+
+        window.loadTickets = function(page = 1, sort = '-submission_time', filter = '') {
+            const searchQuery = document.getElementById('search-input').value;
+            fetch(`/api/your_tickets/?page=${page}&page_size=10&sort_by=${sort}&${filter}&search=${searchQuery}`)
+                .then(response => response.json())
+                .then(data => {
+                    ticketsData = data.tickets; // Store ticket data
+                    const tbody = document.getElementById('ticket-list');
+                    tbody.innerHTML = '';
+                    ticketsData.forEach((ticket, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${ticket.ticket_id}</td>
+                            <td>${ticket.subject}</td>
+                            <td>${ticket.ticket_type}</td>
+                            <td>${ticket.submission_time}</td>
+                            <td>${ticket.status}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" onclick="showTicketDetails('${ticket.ticket_id}')">Details</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    const pagination = document.getElementById('pagination');
+                    pagination.innerHTML = '';
+                    for (let i = 1; i <= data.total_pages; i++) {
+                        const pageItem = document.createElement('li');
+                        pageItem.className = 'page-item' + (i === data.current_page ? ' active' : '');
+                        pageItem.innerHTML = `<a class="page-link" onclick="loadTickets(${i}, '${sort}', '${filter}')">${i}</a>`;
+                        pagination.appendChild(pageItem);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        }
+
+        window.showTicketDetails = function(ticket_id) {
+            fetch(`/api/your_tickets/${ticket_id}/`)
+                .then(response => response.json())
+                .then(data => {
+                    const ticketDetailsContent = document.getElementById('ticket-details-content');
+                    ticketDetailsContent.innerHTML = `
+                        <div class="post">
+                            <div class="user">
+                                <img src="${data.user_avatar}" alt="${data.username}" class="avatar">
+                                <span class="username">${data.username}</span>
+                                <span class="role">${data.user_role}</span>
+                            </div>
+                            <div class="content">
+                                <span class="date">${data.submission_time}</span>
+                                <p>${data.description}</p>
+                            </div>
+                        </div>
+                    `;
+                    data.replies.forEach(reply => {
+                        ticketDetailsContent.innerHTML += `
+                            <div class="post">
+                                <div class="user">
+                                    <img src="${reply.user_avatar}" alt="${reply.username}" class="avatar">
+                                    <span class="username">${reply.username}</span>
+                                    <span class="role">${reply.user_role}</span>
+                                </div>
+                                <div class="content">
+                                    <span class="date">${reply.date}</span>
+                                    <p>${reply.message}</p>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    $("#reply-input").val('');  // Clear reply input
+
+                    // Store ticket_id in reply button
+                    document.getElementById('reply-button').setAttribute('data-ticket-id', ticket_id);
+                })
+                .catch(error => console.error('Error:', error));
+
+            $('#ticketModal').modal('show');
+        }
+
+        document.getElementById('reply-button').addEventListener('click', () => {
+            const ticket_id = document.getElementById('reply-button').getAttribute('data-ticket-id');
+            const message = document.getElementById('reply-input').value;
+            if (message.trim() !== '') {
+                $('#ticketModal').modal('hide');
+                 console.log('close')
+                fetch(`/api/your_tickets/${ticket_id}/reply/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'  // Add CSRF token for security
+                    },
+                    body: JSON.stringify({ message })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        $('#ticketModal').modal('hide');
+                        loadTickets(currentPage, currentSort, currentFilter);
+                    } else {
+                        alert('Error sending reply: ' + data.error);
+                    }
+                })
+            } else {
+                alert('Please enter a message before replying.');
+            }
+        });
+
+        document.getElementById('search-button').addEventListener('click', () => {
+            loadTickets(currentPage, currentSort, currentFilter);
+        });
+
+        document.getElementById('subject-filter-select').addEventListener('change', (event) => {
+            currentFilter = event.target.value ? `subject=${event.target.value}` : '';
+            loadTickets(currentPage, currentSort, currentFilter);
+        });
+
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const sortField = th.getAttribute('data-sort');
+                currentSort = currentSort === sortField ? `-${sortField}` : sortField;
+                loadTickets(currentPage, currentSort, currentFilter);
+            });
+        });
+
+        loadTickets();
+    });
+</script>
+{% endblock content %}

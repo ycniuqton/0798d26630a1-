@@ -1,0 +1,117 @@
+{% load i18n static admin_datta %}
+
+<nav class="pcoded-navbar">
+  <div class="navbar-wrapper">
+    <div class="navbar-brand header-logo">
+      <a href="{% url 'index' %}" class="b-brand">
+        <div class="b-bg">
+          <i class="feather icon-trending-up"></i>
+        </div>
+        <span class="b-title">TrumpVPS.v2</span>
+      </a>
+      <a class="mobile-menu" id="mobile-collapse" href="javascript:"><span></span></a>
+    </div>
+    <div class="navbar-content scroll-div">
+      <ul class="nav pcoded-inner-navbar">
+        <li class="nav-item pcoded-menu-caption">
+        </li>
+        <li
+          class="nav-item pcoded-hasmenu  ">
+          <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i
+                class="feather icon-shopping-cart"></i></span><span class="pcoded-mtext">Products</span></a>
+          <ul class="pcoded-submenu">
+            <li class=""><a href="{% url 'instances' %}" class="">
+                <span class="pcoded-micon"><i class="feather icon-server text-c-green"></i></span>
+                <span class="pcoded-mtext">Instances</span>
+            </a>
+            </li>
+
+            <li class=""><a href="{% url 'vps_history' %}" class="">
+              <span class="pcoded-micon"><i class="feather icon-globe text-c-green"></i></span>
+              <span class="pcoded-mtext">VPS History</span>
+            </a></li>
+
+
+<!--            <li class=""><a href="{% url 'network' %}" class="">-->
+<!--                <span class="pcoded-micon"><i class="feather icon-globe text-c-green"></i></span>-->
+<!--                <span class="pcoded-mtext">Network</span>-->
+<!--                </a></li>-->
+<!--            <li class=""><a href="{% url 'block_storage' %}" class="">-->
+<!--                <span class="pcoded-micon"><i class="feather icon-layers text-c-green"></i></span>-->
+<!--                <span class="pcoded-mtext">Block Storage</span></a></li>-->
+            <li class=""><a href="{% url 'snapshot' %}" class="">
+                <span class="pcoded-micon"><i class="feather icon-copy text-c-green"></i></span>
+                <span class="pcoded-mtext">Snapshot</span></a></li>
+<!--            <li class=""><a href="{% url 'firewall' %}" class="">-->
+<!--                <span class="pcoded-micon"><i class="feather icon-alert-triangle text-c-green"></i></span>-->
+<!--                <span class="pcoded-mtext">Firewall</span></a></li>-->
+<!--            <li class=""><a href="{% url 'image' %}" class="">-->
+<!--                <span class="pcoded-micon"><i class="feather icon-inbox text-c-green"></i></span>-->
+<!--                <span class="pcoded-mtext">Image</span></a></li>-->
+<!--            <li class=""><a href="{% url 'monitoring' %}" class="">-->
+<!--                <span class="pcoded-micon"><i class="feather icon-activity text-c-green"></i></span>-->
+<!--                <span class="pcoded-mtext">Monitoring</span></a></li>-->
+          </ul>
+        </li>
+        <li
+          class="nav-item pcoded-hasmenu  ">
+          <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i
+                class="feather icon-bar-chart"></i></span><span class="pcoded-mtext">Financial</span></a>
+          <ul class="pcoded-submenu">
+            <li class=""><a href="{% url 'payment' %}" class="">
+                <span class="pcoded-mtext">Payment</span></a></li>
+            <li class=""><a href="{% url 'resource_record' %}" class="">
+                <span class="pcoded-mtext">Resource record</span></a></li>
+            <li class=""><a href="{% url 'billing' %}" class="">
+                <span class="pcoded-mtext">Billing</span></a></li>
+            <li class=""><a href="{% url 'invoices' %}" class="">
+                <span class="pcoded-mtext">Invoices</span></a></li>
+            </a>
+          </ul>
+        </li>
+
+        <li
+          class="nav-item pcoded-hasmenu  ">
+          <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i
+                class="feather icon-bookmark"></i></span><span class="pcoded-mtext">Support</span></a>
+          <ul class="pcoded-submenu">
+            <li class=""><a href="{% url 'ticket' %}" class="">
+                <span class="pcoded-mtext">Ticket</span></a></li>
+            <li class=""><a href="{% url 'your_tickets' %}" class="">
+                <span class="pcoded-mtext">Your Tickets</span></a></li>
+          </ul>
+        </li>
+
+        <li
+          class="nav-item pcoded-hasmenu  ">
+          <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i
+                class="feather icon-star-on"></i></span><span class="pcoded-mtext">Affiliate</span></a>
+          <ul class="pcoded-submenu">
+            <li class=""><a href="{% url 'your_introducer' %}" class="">
+                <span class="pcoded-mtext">Your Introducer</span></a></li>
+            <li class=""><a href="{% url 'link_code' %}" class="">
+                <span class="pcoded-mtext">Link code</span></a></li>
+            <li class=""><a href="{% url 'affiliate_stats' %}" class="">
+                <span class="pcoded-mtext">Affiliate stats</span></a></li>
+          </ul>
+        </li>
+        <li
+          class="nav-item pcoded-hasmenu  ">
+          <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i
+                class="feather icon-user"></i></span><span class="pcoded-mtext">Account</span></a>
+          <ul class="pcoded-submenu">
+            <li class=""><a href="{% url 'profile' %}" class="">
+                <span class="pcoded-mtext">Profile</span></a></li>
+            <li class=""><a href="{% url 'authentication' %}" class="">
+                <span class="pcoded-mtext">Authentication</span></a></li>
+          </ul>
+        </li>
+
+        <li class="nav-item">
+          <a target="_blank" href="/api/product/" class="nav-link "><span class="pcoded-micon"><i
+                class="feather icon-zap text-c-green"></i></span><span class="pcoded-mtext">Generated API</span></a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

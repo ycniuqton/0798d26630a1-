@@ -1,0 +1,87 @@
+{% extends 'ctv/layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block extrastyle %}
+<style>
+.iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+.parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<style>
+.search-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.search-bar input {
+    flex: 1;
+}
+.search-bar select, .search-bar button {
+    margin-left: 10px;
+}
+.table thead th {
+    background-color: #f8f9fa;
+}
+.no-images {
+    text-align: center;
+    padding: 50px 0;
+}
+.no-images img {
+    max-width: 150px;
+    margin-bottom: 20px;
+}
+</style>
+
+<div class="container mt-4">
+    <h2>Images</h2>
+    <div class="search-bar">
+        <input type="text" class="form-control" placeholder="Please enter" aria-label="Search">
+        <select class="form-control">
+            <option selected>Image Name</option>
+        </select>
+        <button class="btn btn-outline-secondary"><i class="fas fa-sync-alt"></i></button>
+    </div>
+    <p>The Custom Image is generated for data at the system disk only, while not data at the data disk.<br>
+    Deleting the custom image will not affect the existing VPS.<br>
+    Custom Images are only kept locked for 360 hours and cannot be retrieved after deletion.</p>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Image</th>
+                <th scope="col">Location</th>
+                <th scope="col">OS</th>
+                <th scope="col">Description</th>
+                <th scope="col">Datetime</th>
+                <th scope="col">Operation</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if images %}
+                {% for image in images %}
+                <tr>
+                    <td>{{ image.image }}</td>
+                    <td>{{ image.location }}</td>
+                    <td>{{ image.os }}</td>
+                    <td>{{ image.description }}</td>
+                    <td>{{ image.datetime }}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary">Manage</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="6" class="no-images">
+                        <img src="https://via.placeholder.com/150" alt="No Images">
+                        <h4>No Images</h4>
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}

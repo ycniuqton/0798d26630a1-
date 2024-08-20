@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  {% include 'ctv/includes/head.html' %}
+  {% block extrastyle %}{% endblock extrastyle %}
+</head>
+<body>
+
+  {% block content %}{% endblock content %}
+
+  {% include 'ctv/includes/scripts.html' %}
+  {% block extra_js %}{% endblock extra_js %}
+
+</body>
+</html>

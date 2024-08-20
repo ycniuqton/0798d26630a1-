@@ -1,0 +1,104 @@
+{% extends 'user/layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block extrastyle %}
+<style>
+    .iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+    .parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+    .card-body h5 {
+        margin-bottom: 20px;
+    }
+    .stat-box {
+        background-color: #f8f9fa;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .stat-box h3 {
+        font-size: 2rem;
+        margin: 0;
+    }
+    .stat-box p {
+        margin: 0;
+    }
+    .d-flex.align-items-center.justify-content-between {
+        width: 100%;
+    }
+    .d-flex.align-items-center.justify-content-between i {
+        margin-left: auto;
+    }
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Affiliate Stats</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h5>Promotion statistics</h5>
+                    <div class="row">
+                        <div class="col-4" style="
+    height: 150px;
+">
+                            <div class="stat-box">
+                                <h3>{{ promotion_stats.referred_visitors }}</h3>
+                                <p>Referred visitors</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-box">
+                                <h3>{{ promotion_stats.referred_signups }}</h3>
+                                <p>Referred signups</p>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="stat-box">
+                                <h3>{{ promotion_stats.conversion_rate }}</h3>
+                                <p>Conversion rate</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h5>Commission statistics</h5>
+                    <div class="row">
+                        <div class="col-6" style="
+    height: 150px;
+">
+                            <div class="stat-box">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <p>Total Commission</p>
+                                    <h3>${{ commission_stats.total_commission }}</h3>
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="stat-box">
+                                <div class="d-flex align-items-center justify-content-between">
+                                    <p>Commission last month</p>
+                                    <h3>${{ commission_stats.commission_last_month }}</h3>
+                                    <i class="fas fa-info-circle"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

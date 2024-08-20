@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+{% load i18n static admin_datta %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+{% get_direction as direction %}
+{% get_admin_setting as admin_setting %}
+<html lang="en">
+
+<head>
+  {% include 'user/includes/head.html' %}
+  {% block extrastyle %}{% endblock extrastyle %}
+  {% block extrahead %}{% endblock extrahead %}
+
+  <style>
+    .action-block {
+        display: flex;
+        justify-content: space-around;
+        padding: 20px;
+        background: #f5f5f5;
+        border-radius: 10px;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        margin: 20px 0;
+    }
+    .action-button {
+        margin: 0 5px;
+        padding: 10px 20px;
+        font-size: 14px;
+        border: none;
+        border-radius: 5px;
+        text-align: center;
+        background-color: #ffffff;
+        color: var(--main-color, #007bff);
+        transition: background-color 0.3s, color 0.3s;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .action-button i {
+        font-size: 20px;
+        margin-right: 8px;
+    }
+    .action-button span {
+        font-size: 14px;
+        font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  {% block pre_loader %}
+    {% include 'user/includes/pre-loader.html' %}
+  {% endblock pre_loader %}
+  
+  {% block sidebar %}
+    {% include 'user/includes/sidebar.html' %}
+  {% endblock sidebar %}
+
+  {% block header %}
+    {% include 'user/includes/navigation.html' %}
+  {% endblock header %}
+
+  <!-- [ Main Content ] start -->
+  <div class="pcoded-main-container">
+    <div class="pcoded-wrapper">
+      <div class="pcoded-content">
+        <div class="pcoded-inner-content">
+          <!-- [ breadcrumb ] start -->
+          {% block breadcrumbs %}
+            {% include 'user/includes/breadcrumb.html' %}
+          {% endblock breadcrumbs %}
+          <!-- [ breadcrumb ] end -->
+          <div class="main-body">
+            <div class="page-wrapper">
+              {% block content %}{% endblock content %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% include 'user/includes/scripts.html' %}
+  {% block extra_js %}{% endblock extra_js %}
+
+
+<script>
+  function adjustColorBrightness(color, amount) {
+        let usePound = false;
+        if (color[0] === "#") {
+            color = color.slice(1);
+            usePound = true;
+        }
+        const num = parseInt(color, 16);
+        let r = (num >> 16) + amount;
+        let g = ((num >> 8) & 0x00FF) + amount;
+        let b = (num & 0x0000FF) + amount;
+        r = r < 255 ? (r < 0 ? 0 : r) : 255;
+        g = g < 255 ? (g < 0 ? 0 : g) : 255;
+        b = b < 255 ? (b < 0 ? 0 : b) : 255;
+        return (usePound ? "#" : "") + (r << 16 | g << 8 | b).toString(16).padStart(6, '0');
+    }
+
+    document.querySelectorAll('.action-button').forEach(button => {
+        const mainColor = button.getAttribute('data-color');
+        const hoverColor = adjustColorBrightness(mainColor, -50);
+        button.style.setProperty('--main-color', mainColor);
+
+        button.addEventListener('mouseover', () => {
+            button.style.backgroundColor = mainColor;
+            button.style.color = '#ffffff';
+        });
+
+        button.addEventListener('mouseout', () => {
+            button.style.backgroundColor = '#ffffff';
+            button.style.color = mainColor;
+        });
+
+        button.addEventListener('mousedown', () => {
+            button.style.transform = 'translateY(-2px)';
+        });
+
+        button.addEventListener('mouseup', () => {
+            button.style.transform = 'translateY(0)';
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<style>
+    .iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+    .parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+    .card {
+        cursor: pointer;
+        transition: transform 0.2s;
+        border: 1px solid #ddd;
+    }
+    .card:hover {
+        transform: scale(1.05);
+    }
+    .card.selected {
+        border: 2px solid #007bff;
+        box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+    }
+</style>
+
+<div class="mt-4">
+    <h5>VPS Plans</h5>
+    <div class="row">
+        {% for plan in plans %}
+        <div class="col-md-4">
+            <div class="card plan-card" data-name="{{ plan.name }}" data-vcpu="{{ plan.vcpu }}" data-ram="{{ plan.ram }}" data-bandwidth="{{ plan.bandwidth }}" data-storage="{{ plan.storage }}" data-price="{{ plan.price }}">
+                <div class="card-body">
+                    <h4>{{ plan.name }}</h4>
+                    <ul>
+                        <li>{{ plan.vcpu }}</li>
+                        <li>{{ plan.ram }}</li>
+                        <li>{{ plan.bandwidth }}</li>
+                        <li>{{ plan.storage }}</li>
+                    </ul>
+                    <p>Bắt đầu từ <strong>{{ plan.price }}</strong> 1 tháng</p>
+                    <p>{{ plan.backup }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h5>Service Configuration Options</h5>
+    <form>
+        <div class="row">
+            <div class="col-md-6 form-group">
+                <label for="ipv4">Add IPv4</label>
+                <select class="form-control" id="ipv4">
+                    {% for option in ipv4_options %}
+                    <option value="{{ option }}">{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6 form-group">
+                <label for="bandwidth">Bandwidth (TB) - Network Usage</label>
+                <select class="form-control" id="bandwidth">
+                    {% for option in bandwidth_options %}
+                    <option value="{{ option }}">{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 form-group">
+                <label for="ram">Add RAM</label>
+                <select class="form-control" id="ram">
+                    {% for option in ram_options %}
+                    <option value="{{ option }}">{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6 form-group">
+                <label for="ssd">Add SSD</label>
+                <select class="form-control" id="ssd">
+                    {% for option in ssd_options %}
+                    <option value="{{ option }}">{{ option }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var planCards = document.querySelectorAll('.plan-card');
+
+    planCards.forEach(function(card) {
+        card.addEventListener('click', function() {
+            // Deselect all other cards
+            planCards.forEach(function(otherCard) {
+                otherCard.classList.remove('selected');
+            });
+
+            // Select the clicked card
+            card.classList.add('selected');
+
+            // Update vpsConfiguration
+            var planName = card.getAttribute('data-name');
+            var planVcpu = card.getAttribute('data-vcpu');
+            var planRam = card.getAttribute('data-ram');
+            var planBandwidth = card.getAttribute('data-bandwidth');
+            var planStorage = card.getAttribute('data-storage');
+            var planPrice = card.getAttribute('data-price');
+
+            vpsConfiguration.plan = {
+                name: planName,
+                vcpu: planVcpu,
+                ram: planRam,
+                bandwidth: planBandwidth,
+                storage: planStorage,
+                price: planPrice
+            };
+
+            // Trigger configuration update
+            document.getElementById('config_updated').value = 'true';
+            document.getElementById('config_updated').dispatchEvent(new Event('change'));
+        });
+    });
+
+    // Handle service configuration options
+    var ipv4Select = document.getElementById('ipv4');
+    var bandwidthSelect = document.getElementById('bandwidth');
+    var ramSelect = document.getElementById('ram');
+    var ssdSelect = document.getElementById('ssd');
+
+    function updateSummary() {
+        vpsConfiguration.ipv4 = ipv4Select.options[ipv4Select.selectedIndex].text;
+        vpsConfiguration.bandwidth = bandwidthSelect.options[bandwidthSelect.selectedIndex].text;
+        vpsConfiguration.ram = ramSelect.options[ramSelect.selectedIndex].text;
+        vpsConfiguration.ssd = ssdSelect.options[ssdSelect.selectedIndex].text;
+
+        // Trigger configuration update
+        document.getElementById('config_updated').value = 'true';
+        document.getElementById('config_updated').dispatchEvent(new Event('change'));
+    }
+
+    ipv4Select.addEventListener('change', updateSummary);
+    bandwidthSelect.addEventListener('change', updateSummary);
+    ramSelect.addEventListener('change', updateSummary);
+    ssdSelect.addEventListener('change', updateSummary);
+});
+</script>

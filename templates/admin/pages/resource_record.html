@@ -1,0 +1,87 @@
+{% extends 'user/layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block extrastyle %}
+<style>
+.iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+.parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+.search-bar {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+.search-bar input {
+    flex: 1;
+}
+.search-bar select, .search-bar button {
+    margin-left: 10px;
+}
+.table thead th {
+    background-color: #f8f9fa;
+}
+.no-instances {
+    text-align: center;
+    padding: 50px 0;
+}
+.no-instances img {
+    max-width: 150px;
+    margin-bottom: 20px;
+}
+.no-instances button {
+    background-color: #007bff;
+    color: white;
+}
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Resource Record</h2>
+    <div class="search-bar">
+        <input type="date" class="form-control">
+        <input type="date" class="form-control ml-2">
+        <input type="text" class="form-control ml-2" placeholder="Please enter" aria-label="Search">
+        <select class="form-control ml-2">
+            <option selected>UUID</option>
+        </select>
+        <button class="btn btn-outline-secondary ml-2"><i class="fas fa-sync-alt"></i></button>
+    </div>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Record ID</th>
+                <th scope="col">Location</th>
+                <th scope="col">Configuration</th>
+                <th scope="col">Record Type</th>
+                <th scope="col">Status</th>
+                <th scope="col">Record time</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if records %}
+                {% for record in records %}
+                    <tr>
+                        <td>{{ record.record_id }}</td>
+                        <td>{{ record.location }}</td>
+                        <td>{{ record.configuration }}</td>
+                        <td>{{ record.record_type }}</td>
+                        <td>{{ record.status }}</td>
+                        <td>{{ record.record_time }}</td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="6" class="no-instances">
+                        <img src="https://via.placeholder.com/150" alt="No Instances">
+                        <h4>No Instances</h4>
+                        <p>Deploy a new server at any of our worldwide datacenter locations</p>
+                        <button class="btn btn-primary">Deploy Instance</button>
+                    </td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+{% endblock content %}
