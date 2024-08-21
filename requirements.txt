@@ -17,6 +17,8 @@ gunicorn==21.2.0
 
 requests
 
+pyyaml
+redis
 # DB Layer
 # psycopg2-binary
 # mysqlclient

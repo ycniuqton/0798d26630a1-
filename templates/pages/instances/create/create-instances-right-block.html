@@ -52,6 +52,7 @@
         bandwidth: 'None',
         ram: 'None',
         ssd: 'None',
+        hostname: '',
         login: {
             username: '',
             password: ''
@@ -99,6 +100,7 @@
     }
 
     document.getElementById('submit-vps').addEventListener('click', function() {
+        vpsConfiguration.hostname = document.getElementById('hostname').value;
         fetch('/vps/create/', {
             method: 'POST',
             headers: {

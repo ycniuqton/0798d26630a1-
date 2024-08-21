@@ -8,15 +8,9 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 import random
 from django.shortcuts import render, get_object_or_404
-from admin_datta.forms import RegistrationForm, LoginForm, UserPasswordChangeForm, UserPasswordResetForm, \
-    UserSetPasswordForm
-from django.contrib.auth.views import LoginView, PasswordChangeView, PasswordResetConfirmView, PasswordResetView
-from django.views.generic import CreateView
-from django.contrib.auth import logout
 
-from django.contrib.auth.decorators import login_required
-
-from .models import *
+from services.vps import VPSService
+from .models import Vps
 
 
 def index(request):
@@ -35,43 +29,45 @@ def tables(request):
 
 
 def instances(request):
-    instances_data = [
-        {
-            "id": 1,
-            "server_name": "Server 1",
-            "location": "New York, USA",
-            "ip_address": "192.168.1.1",
-            "status": "Active"
-        },
-        {
-            "id": 2,
-            "server_name": "Server 2",
-            "location": "London, UK",
-            "ip_address": "192.168.1.2",
-            "status": "Inactive"
-        },
-        {
-            "id": 3,
-            "server_name": "Server 3",
-            "location": "Tokyo, Japan",
-            "ip_address": "192.168.1.3",
-            "status": "Active"
-        },
-        {
-            "id": 4,
-            "server_name": "Server 4",
-            "location": "Sydney, Australia",
-            "ip_address": "192.168.1.4",
-            "status": "Inactive"
-        },
-        {
-            "id": 5,
-            "server_name": "Server 5",
-            "location": "Berlin, Germany",
-            "ip_address": "192.168.1.5",
-            "status": "Active"
-        }
-    ]
+    # instances_data = [
+    #     {
+    #         "id": 1,
+    #         "server_name": "Server 1",
+    #         "location": "New York, USA",
+    #         "ip_address": "192.168.1.1",
+    #         "status": "Active"
+    #     },
+    #     {
+    #         "id": 2,
+    #         "server_name": "Server 2",
+    #         "location": "London, UK",
+    #         "ip_address": "192.168.1.2",
+    #         "status": "Inactive"
+    #     },
+    #     {
+    #         "id": 3,
+    #         "server_name": "Server 3",
+    #         "location": "Tokyo, Japan",
+    #         "ip_address": "192.168.1.3",
+    #         "status": "Active"
+    #     },
+    #     {
+    #         "id": 4,
+    #         "server_name": "Server 4",
+    #         "location": "Sydney, Australia",
+    #         "ip_address": "192.168.1.4",
+    #         "status": "Inactive"
+    #     },
+    #     {
+    #         "id": 5,
+    #         "server_name": "Server 5",
+    #         "location": "Berlin, Germany",
+    #         "ip_address": "192.168.1.5",
+    #         "status": "Active"
+    #     }
+    # ]
+
+    instances_data = Vps.objects.all()
 
     context = {
         'segment': 'instances',
@@ -891,17 +887,38 @@ def create_vps(request):
         ram = data.get('ram', 'None')
         ssd = data.get('ssd', 'None')
         login = data.get('login', {})
+        hostname = data.get('hostname', 'None')
 
-        # Here you would add the logic to actually create the VPS.
-        # This might involve interacting with a VPS provider's API.
+        base_url = "http://127.0.0.1:5000"
+        api_key = "scrypt:32768:8:1$RL6X6J7bJJiROtTL$5bd54c34882906e9cf41e596c0a2b67f2a256b1492e266642f3c40521e4b4521ff56dfcf84e9deb9e34ea63d6e89de3c089d32041b5269d76f4c11078636aebd"
 
-        # For now, we'll just return the received configuration for demo purposes
-        response_data = {
-            'status': 'success',
-            'message': 'VPS created successfully',
-            'vpsConfiguration': data
+        service = VPSService(base_url, api_key)
+        payload = {
+            "hostname": hostname,
+            "password": "somepass",
+            "serid": 0,
+            "plid": 58,
+            "osid": 100006
         }
-        return JsonResponse(response_data)
+
+        try:
+            response = service.create(payload)
+            # For now, we'll just return the received configuration for demo purposes
+            response_data = {
+                'status': 'success',
+                'message': 'VPS created successfully',
+                'vpsConfiguration': data
+            }
+            return JsonResponse(response_data)
+        except:
+            response_data = {
+                'status': 'error',
+                'message': 'Failed to create VPS',
+                'vpsConfiguration': {}
+            }
+            return JsonResponse(response_data)
+
+
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
