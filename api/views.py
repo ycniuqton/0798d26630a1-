@@ -1,87 +1,45 @@
-from http import HTTPStatus
-from django.http import Http404
+from rest_framework import generics, permissions
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.generics import get_object_or_404
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.authtoken.models import Token
+from django.contrib.auth import login, logout
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
 
 
-from api.serializers import *
+class RegisterAPI(generics.GenericAPIView):
+    permission_classes = [permissions.AllowAny]
+    serializer_class = RegisterSerializer
 
-
-try:
-
-    from home.models import Product
-
-except:
-    pass
-
-class ProductView(APIView):
-
-    permission_classes = (IsAuthenticatedOrReadOnly,)
-
-    def post(self, request):
-        serializer = ProductSerializer(data=request.data)
-        if not serializer.is_valid():
-            return Response(data={
-                **serializer.errors,
-                'success': False
-            }, status=HTTPStatus.BAD_REQUEST)
-        serializer.save()
-        return Response(data={
-            'message': 'Record Created.',
-            'success': True
-        }, status=HTTPStatus.OK)
-
-    def get(self, request, pk=None):
-        if not pk:
-            return Response({
-                'data': [ProductSerializer(instance=obj).data for obj in Product.objects.all()],
-                'success': True
-            }, status=HTTPStatus.OK)
-        try:
-            obj = get_object_or_404(Product, pk=pk)
-        except Http404:
-            return Response(data={
-                'message': 'object with given id not found.',
-                'success': False
-            }, status=HTTPStatus.NOT_FOUND)
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        token = Token.objects.create(user=user)
         return Response({
-            'data': ProductSerializer(instance=obj).data,
-            'success': True
-        }, status=HTTPStatus.OK)
+            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+            "token": token.key
+        })
 
-    def put(self, request, pk):
-        try:
-            obj = get_object_or_404(Product, pk=pk)
-        except Http404:
-            return Response(data={
-                'message': 'object with given id not found.',
-                'success': False
-            }, status=HTTPStatus.NOT_FOUND)
-        serializer = ProductSerializer(instance=obj, data=request.data, partial=True)
-        if not serializer.is_valid():
-            return Response(data={
-                **serializer.errors,
-                'success': False
-            }, status=HTTPStatus.BAD_REQUEST)
-        serializer.save()
-        return Response(data={
-            'message': 'Record Updated.',
-            'success': True
-        }, status=HTTPStatus.OK)
 
-    def delete(self, request, pk):
-        try:
-            obj = get_object_or_404(Product, pk=pk)
-        except Http404:
-            return Response(data={
-                'message': 'object with given id not found.',
-                'success': False
-            }, status=HTTPStatus.NOT_FOUND)
-        obj.delete()
-        return Response(data={
-            'message': 'Record Deleted.',
-            'success': True
-        }, status=HTTPStatus.OK)
+class LoginAPI(generics.GenericAPIView):
+    serializer_class = LoginSerializer
+    permission_classes = [permissions.AllowAny]
 
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
+        login(request, user)
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            "user": UserSerializer(user, context=self.get_serializer_context()).data,
+            "token": token.key
+        })
+
+
+class LogoutAPI(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        request.user.auth_token.delete()
+        logout(request)
+        return Response({"message": "Successfully logged out"})

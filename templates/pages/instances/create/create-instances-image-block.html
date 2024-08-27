@@ -17,6 +17,9 @@
     .version-select {
         display: none;
     }
+    .image-os-icon{
+        max-width: 100px;
+    }
 </style>
 
 <div class="image-selection">
@@ -41,7 +44,7 @@
                 <div class="col-6 col-md-4 col-lg-3 mb-3">
                     <div class="card image-card" data-name="{{ image.name }}">
                         <div class="card-body text-center">
-                            <img src="{{ image.image_url }}" alt="{{ image.name }}" class="mb-2">
+                            <img src="/api/static/os_icon/{{ image.image_url }}" alt="{{ image.name }}" class="mb-2  image-os-icon">
                             <h6>{{ image.name }}</h6>
                             <select class="form-control version-select" data-image="{{ image.name }}">
                                 {% for version in image.versions %}

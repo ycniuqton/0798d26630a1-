@@ -1,19 +1,35 @@
 from rest_framework import serializers
+from django.contrib.auth import authenticate
+from home.models import User
 
 
-try:
-
-    from home.models import Product
-
-except:
-    pass 
-
-class ProductSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     class Meta:
+        model = User
+        fields = ('id', 'username', 'email')
 
-        try:
-            model = Product
-        except:
-            pass    
-        fields = '__all__'
 
+class RegisterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password')
+        extra_kwargs = {'password': {'write_only': True}}
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            validated_data['username'],
+            validated_data['email'],
+            validated_data['password']
+        )
+        return user
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, data):
+        user = authenticate(**data)
+        if user and user.is_active:
+            return user
+        raise serializers.ValidationError("Invalid credentials")

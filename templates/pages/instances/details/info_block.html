@@ -8,7 +8,7 @@
         <table class="table table-borderless">
             <tr>
                 <th>Server Name</th>
-                <td>{{ instance.server_name }}</td>
+                <td>{{ instance.hostname }}</td>
             </tr>
             <tr>
                 <th>IP Address</th>
@@ -25,24 +25,24 @@
             <tr>
                 <th>Image</th>
                 <td>
-                    <span id="os-text">{{ instance.image }}</span>
-                    <i class="fas fa-edit" id="change-os-icon" style="cursor: pointer;" onclick="showOsDropdown()"></i>
-                    <select id="os-dropdown" class="form-control d-none">
-                        {% for os in os_options %}
-                        <option value="{{ os }}">{{ os }}</option>
-                        {% endfor %}
-                    </select>
-                    <button id="update-os-btn" class="btn btn-primary d-none" onclick="updateOs()">Update</button>
-                    <button id="cancel-os-btn" class="btn btn-secondary d-none" onclick="cancelOsChange()">Cancel</button>
+                    <span id="os-text">{{ instance.os }}</span>
+<!--                    <i class="fas fa-edit" id="change-os-icon" style="cursor: pointer;" onclick="showOsDropdown()"></i>-->
+<!--                    <select id="os-dropdown" class="form-control d-none">-->
+<!--                        {% for os in os_options %}-->
+<!--                        <option value="{{ os }}">{{ os }}</option>-->
+<!--                        {% endfor %}-->
+<!--                    </select>-->
+<!--                    <button id="update-os-btn" class="btn btn-primary d-none" onclick="updateOs()">Update</button>-->
+<!--                    <button id="cancel-os-btn" class="btn btn-secondary d-none" onclick="cancelOsChange()">Cancel</button>-->
                 </td>
             </tr>
             <tr>
                 <th>Created At</th>
-                <td>{{ instance.created_at }}</td>
+                <td>{{ instance.created }}</td>
             </tr>
             <tr>
                 <th>Last Modified</th>
-                <td>{{ instance.last_modified }}</td>
+                <td>{{ instance.updated }}</td>
             </tr>
         </table>
     </div>

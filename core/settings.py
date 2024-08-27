@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 from str2bool import str2bool
 from django.utils.translation import gettext_lazy as _
 from config import *
+import dj_database_url
 
 import django_dyn_dt
 
@@ -72,9 +73,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     "home",
+    "api",
 
     # Tooling Dynamic_DT
     'django_dyn_dt',  # <-- NEW: Dynamic_DT
+    'rest_framework_simplejwt.token_blacklist',
 
     # Tooling API-GEN
     'django_api_gen',  # Django API GENERATOR  # <-- NEW
@@ -83,6 +86,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'core.middleware.CustomAuthMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -92,6 +96,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+
 ]
 
 ROOT_URLCONF = "core.urls"
@@ -127,24 +132,26 @@ DB_HOST = os.getenv('DB_HOST', None)
 DB_PORT = os.getenv('DB_PORT', None)
 DB_NAME = os.getenv('DB_NAME', None)
 
-if DB_ENGINE and DB_NAME and DB_USERNAME:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.' + DB_ENGINE,
-            'NAME': DB_NAME,
-            'USER': DB_USERNAME,
-            'PASSWORD': DB_PASS,
-            'HOST': DB_HOST,
-            'PORT': DB_PORT,
-        },
-    }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': 'db.sqlite3',
-        }
-    }
+DATABASES = {'default': dj_database_url.config(default=PGDBConfig.DB_URI)}
+
+# if DB_ENGINE and DB_NAME and DB_USERNAME:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.' + DB_ENGINE,
+#             'NAME': DB_NAME,
+#             'USER': DB_USERNAME,
+#             'PASSWORD': DB_PASS,
+#             'HOST': DB_HOST,
+#             'PORT': DB_PORT,
+#         },
+#     }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': 'db.sqlite3',
+#         }
+#     }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -213,10 +220,45 @@ API_GENERATOR = {
 }
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'core.authentication.CookieBasicAuthentication'
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.IsAuthenticated'
+
+    ),
+    'EXCEPTION_HANDLER': 'core.exception_handlers.custom_exception_handler',
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=14),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "UPDATE_LAST_LOGIN": False,
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": SECRET_KEY,
+    "VERIFYING_KEY": None,
+    "AUDIENCE": None,
+    "ISSUER": None,
+    "JWK_URL": None,
+    "LEEWAY": 0,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
+    "JTI_CLAIM": "jti",
+    "SLIDING_TOKEN_REFRESH_EXP_CLAIM": "refresh_exp",
+    "SLIDING_TOKEN_LIFETIME": timedelta(minutes=5),
+    "SLIDING_TOKEN_REFRESH_LIFETIME": timedelta(days=1),
 }
 
 AUTH_USER_MODEL = 'home.User'

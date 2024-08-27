@@ -10,7 +10,7 @@
     .table-custom { margin-top: 20px; }
     .table thead th { background-color: #f8f9fa; }
     .no-instances { text-align: center; padding: 50px 0; }
-    .no-instances img { max-width: 150px; margin-bottom: 20px; }
+    .no-instances img { max-width: 400px; margin-bottom: 20px; }
     .no-instances button { background-color: #007bff; color: white; }
     .top-bar { display: flex; justify-content: space-between; align-items: center; }
     .btn-add { background-color: #007bff; color: white; }
@@ -25,7 +25,7 @@
 <div class="container">
     <div class="top-bar my-4">
         <h2>Instances</h2>
-        <button class="action-button" data-color="#007bff" onclick="location.href='/create_instances/';"><span>+ Create</span></button>
+        <button class="action-button" data-color="#007bff" onclick="location.href='/instances/create/';"><span>+ Create</span></button>
     </div>
     <div class="mb-3 float-right-buttons" style="display:flex" >
         <button class="action-button" data-color="#28a745" onclick="handleAction('start')"><i
@@ -66,7 +66,7 @@
                 {% for instance in instances %}
                 <tr>
                     <td><input type="checkbox" class="instance-checkbox" data-instance-id="{{ instance.id }}"></td>
-                    <td>{{ instance.server_name }}</td>
+                    <td>{{ instance.hostname }}</td>
                     <td>{{ instance.location }}</td>
                     <td>{{ instance.ip_address }}</td>
                     <td>{{ instance.status }}</td>
@@ -78,10 +78,10 @@
             {% else %}
                 <tr>
                     <td colspan="6" class="no-instances">
-                        <img src="https://via.placeholder.com/150" alt="No Instances">
+                        <img src="/static/assets/images/custom/vps.png" alt="No Instances">
                         <h4>No Instances</h4>
                         <p>Deploy a new server at any of our worldwide datacenter locations</p>
-                        <button class="btn btn-primary">Deploy Instance</button>
+                        <button class="btn btn-primary" onclick="location.href='/instances/create/';" >Deploy Instance</button>
                     </td>
                 </tr>
             {% endif %}

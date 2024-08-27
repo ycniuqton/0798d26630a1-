@@ -19,6 +19,11 @@ requests
 
 pyyaml
 redis
+marshmallow
+kafka-python
 # DB Layer
 # psycopg2-binary
 # mysqlclient
+
+
+djangorestframework-simplejwt

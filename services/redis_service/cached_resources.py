@@ -1,5 +1,5 @@
 import requests
-from __base__ import CachedResource
+from services.redis_service.__base__ import CachedResource
 from core import settings
 
 
@@ -37,13 +37,18 @@ class CachedServer(CachedResource):
 
 
 if __name__ == "__main__":
-    plan = CachedPlan()
-    print(plan.get())
+    # plan = CachedPlan()
+    # print(plan.get())
     # plan.delete()
-
-    os = CachedOS()
-    print(os.get())
+    #
+    # os = CachedOS()
+    # print(os.get())
+    #
+    # server = CachedServer()
+    # print(server.get())
 
     server = CachedServer()
+    # server.delete()
     print(server.get())
+
 

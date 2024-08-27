@@ -13,6 +13,18 @@
         border: 2px solid #007bff;
         box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
     }
+    .no-bullets {
+<!--    list-style-type: none;-->
+}
+    .card-plan-name {
+    background-color: #04a9f5;
+    margin-left: -20px;
+    margin-right: -20px;
+    border-radius: 5px;
+    padding: 15px;
+    margin-top: -25px;
+}
+
 </style>
 
 <div class="mt-4">
@@ -20,16 +32,17 @@
     <div class="row">
         {% for plan in plans %}
         <div class="col-md-4">
-            <div class="card plan-card" data-name="{{ plan.name }}" data-vcpu="{{ plan.vcpu }}" data-ram="{{ plan.ram }}" data-bandwidth="{{ plan.bandwidth }}" data-storage="{{ plan.storage }}" data-price="{{ plan.price }}">
-                <div class="card-body">
-                    <h4>{{ plan.name }}</h4>
-                    <ul>
-                        <li>{{ plan.vcpu }}</li>
-                        <li>{{ plan.ram }}</li>
-                        <li>{{ plan.bandwidth }}</li>
-                        <li>{{ plan.storage }}</li>
+            <div class="card plan-card" data-name="{{ plan.name }}" data-vcpu="{{ plan.cpu }}" data-ram="{{ plan.ram }}" data-bandwidth="{{ plan.bandwidth }}" data-storage="{{ plan.disk }}" data-price="{{ plan.price }}"
+            plan-id="{{plan.id}}">
+                <div class="card-body ">
+                    <h4 class="card-plan-name">{{ plan.name }}</h4>
+                    <ul class="no-bullets">
+                        <li>{{ plan.cpu }} Core</li>
+                        <li>{{ plan.ram }} MB</li>
+                        <li>{{ plan.bandwidth }} Mbps</li>
+                        <li>{{ plan.disk }} GB</li>
                     </ul>
-                    <p>Bắt đầu từ <strong>{{ plan.price }}</strong> 1 tháng</p>
+                    <p>Bắt đầu từ <strong>{{ plan.price }} VND</strong> 1 tháng</p>
                     <p>{{ plan.backup }}</p>
                 </div>
             </div>
@@ -37,45 +50,47 @@
         {% endfor %}
     </div>
 
-    <h5>Service Configuration Options</h5>
-    <form>
-        <div class="row">
-            <div class="col-md-6 form-group">
-                <label for="ipv4">Add IPv4</label>
-                <select class="form-control" id="ipv4">
-                    {% for option in ipv4_options %}
-                    <option value="{{ option }}">{{ option }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-6 form-group">
-                <label for="bandwidth">Bandwidth (TB) - Network Usage</label>
-                <select class="form-control" id="bandwidth">
-                    {% for option in bandwidth_options %}
-                    <option value="{{ option }}">{{ option }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-6 form-group">
-                <label for="ram">Add RAM</label>
-                <select class="form-control" id="ram">
-                    {% for option in ram_options %}
-                    <option value="{{ option }}">{{ option }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-6 form-group">
-                <label for="ssd">Add SSD</label>
-                <select class="form-control" id="ssd">
-                    {% for option in ssd_options %}
-                    <option value="{{ option }}">{{ option }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-    </form>
+<!--    <h5>Service Configuration Options</h5>-->
+<!--    <form>-->
+<!--        <div class="row">-->
+<!--            <div class="col-md-6 form-group">-->
+<!--                <label for="ipv4">Add IPv4</label>-->
+<!--                <select class="form-control" id="ipv4">-->
+<!--                    {% for option in ipv4_options %}-->
+<!--                    <option value="{{ option }}">{{ option }}</option>-->
+<!--                    {% endfor %}-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            <div class="col-md-6 form-group">-->
+<!--                <label for="bandwidth">Bandwidth (TB) - Network Usage</label>-->
+<!--                <select class="form-control" id="bandwidth">-->
+<!--                    {% for option in bandwidth_options %}-->
+<!--                    <option value="{{ option }}">{{ option }}</option>-->
+<!--                    {% endfor %}-->
+<!--                </select>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        <div class="row">-->
+<!--            <div class="col-md-6 form-group">-->
+<!--                <label for="ram">Add RAM</label>-->
+<!--                <select class="form-control" id="ram">-->
+<!--                    {% for option in ram_options %}-->
+<!--                    <option value="{{ option }}">{{ option }}</option>-->
+<!--                    {% endfor %}-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            <div class="col-md-6 form-group">-->
+<!--                <label for="ssd">Add SSD</label>-->
+<!--                <select class="form-control" id="ssd">-->
+<!--                    {% for option in ssd_options %}-->
+<!--                    <option value="{{ option }}">{{ option }}</option>-->
+<!--                    {% endfor %}-->
+<!--                </select>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </form>-->
+
+
 </div>
 
 
@@ -96,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update vpsConfiguration
             var planName = card.getAttribute('data-name');
             var planVcpu = card.getAttribute('data-vcpu');
+            var planID = card.getAttribute('plan-id');
             var planRam = card.getAttribute('data-ram');
             var planBandwidth = card.getAttribute('data-bandwidth');
             var planStorage = card.getAttribute('data-storage');
@@ -104,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
             vpsConfiguration.plan = {
                 name: planName,
                 vcpu: planVcpu,
+                id: planID,
                 ram: planRam,
                 bandwidth: planBandwidth,
                 storage: planStorage,
@@ -133,9 +150,9 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('config_updated').dispatchEvent(new Event('change'));
     }
 
-    ipv4Select.addEventListener('change', updateSummary);
-    bandwidthSelect.addEventListener('change', updateSummary);
-    ramSelect.addEventListener('change', updateSummary);
-    ssdSelect.addEventListener('change', updateSummary);
+<!--    ipv4Select.addEventListener('change', updateSummary);-->
+<!--    bandwidthSelect.addEventListener('change', updateSummary);-->
+<!--    ramSelect.addEventListener('change', updateSummary);-->
+<!--    ssdSelect.addEventListener('change', updateSummary);-->
 });
 </script>

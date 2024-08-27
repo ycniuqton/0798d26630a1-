@@ -13,10 +13,10 @@
             <li><strong>RAM:</strong> <span id="summary-ram">None</span></li>
             <li><strong>Network:</strong> <span id="summary-network">None</span></li>
             <li><strong>Storage:</strong> <span id="summary-storage">None</span></li>
-            <li><strong>Additional IPv4:</strong> <span id="summary-ipv4">None</span></li>
-            <li><strong>Additional RAM:</strong> <span id="summary-ram-add">None</span></li>
-            <li><strong>Additional SSD:</strong> <span id="summary-ssd">None</span></li>
-            <li><strong>Bandwidth (TB):</strong> <span id="summary-bandwidth">None</span></li>
+            <!--            <li><strong>Additional IPv4:</strong> <span id="summary-ipv4">None</span></li>-->
+            <!--            <li><strong>Additional RAM:</strong> <span id="summary-ram-add">None</span></li>-->
+            <!--            <li><strong>Additional SSD:</strong> <span id="summary-ssd">None</span></li>-->
+            <!--            <li><strong>Bandwidth (TB):</strong> <span id="summary-bandwidth">None</span></li>-->
         </ul>
         <hr>
         <div class="mb-3">
@@ -71,10 +71,10 @@
         document.getElementById('summary-ram').innerText = vpsConfiguration.plan.ram || 'None';
         document.getElementById('summary-network').innerText = vpsConfiguration.plan.bandwidth || 'None';
         document.getElementById('summary-storage').innerText = vpsConfiguration.plan.storage || 'None';
-        document.getElementById('summary-ipv4').innerText = vpsConfiguration.ipv4;
-        document.getElementById('summary-ram-add').innerText = vpsConfiguration.ram;
-        document.getElementById('summary-ssd').innerText = vpsConfiguration.ssd;
-        document.getElementById('summary-bandwidth').innerText = vpsConfiguration.bandwidth;
+<!--        document.getElementById('summary-ipv4').innerText = vpsConfiguration.ipv4;-->
+<!--        document.getElementById('summary-ram-add').innerText = vpsConfiguration.ram;-->
+<!--        document.getElementById('summary-ssd').innerText = vpsConfiguration.ssd;-->
+<!--        document.getElementById('summary-bandwidth').innerText = vpsConfiguration.bandwidth;-->
 
         // Fetch the total cost from the calculator API
         fetch('/api/vps-calculator/', {
@@ -100,8 +100,23 @@
     }
 
     document.getElementById('submit-vps').addEventListener('click', function() {
-        vpsConfiguration.hostname = document.getElementById('hostname').value;
-        fetch('/vps/create/', {
+        if (vpsConfiguration.location.id === undefined) {
+            alert('Please select a location.');
+            return;
+        }
+        if (vpsConfiguration.image.version === undefined) {
+            alert('Please select an image.');
+            return;
+        }
+        if (vpsConfiguration.plan.id === undefined) {
+            alert('Please select a plan.');
+            return;
+        }
+
+
+
+
+        fetch('/api/vps/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -111,7 +126,7 @@
         })
         .then(response => {
             if (response.ok) {
-                alert('VPS created successfully!');
+                location.href='/instances/'
             } else {
                 alert('Failed to create VPS.');
             }
@@ -158,24 +173,6 @@
     fetchCurrentBalance();
     render_summary_block();
 
-    // Duration input handling
-    document.getElementById('duration-up').addEventListener('click', function() {
-        var durationInput = document.getElementById('duration-input');
-        durationInput.value = parseInt(durationInput.value) + 1;
-        vpsConfiguration.duration = parseInt(durationInput.value);
-        document.getElementById('config_updated').value = 'true';
-        document.getElementById('config_updated').dispatchEvent(new Event('change'));
-    });
-
-    document.getElementById('duration-down').addEventListener('click', function() {
-        var durationInput = document.getElementById('duration-input');
-        if (parseInt(durationInput.value) > 1) {
-            durationInput.value = parseInt(durationInput.value) - 1;
-            vpsConfiguration.duration = parseInt(durationInput.value);
-            document.getElementById('config_updated').value = 'true';
-            document.getElementById('config_updated').dispatchEvent(new Event('change'));
-        }
-    });
 
     document.getElementById('duration-input').addEventListener('input', function() {
         vpsConfiguration.duration = parseInt(this.value);

@@ -1,3 +1,4 @@
+from admin_datta.views import UserLoginView
 from django.shortcuts import render, redirect
 import requests
 from django.http import JsonResponse
@@ -10,7 +11,12 @@ import random
 from django.shortcuts import render, get_object_or_404
 
 from services.vps import VPSService
-from .models import Vps
+from home.models import Vps
+
+from django.http import JsonResponse, HttpResponse
+from django.conf import settings
+from django.views import View
+import os
 
 
 def index(request):
@@ -28,199 +34,11 @@ def tables(request):
     return render(request, "pages/dynamic-tables.html", context)
 
 
-def instances(request):
-    # instances_data = [
-    #     {
-    #         "id": 1,
-    #         "server_name": "Server 1",
-    #         "location": "New York, USA",
-    #         "ip_address": "192.168.1.1",
-    #         "status": "Active"
-    #     },
-    #     {
-    #         "id": 2,
-    #         "server_name": "Server 2",
-    #         "location": "London, UK",
-    #         "ip_address": "192.168.1.2",
-    #         "status": "Inactive"
-    #     },
-    #     {
-    #         "id": 3,
-    #         "server_name": "Server 3",
-    #         "location": "Tokyo, Japan",
-    #         "ip_address": "192.168.1.3",
-    #         "status": "Active"
-    #     },
-    #     {
-    #         "id": 4,
-    #         "server_name": "Server 4",
-    #         "location": "Sydney, Australia",
-    #         "ip_address": "192.168.1.4",
-    #         "status": "Inactive"
-    #     },
-    #     {
-    #         "id": 5,
-    #         "server_name": "Server 5",
-    #         "location": "Berlin, Germany",
-    #         "ip_address": "192.168.1.5",
-    #         "status": "Active"
-    #     }
-    # ]
-
-    instances_data = Vps.objects.all()
-
-    context = {
-        'segment': 'instances',
-        'instances': instances_data
-    }
-    return render(request, "pages/instances.html", context)
-
-
 def home(request):
     context = {
         'segment': 'home'
     }
     return render(request, "pages/home.html", context)
-
-
-def create_instances(request):
-    plans = [
-        {
-            "name": "VPS VN-1",
-            "vcpu": "1 vCPU",
-            "ram": "1GB RAM",
-            "bandwidth": "1TB băng thông",
-            "storage": "20GB SSD Enterprise",
-            "price": "60,000 đ",
-            "backup": "NO BACKUP",
-            "link": "#"
-        },
-        {
-            "name": "VPS VN-2",
-            "vcpu": "1 vCPU",
-            "ram": "2GB RAM",
-            "bandwidth": "3TB băng thông",
-            "storage": "20GB SSD Enterprise",
-            "price": "120,000 đ",
-            "backup": "NO BACKUP",
-            "link": "#"
-        },
-        {
-            "name": "VPS VN-3",
-            "vcpu": "2 vCPU",
-            "ram": "2GB RAM",
-            "bandwidth": "3TB băng thông",
-            "storage": "20GB SSD Enterprise",
-            "price": "140,000 đ",
-            "backup": "",
-            "link": "#"
-        },
-        {
-            "name": "VPS VN-4",
-            "vcpu": "2 vCPU",
-            "ram": "4GB RAM",
-            "bandwidth": "5TB băng thông",
-            "storage": "30GB SSD Enterprise",
-            "price": "200,000 đ",
-            "backup": "",
-            "link": "#"
-        },
-        {
-            "name": "VPS VN-6",
-            "vcpu": "3 vCPU",
-            "ram": "6GB RAM",
-            "bandwidth": "5TB băng thông",
-            "storage": "40GB SSD Enterprise",
-            "price": "300,000 đ",
-            "backup": "",
-            "link": "#"
-        },
-        {
-            "name": "VPS VN-8",
-            "vcpu": "4 vCPU",
-            "ram": "8GB RAM",
-            "bandwidth": "10TB băng thông",
-            "storage": "50GB SSD Enterprise",
-            "price": "400,000 đ",
-            "backup": "số lượng lớn ib giảm tới 10%",
-            "link": "#"
-        }
-    ]
-    ipv4_options = ["1 IPv4", "2 IPv4", "5 IPv4"]
-    bandwidth_options = ["Default", "+ 5TB", "+ 10TB"]
-    ram_options = ["Default", "+ 3GB", "+ 6GB"]
-    ssd_options = ["Default", "+ 50GB", "+ 100GB"]
-
-    # country
-    regions = [
-        "Asia", "North America", "Europe", "South America", "Africa", "Oceania", "Middle East", "ALL"
-    ]
-
-    locations = [
-        {"name": "Washington", "country": "USA", "region": "North America"},
-        {"name": "Silicon Valley", "country": "USA", "region": "North America"},
-        {"name": "Toronto", "country": "Canada", "region": "North America"},
-        {"name": "Vancouver", "country": "Canada", "region": "North America"},
-        {"name": "Frankfurt", "country": "Germany", "region": "Europe"},
-        {"name": "London", "country": "UK", "region": "Europe"},
-        {"name": "Paris", "country": "France", "region": "Europe"},
-        {"name": "Amsterdam", "country": "Netherlands", "region": "Europe"},
-        {"name": "Jakarta", "country": "Indonesia", "region": "Asia"},
-        {"name": "Singapore", "country": "Singapore", "region": "Asia"},
-        {"name": "Tokyo", "country": "Japan", "region": "Asia"},
-        {"name": "Seoul", "country": "South Korea", "region": "Asia"},
-        {"name": "São Paulo", "country": "Brazil", "region": "South America"},
-        {"name": "Buenos Aires", "country": "Argentina", "region": "South America"},
-        {"name": "Cape Town", "country": "South Africa", "region": "Africa"},
-        {"name": "Nairobi", "country": "Kenya", "region": "Africa"},
-        {"name": "Sydney", "country": "Australia", "region": "Oceania"},
-        {"name": "Melbourne", "country": "Australia", "region": "Oceania"},
-        {"name": "Dubai", "country": "UAE", "region": "Middle East"},
-        {"name": "Riyadh", "country": "Saudi Arabia", "region": "Middle East"},
-    ]
-    # Fetch flags using restcountries.com API
-    # for location in locations:
-    #     response = requests.get(f"https://restcountries.com/v3.1/name/{location['country']}?fields=flags")
-    #     if response.status_code == 200:
-    #         location_data = response.json()
-    #         if location_data:
-    #             location['flag'] = location_data[0]['flags']['png']
-    #     else:
-    #         location['flag'] = "https://via.placeholder.com/30"  # Fallback image
-
-    # OS
-    categories = ["ALL", "System Image"]
-    images = [
-        {"name": "Ubuntu", "versions": ["18.04", "19.04", "20.04", "22.04"], "category": "System Image",
-         "image_url": "https://via.placeholder.com/50"},
-        {"name": "Debian", "versions": ["9", "10", "11"], "category": "System Image",
-         "image_url": "https://via.placeholder.com/50"},
-        {"name": "AlmaLinux", "versions": ["8.4", "8.5", "8.6"], "category": "System Image",
-         "image_url": "https://via.placeholder.com/50"},
-        {"name": "Arch Linux", "versions": ["2020.05", "2021.06", "2022.07"], "category": "System Image",
-         "image_url": "https://via.placeholder.com/50"},
-        {"name": "CentOS", "versions": ["7", "8"], "category": "System Image",
-         "image_url": "https://via.placeholder.com/50"},
-        {"name": "FreeBSD", "versions": ["11", "12", "13"], "category": "System Image",
-         "image_url": "https://via.placeholder.com/50"},
-        {"name": "Rocky Linux", "versions": ["8.4", "8.5", "8.6"], "category": "System Image",
-         "image_url": "https://via.placeholder.com/50"},
-        {"name": "Windows", "versions": ["10", "Server 2016", "Server 2019"], "category": "System Image",
-         "image_url": "https://via.placeholder.com/50"},
-    ]
-    context = {
-        'segment': 'create_instances',
-        'plans': plans,
-        'ipv4_options': ipv4_options,
-        'bandwidth_options': bandwidth_options,
-        'ram_options': ram_options,
-        'ssd_options': ssd_options,
-        'regions': regions,
-        'locations': locations,
-        'categories': categories,
-        'images': images,
-    }
-    return render(request, "pages/instances/create/create-instances.html", context)
 
 
 def network(request):
@@ -734,7 +552,6 @@ def ticket_detail_view(request, ticket_id):
     return JsonResponse(ticket_data)
 
 
-
 def affiliate(request):
     context = {
         'segment': 'affiliate'
@@ -803,48 +620,6 @@ def notifications(request):
     return render(request, "pages/notifications.html", context)
 
 
-def instance_detail(request, instance_id):
-    instance = {
-        'id': 123,
-        'server_name': 'Server-01',
-        'ip_address': '192.168.1.1',
-        'location': 'New York',
-        'os': 'Ubuntu 20.04 LTS',
-        'created_at': '2024-07-20 12:34:56',
-        'last_modified': '2024-07-20 12:34:56',
-        'detailed_location': 'Seoul',
-        'country': 'South Korea',
-        'image': 'AlmaLinux 8.4',
-        'instance_type': 'VPS VN-3',
-        'vcpu': '2 vCPU',
-        'ram': '2GB RAM',
-        'network': '3TB băng thông',
-        'storage': '20GB SSD Enterprise',
-        'additional_ipv4': '1 IPv4',
-        'additional_ram': '+ 3GB',
-        'additional_ssd': '+ 50GB',
-        'bandwidth': '',
-        'hostname': '2024071001535329714',
-        'login': 'root',
-        'password': 'password123'
-    }
-
-    os_options = ['Ubuntu 20.04 LTS', 'AlmaLinux 8.4', 'CentOS 7', 'Debian 10']
-    instance_types = [
-        {'name': 'VPS VN-3', 'vcpu': '2 vCPU', 'ram': '2GB RAM'},
-        {'name': 'VPS VN-4', 'vcpu': '4 vCPU', 'ram': '4GB RAM'},
-        {'name': 'VPS VN-5', 'vcpu': '8 vCPU', 'ram': '8GB RAM'},
-    ]
-
-    context = {
-        'instance': instance,
-        'os_options': os_options,
-        'instance_types': instance_types,
-    }
-
-    return render(request, 'pages/instances/detail.html', context)
-
-
 @csrf_exempt
 def vps_calculator(request):
     if request.method == 'POST':
@@ -869,56 +644,6 @@ def vps_calculator(request):
             total_cost += 3.00  # Example cost for additional bandwidth
 
         return JsonResponse({'total_cost': total_cost})
-
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
-@csrf_exempt
-def create_vps(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-
-        # Extract configuration
-        location = data.get('location', {})
-        image = data.get('image', {})
-        plan = data.get('plan', {})
-        ipv4 = data.get('ipv4', 'None')
-        bandwidth = data.get('bandwidth', 'None')
-        ram = data.get('ram', 'None')
-        ssd = data.get('ssd', 'None')
-        login = data.get('login', {})
-        hostname = data.get('hostname', 'None')
-
-        base_url = "http://127.0.0.1:5000"
-        api_key = "scrypt:32768:8:1$RL6X6J7bJJiROtTL$5bd54c34882906e9cf41e596c0a2b67f2a256b1492e266642f3c40521e4b4521ff56dfcf84e9deb9e34ea63d6e89de3c089d32041b5269d76f4c11078636aebd"
-
-        service = VPSService(base_url, api_key)
-        payload = {
-            "hostname": hostname,
-            "password": "somepass",
-            "serid": 0,
-            "plid": 58,
-            "osid": 100006
-        }
-
-        try:
-            response = service.create(payload)
-            # For now, we'll just return the received configuration for demo purposes
-            response_data = {
-                'status': 'success',
-                'message': 'VPS created successfully',
-                'vpsConfiguration': data
-            }
-            return JsonResponse(response_data)
-        except:
-            response_data = {
-                'status': 'error',
-                'message': 'Failed to create VPS',
-                'vpsConfiguration': {}
-            }
-            return JsonResponse(response_data)
-
-
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
@@ -1127,294 +852,6 @@ def vps_history(request):
     return render(request, 'pages/instances/history/history.html', context)
 
 
-def get_vps_logs(request):
-    filterable_fields = ['instance_name']
-    page = request.GET.get('page', 1)
-    page_size = request.GET.get('page_size', 10)
-    sort_by = request.GET.get('sort_by', '-datetime')
-    filters = {field: request.GET.get(field) for field in filterable_fields if request.GET.get(field)}
-
-    logs = [
-        {
-            "id": 1,
-            "instance_name": "VPS-001",
-            "action": "Create",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-21 14:30:00",
-            "details": "VPS created successfully."
-        },
-        {
-            "id": 2,
-            "instance_name": "VPS-002",
-            "action": "Delete",
-            "status": "Failed",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-22 10:15:00",
-            "details": "Failed to delete VPS due to insufficient permissions."
-        },
-        {
-            "id": 3,
-            "instance_name": "VPS-003",
-            "action": "Suspend",
-            "status": "Success",
-            "performed_by": "admin@example.com",
-            "datetime": "2024-07-23 08:45:00",
-            "details": "VPS suspended due to non-payment."
-        },
-        {
-            "id": 4,
-            "instance_name": "VPS-004",
-            "action": "Upgrade",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-24 12:30:00",
-            "details": "VPS upgraded to a higher plan."
-        },
-        {
-            "id": 1,
-            "instance_name": "VPS-001",
-            "action": "Create",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-21 14:30:00",
-            "details": "VPS created successfully."
-        },
-        {
-            "id": 2,
-            "instance_name": "VPS-002",
-            "action": "Delete",
-            "status": "Failed",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-22 10:15:00",
-            "details": "Failed to delete VPS due to insufficient permissions."
-        },
-        {
-            "id": 3,
-            "instance_name": "VPS-003",
-            "action": "Suspend",
-            "status": "Success",
-            "performed_by": "admin@example.com",
-            "datetime": "2024-07-23 08:45:00",
-            "details": "VPS suspended due to non-payment."
-        },
-        {
-            "id": 4,
-            "instance_name": "VPS-004",
-            "action": "Upgrade",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-24 12:30:00",
-            "details": "VPS upgraded to a higher plan."
-        },
-        {
-            "id": 1,
-            "instance_name": "VPS-001",
-            "action": "Create",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-21 14:30:00",
-            "details": "VPS created successfully."
-        },
-        {
-            "id": 2,
-            "instance_name": "VPS-002",
-            "action": "Delete",
-            "status": "Failed",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-22 10:15:00",
-            "details": "Failed to delete VPS due to insufficient permissions."
-        },
-        {
-            "id": 3,
-            "instance_name": "VPS-003",
-            "action": "Suspend",
-            "status": "Success",
-            "performed_by": "admin@example.com",
-            "datetime": "2024-07-23 08:45:00",
-            "details": "VPS suspended due to non-payment."
-        },
-        {
-            "id": 4,
-            "instance_name": "VPS-004",
-            "action": "Upgrade",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-24 12:30:00",
-            "details": "VPS upgraded to a higher plan."
-        },
-        {
-            "id": 1,
-            "instance_name": "VPS-001",
-            "action": "Create",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-21 14:30:00",
-            "details": "VPS created successfully."
-        },
-        {
-            "id": 2,
-            "instance_name": "VPS-002",
-            "action": "Delete",
-            "status": "Failed",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-22 10:15:00",
-            "details": "Failed to delete VPS due to insufficient permissions."
-        },
-        {
-            "id": 3,
-            "instance_name": "VPS-003",
-            "action": "Suspend",
-            "status": "Success",
-            "performed_by": "admin@example.com",
-            "datetime": "2024-07-23 08:45:00",
-            "details": "VPS suspended due to non-payment."
-        },
-        {
-            "id": 4,
-            "instance_name": "VPS-004",
-            "action": "Upgrade",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-24 12:30:00",
-            "details": "VPS upgraded to a higher plan."
-        },
-        {
-            "id": 1,
-            "instance_name": "VPS-001",
-            "action": "Create",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-21 14:30:00",
-            "details": "VPS created successfully."
-        },
-        {
-            "id": 2,
-            "instance_name": "VPS-002",
-            "action": "Delete",
-            "status": "Failed",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-22 10:15:00",
-            "details": "Failed to delete VPS due to insufficient permissions."
-        },
-        {
-            "id": 3,
-            "instance_name": "VPS-003",
-            "action": "Suspend",
-            "status": "Success",
-            "performed_by": "admin@example.com",
-            "datetime": "2024-07-23 08:45:00",
-            "details": "VPS suspended due to non-payment."
-        },
-        {
-            "id": 4,
-            "instance_name": "VPS-004",
-            "action": "Upgrade",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-24 12:30:00",
-            "details": "VPS upgraded to a higher plan."
-        },
-        {
-            "id": 1,
-            "instance_name": "VPS-001",
-            "action": "Create",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-21 14:30:00",
-            "details": "VPS created successfully."
-        },
-        {
-            "id": 2,
-            "instance_name": "VPS-002",
-            "action": "Delete",
-            "status": "Failed",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-22 10:15:00",
-            "details": "Failed to delete VPS due to insufficient permissions."
-        },
-        {
-            "id": 3,
-            "instance_name": "VPS-003",
-            "action": "Suspend",
-            "status": "Success",
-            "performed_by": "admin@example.com",
-            "datetime": "2024-07-23 08:45:00",
-            "details": "VPS suspended due to non-payment."
-        },
-        {
-            "id": 4,
-            "instance_name": "VPS-004",
-            "action": "Upgrade",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-24 12:30:00",
-            "details": "VPS upgraded to a higher plan."
-        },
-        {
-            "id": 1,
-            "instance_name": "VPS-001",
-            "action": "Create",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-21 14:30:00",
-            "details": "VPS created successfully."
-        },
-        {
-            "id": 2,
-            "instance_name": "VPS-002",
-            "action": "Delete",
-            "status": "Failed",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-22 10:15:00",
-            "details": "Failed to delete VPS due to insufficient permissions."
-        },
-        {
-            "id": 3,
-            "instance_name": "VPS-003",
-            "action": "Suspend",
-            "status": "Success",
-            "performed_by": "admin@example.com",
-            "datetime": "2024-07-23 08:45:00",
-            "details": "VPS suspended due to non-payment."
-        },
-        {
-            "id": 4,
-            "instance_name": "VPS-004",
-            "action": "Upgrade",
-            "status": "Success",
-            "performed_by": "user@example.com",
-            "datetime": "2024-07-24 12:30:00",
-            "details": "VPS upgraded to a higher plan."
-        }
-    ]
-
-    paginator = Paginator(logs, page_size)
-    page_obj = paginator.get_page(page)
-
-    logs_data = [data for data in page_obj]
-    # logs_data = [
-    #     {
-    #         'id': log.id,
-    #         'instance_name': log.instance_name,
-    #         'action': log.action,
-    #         'status': log.status,
-    #         'performed_by': log.performed_by,
-    #         'datetime': log.datetime,
-    #         'details': log.details,
-    #     }
-    #     for log in page_obj
-    # ]
-
-    return JsonResponse({
-        'logs': logs_data,
-        'total_pages': paginator.num_pages,
-        'current_page': page_obj.number,
-        'has_next': page_obj.has_next(),
-        'has_previous': page_obj.has_previous(),
-    })
-
-
 def get_vnc_link(request, instance_id):
     # Fetch the instance to ensure it exists
 
@@ -1437,3 +874,28 @@ def get_snapshots(request, instance_id):
     ]
 
     return JsonResponse({"snapshots": snapshots})
+
+
+from rest_framework.authtoken.models import Token
+from datetime import datetime, timedelta
+
+
+class CustomUserLoginView(UserLoginView):
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        token, created = Token.objects.get_or_create(user=request.user)
+        expired = datetime.utcnow() + timedelta(days=7)
+        expired = expired.strftime("%A %B %D %Y %I:%M:%S")
+        response.headers[
+            'set-cookie'] = f'basic_token={token.key}; expires={expired}; Max-Age=31449600; Path=/; SameSite=Lax'
+        return response
+
+
+def logout_view(request):
+    # Create a response object
+    response = redirect('/accounts/login/')
+
+    # Clear the 'basic_token' cookie
+    response.delete_cookie('basic_token')
+
+    return response

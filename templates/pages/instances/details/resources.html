@@ -7,11 +7,11 @@
             <tr>
                 <th>Instance</th>
                 <td>
-                    <span id="instance-text">{{ instance.instance_type }}</span>
+                    <span id="instance-text">{{ instance.plan_name }}</span>
                     <i class="fas fa-edit" id="change-instance-icon" style="cursor: pointer;" onclick="showInstanceDropdown()"></i>
                     <select id="instance-dropdown" class="form-control d-none" onchange="updateInstanceDetails()">
                         {% for instance_type in instance_types %}
-                        <option value="{{ instance_type.name }}" data-vcpu="{{ instance_type.vcpu }}" data-ram="{{ instance_type.ram }}">
+                        <option value="{{ instance_type.name }}" data-vcpu="{{ instance_type.cpu }}" data-ram="{{ instance_type.ram }}">
                             {{ instance_type.name }}
                         </option>
                         {% endfor %}
@@ -22,7 +22,7 @@
             </tr>
             <tr>
                 <th>vCPU</th>
-                <td id="vcpu-text">{{ instance.vcpu }}</td>
+                <td id="vcpu-text">{{ instance.cpu }}</td>
             </tr>
             <tr>
                 <th>RAM</th>
@@ -30,11 +30,11 @@
             </tr>
             <tr>
                 <th>Network</th>
-                <td>{{ instance.network }}</td>
+                <td>{{ instance.network_speed }}</td>
             </tr>
             <tr>
                 <th>Storage</th>
-                <td>{{ instance.storage }}</td>
+                <td>{{ instance.disk }}</td>
             </tr>
             {% if instance.additional_ipv4 %}
             <tr>

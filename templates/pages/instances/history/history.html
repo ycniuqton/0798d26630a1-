@@ -32,6 +32,30 @@
         .width-auto{
             width: auto;
         }
+
+    .loader-line {
+            display: none; /* Hidden by default */
+            height: 4px;
+            width: 100%;
+            background-color: #3498db; /* Blue color for the loader */
+            position: fixed;
+            top: 0;
+            left: 0;
+            animation: loading 2s linear infinite; /* Loading animation */
+        }
+
+    /* Animation keyframes for the loader */
+        @keyframes loading {
+            0% {
+                transform: translateX(-100%);
+            }
+            50% {
+                transform: translateX(0%);
+            }
+            100% {
+                transform: translateX(100%);
+            }
+        }
 </style>
 {% endblock extrastyle %}
 
@@ -69,6 +93,7 @@
             <th scope="col">Details</th>
         </tr>
         </thead>
+        <div class="loader-line" id="loader"></div>
         <tbody id="logs-tbody">
         <!-- Logs will be loaded here via AJAX -->
         </tbody>
@@ -86,12 +111,16 @@
         let currentSort = '-datetime';
         let currentActionFilter = '';
         let currentStatusFilter = '';
-        let currentFilter = '';
+        let currentFilter = {};
+        let currentSearch = '';
 
-        window.loadLogs = function(page = 1, sort = '-datetime', filter = '') {
+        window.loadLogs = function(page = 1, sort = '-datetime', filter = {}, search = '') {
+
+        document.getElementById('loader').style.display = 'block';
+
             console.log("triggered");
-            const searchQuery = document.getElementById('search-input').value;
-            fetch(`/api/vps/logs/?page=${page}&page_size=10&sort_by=${sort}&${filter}&search=${searchQuery}`)
+            filter_str = Object.keys(filter).map(key => key + "=" + filter[key]).join('&');
+            fetch(`/api/vps/logs/?page=${page}&page_size=10&sort_by=${sort}&${filter_str}&search=${search}`)
                 .then(response => response.json())
                 .then(data => {
                     const tbody = document.getElementById('logs-tbody');
@@ -99,7 +128,7 @@
                     data.logs.forEach(log => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${log.instance_name}</td>
+                            <td>${log.hostname}</td>
                             <td>${log.action}</td>
                             <td>${log.status}</td>
                             <td>${log.performed_by}</td>
@@ -117,29 +146,38 @@
                         pageItem.innerHTML = `<a class="page-link" onclick="loadLogs(${i}, '${sort}', '${filter}')">${i}</a>`;
                         pagination.appendChild(pageItem);
                     }
+                    document.getElementById('loader').style.display = 'none';
                 })
                 .catch(error => console.error('Error:', error));
         }
 
         document.getElementById('search-button').addEventListener('click', () => {
-            loadLogs(currentPage, currentSort, currentActionFilter, currentStatusFilter);
+            currentSearch = document.getElementById('search-input').value.toLowerCase();
+            loadLogs(currentPage, currentSort, currentFilter, currentSearch);
+        });
+
+        document.getElementById('search-input').addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                currentSearch = document.getElementById('search-input').value.toLowerCase();
+                loadLogs(currentPage, currentSort, currentFilter, currentSearch);
+            }
         });
 
         document.getElementById('action-filter-select').addEventListener('change', (event) => {
-            currentActionFilter = event.target.value;
-            loadLogs(currentPage, currentSort, currentActionFilter, currentStatusFilter);
+            currentFilter["action"] = event.target.value.toLowerCase();
+            loadLogs(currentPage, currentSort, currentFilter, currentSearch);
         });
 
         document.getElementById('status-filter-select').addEventListener('change', (event) => {
-            currentStatusFilter = event.target.value;
-            loadLogs(currentPage, currentSort, currentActionFilter, currentStatusFilter);
+            currentFilter["status"] = event.target.value.toLowerCase();
+            loadLogs(currentPage, currentSort, currentFilter, currentSearch);
         });
 
         document.querySelectorAll('th[data-sort]').forEach(th => {
             th.addEventListener('click', () => {
                 const sortField = th.getAttribute('data-sort');
                 currentSort = currentSort === sortField ? `-${sortField}` : sortField;
-                loadLogs(currentPage, currentSort, currentFilter);
+                loadLogs(currentPage, currentSort, currentFilter, currentSearch);
             });
         });
 

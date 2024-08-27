@@ -1,9 +1,12 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
 
-from . import views
-from .views import vps_calculator, create_vps, user_profile, manage_tokens, delete_token, set_introducer, \
+from home import views
+from .views import vps_calculator, user_profile, manage_tokens, delete_token, set_introducer, \
     current_introducer, tickets_view, faqs_view
+from home.views.instances import instances, create_instances, instance_detail
+from home.views.statics import FlagAPI, OSIconAPI
+
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -11,10 +14,12 @@ urlpatterns = [
 
     path('home/', views.home, name='home'),
 
-    path('instances/', views.instances, name='instances'),
-    path('instance/<int:instance_id>/', views.instance_detail, name='instance_detail'),
+    path('instances/', instances, name='instances'),
+    path('instances/create/', create_instances, name='create_instances'),
+    path('instance/<str:instance_id>/', instance_detail, name='instance_detail'),
 
-    path('create_instances/', views.create_instances, name='create_instances'),
+    path('accounts/login/', views.CustomUserLoginView.as_view(), name='login'),
+    path('accounts/logout/', views.logout_view, name='logout'),
 
     path('network/', views.network, name='network'),
     path('block_storage/', views.block_storage, name='block_storage'),
@@ -44,7 +49,7 @@ urlpatterns = [
     path('authentication/', views.authentication, name='authentication'),
     path('notifications/', views.notifications, name='notifications'),
     path('api/vps-calculator/', vps_calculator, name='vps-calculator'),
-    path('vps/create/', create_vps, name='create-vps'),
+
     path('api/user/profile/', user_profile, name='user-profile'),
     path('api/tokens/', manage_tokens, name='manage-tokens'),
     path('api/tokens/<str:token_id>/', delete_token, name='delete-token'),
@@ -55,5 +60,7 @@ urlpatterns = [
     path('api/vps/<int:instance_id>/vnc-link/', views.get_vnc_link, name='get_vnc_link'),
     path('api/vps/<int:instance_id>/snapshots/', views.get_snapshots, name='get_snapshots'),
     path('api/vps/history/', views.vps_history, name='vps_history'),
-    path('api/vps/logs/', views.get_vps_logs, name='get_vps_logs'),
+
+    path('api/static/flags/<str:country_code>/', FlagAPI.as_view(), name='country_flag_api'),
+    path('api/static/os_icon/<str:os_code>/', OSIconAPI.as_view(), name='os_icon_api'),
 ]
