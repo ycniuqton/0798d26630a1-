@@ -1,4 +1,4 @@
-from services.kafka_adapter._exceptions import InvalidEventPayload, SkippableException
+from adapters.kafka_adapter import SkippableException
 
 
 class DBInsertFailed(SkippableException):

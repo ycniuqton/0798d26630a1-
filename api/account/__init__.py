@@ -38,3 +38,16 @@ class AccountAPI(APIView):
                 setattr(user, field, data[field])
         user.save()
         return JsonResponse(user.to_readable_dict())
+
+
+class AccountBalanceAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        try:
+            balance = user.balance
+            balance = balance.to_readable_dict()
+        except:
+            balance = {}
+        return JsonResponse(balance)

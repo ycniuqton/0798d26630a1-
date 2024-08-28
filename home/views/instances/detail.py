@@ -1,22 +1,7 @@
-from django.shortcuts import render, redirect
-import requests
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
-import json
-from datetime import datetime, timedelta, date
 from django.shortcuts import render
-from django.core.paginator import Paginator
-import random
-from django.shortcuts import render, get_object_or_404
 
-from services.redis_service import CachedPlan
-from services.vps import VPSService
+from adapters.redis_service import CachedPlan
 from home.models import Vps
-
-from django.http import JsonResponse, HttpResponse
-from django.conf import settings
-from django.views import View
-import os
 
 
 def instance_detail(request, instance_id):

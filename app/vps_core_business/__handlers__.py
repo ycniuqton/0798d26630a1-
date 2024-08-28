@@ -1,11 +1,10 @@
-from services.kafka_adapter.consumer import BaseHandler
+from adapters.kafka_adapter._base import BaseHandler
 from marshmallow import Schema, fields, INCLUDE
-from datetime import datetime
-from typing import Dict, Any, Optional
+from typing import Dict, Any
 
 from services.vps import VPSService
 from home.models import Vps, VpsStatus
-from services.kafka_adapter._exceptions import SkippableException
+from adapters.kafka_adapter._exceptions import SkippableException
 from .exception import DBInsertFailed
 
 

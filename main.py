@@ -1,9 +1,7 @@
 import logging
 
 import click
-from typing import List
-import time
-from services.logger import setup_app_level_logger
+from adapters.logger import setup_app_level_logger
 import os
 import django
 

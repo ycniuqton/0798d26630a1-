@@ -24,10 +24,11 @@ import os
 @permission_classes([IsAuthenticated])
 def instances(request):
     user = request.user
-    if user.is_staff:
-        instances_data = Vps.objects.all()
-    else:
-        instances_data = Vps.objects.filter(user_id=user.id).all()
+    instances_data = []
+    # if user.is_staff:
+    #     instances_data = Vps.objects.all()
+    # else:
+    #     instances_data = Vps.objects.filter(user_id=user.id).all()
 
     context = {
         'segment': 'instances',

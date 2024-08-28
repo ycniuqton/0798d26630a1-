@@ -1,5 +1,4 @@
-import requests
-from services.redis_service.__base__ import CachedResource
+from adapters.redis_service.__base__ import CachedResource
 from core import settings
 
 

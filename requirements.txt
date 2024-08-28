@@ -25,5 +25,9 @@ kafka-python
 # psycopg2-binary
 # mysqlclient
 
-
+pyaml
 djangorestframework-simplejwt
+dj-database-url
+
+psycopg2
+logging_context

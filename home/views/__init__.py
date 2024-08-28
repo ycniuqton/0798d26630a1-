@@ -1,4 +1,6 @@
-from admin_datta.views import UserLoginView
+from admin_datta.views import UserLoginView, UserRegistrationView
+from django.contrib.auth import get_user_model
+from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import render, redirect
 import requests
 from django.http import JsonResponse
@@ -10,7 +12,6 @@ from django.core.paginator import Paginator
 import random
 from django.shortcuts import render, get_object_or_404
 
-from services.vps import VPSService
 from home.models import Vps
 
 from django.http import JsonResponse, HttpResponse
@@ -306,37 +307,26 @@ def monitoring(request):
 
 
 def payment(request):
+    user = request.user
+    balance = user.balance
+    balance_records = balance.transactions.all()
     balance_records = [
         {
-            "payment_account": "Account 1",
-            "payment_type": "Type 1",
-            "payment_method": "Credit Card",
-            "time": "2024-07-15 14:30",
-            "recharge_amount": "$100.00",
-            "operation": "View"
-        },
-        {
-            "payment_account": "Account 2",
-            "payment_type": "Type 2",
-            "payment_method": "PayPal",
-            "time": "2024-07-14 10:20",
-            "recharge_amount": "$50.00",
-            "operation": "View"
-        },
-        {
-            "payment_account": "Account 3",
-            "payment_type": "Type 3",
-            "payment_method": "Alipay",
-            "time": "2024-07-13 08:45",
-            "recharge_amount": "$200.00",
+            "payment_account": record.user.email,
+            "payment_type": record.type,
+            "payment_method": "System",
+            "time": record._created,
+            "recharge_amount": record.amount,
             "operation": "View"
         }
+        for record in balance_records
     ]
     context = {
         'segment': 'payment',
-        'balance_records': balance_records
+        'balance_records': balance_records,
+        'balance': balance.amount
     }
-    return render(request, "pages/payment.html", context)
+    return render(request, "pages/financial/payment.html", context)
 
 
 def resource_record(request):
@@ -633,7 +623,10 @@ def vps_calculator(request):
         bandwidth = data.get('bandwidth', 'None')
 
         # Calculate total cost (example logic)
-        total_cost = float(plan.get('price', 0))
+        total_cost = plan.get('price', 0)
+        if isinstance(plan, str):
+            total_cost = float(plan.replace(',', '.'))
+
         if additional_ipv4 != 'None':
             total_cost += 2.00  # Example cost for additional IPv4
         if additional_ram != 'None':
@@ -646,6 +639,7 @@ def vps_calculator(request):
         return JsonResponse({'total_cost': total_cost})
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
 
 # In-memory storage for tokens (for demonstration purposes)
 tokens = []
@@ -844,28 +838,3 @@ def get_snapshots(request, instance_id):
     ]
 
     return JsonResponse({"snapshots": snapshots})
-
-
-from rest_framework.authtoken.models import Token
-from datetime import datetime, timedelta
-
-
-class CustomUserLoginView(UserLoginView):
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        token, created = Token.objects.get_or_create(user=request.user)
-        expired = datetime.utcnow() + timedelta(days=7)
-        expired = expired.strftime("%A %B %D %Y %I:%M:%S")
-        response.headers[
-            'set-cookie'] = f'basic_token={token.key}; expires={expired}; Max-Age=31449600; Path=/; SameSite=Lax'
-        return response
-
-
-def logout_view(request):
-    # Create a response object
-    response = redirect('/accounts/login/')
-
-    # Clear the 'basic_token' cookie
-    response.delete_cookie('basic_token')
-
-    return response

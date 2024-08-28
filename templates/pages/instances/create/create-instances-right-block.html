@@ -152,7 +152,7 @@
 
     // Fetch current balance
     function fetchCurrentBalance() {
-        fetch('/api/current-balance/', {
+        fetch('/api/account/balance/', {
             method: 'GET',
             headers: {
                 'X-CSRFToken': '{{ csrf_token }}'
@@ -160,7 +160,8 @@
         })
         .then(response => response.json())
         .then(data => {
-            var currentBalance = data.current_balance;
+            var currentBalance = data.amount;
+            console.log('Current Balance:', currentBalance);
             document.getElementById('current-balance').innerText = '$' + currentBalance.toFixed(2);
         })
         .catch(error => {

@@ -105,3 +105,23 @@ class VPSLog(BaseModel):
         if self.user and not self.performed_by:
             self.performed_by = self.user.username
         super().save(*args, **kwargs)
+
+
+class Balance(BaseModel):
+    amount = models.FloatField()
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='balance')
+
+    def __str__(self):
+        return f'{self.amount}'
+
+
+class Transaction(BaseModel):
+    amount = models.FloatField()
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    type = models.CharField(max_length=200)
+    status = models.CharField(max_length=200)
+    description = models.TextField()
+    balance = models.ForeignKey(Balance, on_delete=models.CASCADE, related_name='transactions')
+
+    def __str__(self):
+        return f'{self.amount} {self.currency} ({self.status})'

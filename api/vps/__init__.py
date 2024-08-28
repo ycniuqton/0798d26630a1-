@@ -11,6 +11,7 @@ class VPSAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        user = request.user
         filterable_fields = ['hostname', 'location', 'ip_address', 'status']
         search_fields = ['hostname', 'location', 'ip_address', 'status']
         sortable_fields = ['hostname', 'location', 'ip_address', 'status', '_created']
@@ -28,6 +29,8 @@ class VPSAPI(APIView):
             search_query = Q()
 
         objects = Vps.objects.filter(**filters).filter(search_query)
+        if not user.is_staff:
+            objects = objects.filter(user_id=user.id)
         total = objects.count()
 
         objects = objects.order_by(sort_by).all()[page_size * (page - 1):page_size * page]

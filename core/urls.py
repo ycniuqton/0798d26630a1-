@@ -24,7 +24,6 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path("", include('admin_datta.urls')),
     path('', include('django_dyn_dt.urls')),  # <-- NEW: Dynamic_DT Routing
-    # path("", include("users.urls", namespace="users")),
 ]
 
 # # Lazy-load on routing is needed

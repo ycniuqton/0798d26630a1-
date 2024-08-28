@@ -5,11 +5,12 @@ from rest_framework.permissions import IsAuthenticated
 
 from home.models import Vps
 
-from django.http import JsonResponse, HttpResponse
-from services.redis_service import CachedPlan, CachedOS, CachedServer
-from services.kafka_adapter import make_kafka_publisher
+from django.http import JsonResponse
+from adapters.redis_service import CachedPlan, CachedOS, CachedServer
+from adapters.kafka_adapter import make_kafka_publisher
 from config import KafkaConfig
 from services.vps_log import VPSLogger
+from services.balance import BalanceRepository
 
 
 @api_view(['POST'])
@@ -46,6 +47,9 @@ def create_vps(request):
     if not osid or not plan or not server:
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
+    if user.balance.amount < plan['price']:
+        return JsonResponse({'error': 'Insufficient balance'}, status=400)
+
     vps = Vps(
         cpu=plan['cpu'],
         ram=plan['ram'],
@@ -61,6 +65,8 @@ def create_vps(request):
         os=image_version
     )
     vps.save()
+
+    BalanceRepository().charge(user.id, plan['price'])
 
     VPSLogger().log(user, vps, 'create', 'creating')
 

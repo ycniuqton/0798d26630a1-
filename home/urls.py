@@ -6,6 +6,7 @@ from .views import vps_calculator, manage_tokens, delete_token, set_introducer, 
     current_introducer, tickets_view, faqs_view
 from home.views.instances import instances, create_instances, instance_detail
 from home.views.statics import FlagAPI, OSIconAPI
+from home.views.accounts import *
 
 
 urlpatterns = [
@@ -18,8 +19,9 @@ urlpatterns = [
     path('instances/create/', create_instances, name='create_instances'),
     path('instance/<str:instance_id>/', instance_detail, name='instance_detail'),
 
-    path('accounts/login/', views.CustomUserLoginView.as_view(), name='login'),
-    path('accounts/logout/', views.logout_view, name='logout'),
+    path('accounts/login/', CustomUserLoginView.as_view(), name='login'),
+    path('accounts/register/', UserRegistrationView.as_view(), name='register'),
+    path('accounts/logout/', logout_view, name='logout'),
 
     path('network/', views.network, name='network'),
     path('block_storage/', views.block_storage, name='block_storage'),

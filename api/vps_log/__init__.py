@@ -7,7 +7,7 @@ from django.db.models import Q
 
 
 def get_vps_logs(request):
-    # query from VPSLog model
+    user = request.user
 
     filterable_fields = ['hostname', 'action', 'status']
     search_fields = ['hostname', 'action', 'status', 'performed_by']
@@ -24,6 +24,9 @@ def get_vps_logs(request):
         search_query = Q()
 
     logs = VPSLog.objects.filter(**filters).filter(search_query)
+    if not user.is_staff:
+        logs = logs.filter(user_id=user.id)
+
     total = logs.count()
 
     logs = logs.order_by(sort_by).all()[page_size * (page - 1):page_size * page]
