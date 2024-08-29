@@ -84,8 +84,8 @@
             {% if billing_records %}
                 {% for record in billing_records %}
                     <tr>
-                        <td>{{ record.date }}</td>
-                        <td>{{ record.billing_amount }}</td>
+                        <td>{{ record.cycle }}</td>
+                        <td>{{ record.amount }}</td>
                         <td>
                             <button class="btn btn-sm btn-outline-primary">{{ record.operation }}</button>
                         </td>

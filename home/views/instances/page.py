@@ -34,4 +34,4 @@ def instances(request):
         'segment': 'instances',
         'instances': instances_data
     }
-    return render(request, "pages/instances.html", context)
+    return render(request, "pages/instances/instances.html", context)

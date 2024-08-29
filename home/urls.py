@@ -2,12 +2,12 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 
 from home import views
-from .views import vps_calculator, manage_tokens, delete_token, set_introducer, \
+from .views import manage_tokens, delete_token, set_introducer, \
     current_introducer, tickets_view, faqs_view
 from home.views.instances import instances, create_instances, instance_detail
 from home.views.statics import FlagAPI, OSIconAPI
 from home.views.accounts import *
-
+from home.views.financial import invoices_view, financial_view, payment_view, billing_view, resource_record
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -30,12 +30,11 @@ urlpatterns = [
     path('image/', views.image, name='image'),
     path('monitoring/', views.monitoring, name='monitoring'),
 
-    path('payment/', views.payment, name='payment'),
-    path('billing/', views.billing, name='billing'),
-    path('resource_record/', views.resource_record, name='resource_record'),
-    # path('/', views., name=''),
+    path('payment/', payment_view, name='payment'),
+    path('billing/', billing_view, name='billing'),
+    path('resource_record/', resource_record, name='resource_record'),
 
-    path('financial/', views.financial, name='financial'),
+    path('financial/', financial_view, name='financial'),
     path('support/', views.support, name='support'),
     path('ticket/', views.ticket, name='ticket'),
     path('your_tickets/', views.your_tickets, name='your_tickets'),
@@ -50,14 +49,13 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('authentication/', views.authentication, name='authentication'),
     path('notifications/', views.notifications, name='notifications'),
-    path('api/vps-calculator/', vps_calculator, name='vps-calculator'),
 
     path('api/tokens/', manage_tokens, name='manage-tokens'),
     path('api/tokens/<str:token_id>/', delete_token, name='delete-token'),
     path('api/set-introducer/', set_introducer, name='set_introducer'),
     path('api/current-introducer/', current_introducer, name='current_introducer'),
     path('api/faqs/', faqs_view, name='faqs_view'),
-    path('invoices/', views.invoices_view, name='invoices'),
+    path('invoices/', invoices_view, name='invoices'),
     path('api/vps/<int:instance_id>/vnc-link/', views.get_vnc_link, name='get_vnc_link'),
     path('api/vps/<int:instance_id>/snapshots/', views.get_snapshots, name='get_snapshots'),
     path('api/vps/history/', views.vps_history, name='vps_history'),

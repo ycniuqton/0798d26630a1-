@@ -17,7 +17,7 @@ class BalanceRepository:
         if not user:
             return None
 
-        Transaction.objects.create(
+        transaction = Transaction.objects.create(
             user_id=user_id,
             amount=amount,
             type=_type,
@@ -28,7 +28,7 @@ class BalanceRepository:
         balance.amount += amount
         balance.save()
 
-        return True
+        return transaction
 
     def topup(self, user_id, amount):
         return self.modify(user_id, amount, 'topup')

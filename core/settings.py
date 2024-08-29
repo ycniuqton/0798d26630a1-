@@ -262,4 +262,8 @@ SIMPLE_JWT = {
 }
 
 AUTH_USER_MODEL = 'home.User'
+
+USE_TZ = True  # This ensures that Django stores datetimes in UTC
+TIME_ZONE = 'UTC'  # Or any other timezone you are working with
+
 ########################################

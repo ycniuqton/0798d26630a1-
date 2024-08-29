@@ -40,7 +40,7 @@ class BaseModel(models.Model):
             if isinstance(value, (str, int, float, bool, list, dict)):
                 return value
             if isinstance(value, timezone.datetime):
-                return value.isoformat()
+                return value.strftime("%B %d, %Y at %I:%M %p")
             return str(value)
 
         return {field.name: convert_build_in_types(getattr(self, field.name)) for field in self._meta.fields}
@@ -81,6 +81,7 @@ class Vps(BaseModel):
     ip = models.GenericIPAddressField(null=True, blank=True)
     status = models.CharField(max_length=20, null=True, blank=True, default=VpsStatus.CREATING)
     os = models.CharField(max_length=200, null=True, blank=True)
+    end_time = models.DateTimeField(null=True, blank=True)
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
@@ -124,4 +125,34 @@ class Transaction(BaseModel):
     balance = models.ForeignKey(Balance, on_delete=models.CASCADE, related_name='transactions')
 
     def __str__(self):
-        return f'{self.amount} {self.currency} ({self.status})'
+        return f'{self.amount} ({self.status})'
+
+
+class Invoice(BaseModel):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    amount = models.FloatField()
+    status = models.CharField(max_length=200)
+    description = models.TextField()
+    due_date = models.DateTimeField(default=timezone.now)
+    start_time = models.DateTimeField(default=timezone.now)
+    end_time = models.DateTimeField(default=timezone.now)
+    code = models.CharField(max_length=200, null=True, blank=True)
+    cycle = models.CharField(max_length=200, null=True, blank=True)
+    transaction = models.OneToOneField(Transaction, on_delete=models.CASCADE, related_name='invoice', null=True,
+                                       blank=True)
+
+    def __str__(self):
+        return f'{self.amount} ({self.status})'
+
+
+class InvoiceLine(BaseModel):
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='lines')
+    description = models.TextField()
+    amount = models.FloatField()
+    status = models.CharField(max_length=200)
+    vps = models.ForeignKey(Vps, on_delete=models.CASCADE)
+    start_time = models.DateTimeField(default=timezone.now)
+    end_time = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'{self.amount} ({self.status})'

@@ -62,6 +62,7 @@
     };
 
     function render_summary_block() {
+        document.getElementById('loader').style.display = 'block';
         // Update summary block with current configuration
         document.getElementById('summary-location').innerText = vpsConfiguration.location.name || 'None';
         document.getElementById('summary-country').innerText = vpsConfiguration.location.country || 'None';
@@ -77,7 +78,7 @@
 <!--        document.getElementById('summary-bandwidth').innerText = vpsConfiguration.bandwidth;-->
 
         // Fetch the total cost from the calculator API
-        fetch('/api/vps-calculator/', {
+        fetch('/api/vps/calculator', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -89,14 +90,17 @@
         .then(data => {
             var totalCost = data.total_cost;
             document.getElementById('summary-total').innerText = '$' + totalCost.toFixed(2) + '/mo';
-            document.getElementById('summary-hourly').innerText = '$' + (totalCost / 730).toFixed(4) + '/h';
+            document.getElementById('summary-hourly').innerText = '$' + (totalCost / 720).toFixed(4) + '/h';
             document.getElementById('submit-vps').disabled = false;
+            document.getElementById('loader').style.display = 'none';
         })
         .catch(error => {
             console.error('Error:', error);
             document.getElementById('summary-total').innerText = '$0.00/mo';
             document.getElementById('summary-hourly').innerText = '$0.0000/h';
+            document.getElementById('loader').style.display = 'none';
         });
+
     }
 
     document.getElementById('submit-vps').addEventListener('click', function() {

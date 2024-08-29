@@ -306,120 +306,6 @@ def monitoring(request):
     return render(request, "pages/monitoring.html", context)
 
 
-def payment(request):
-    user = request.user
-    balance = user.balance
-    balance_records = balance.transactions.all()
-    balance_records = [
-        {
-            "payment_account": record.user.email,
-            "payment_type": record.type,
-            "payment_method": "System",
-            "time": record._created,
-            "recharge_amount": record.amount,
-            "operation": "View"
-        }
-        for record in balance_records
-    ]
-    context = {
-        'segment': 'payment',
-        'balance_records': balance_records,
-        'balance': balance.amount
-    }
-    return render(request, "pages/financial/payment.html", context)
-
-
-def resource_record(request):
-    sample_data = [
-        {
-            "record_id": "Record 1",
-            "location": "New York, USA",
-            "configuration": "Config 1",
-            "record_type": "Type A",
-            "status": "Active",
-            "record_time": "2024-07-10 14:30"
-        },
-        {
-            "record_id": "Record 2",
-            "location": "London, UK",
-            "configuration": "Config 2",
-            "record_type": "Type B",
-            "status": "Inactive",
-            "record_time": "2024-07-11 09:20"
-        },
-        {
-            "record_id": "Record 3",
-            "location": "Tokyo, Japan",
-            "configuration": "Config 3",
-            "record_type": "Type C",
-            "status": "Active",
-            "record_time": "2024-07-12 17:45"
-        },
-        {
-            "record_id": "Record 4",
-            "location": "Sydney, Australia",
-            "configuration": "Config 4",
-            "record_type": "Type D",
-            "status": "Inactive",
-            "record_time": "2024-07-13 12:15"
-        },
-        {
-            "record_id": "Record 5",
-            "location": "Berlin, Germany",
-            "configuration": "Config 5",
-            "record_type": "Type E",
-            "status": "Active",
-            "record_time": "2024-07-14 08:30"
-        }
-    ]
-
-    context = {
-        'segment': 'resource_record',
-        'records': sample_data
-    }
-    return render(request, "pages/resource_record.html", context)
-
-
-def billing(request):
-    billing_records = [
-        {
-            "date": "2024-07-01",
-            "billing_amount": "$100.00",
-            "operation": "View"
-        },
-        {
-            "date": "2024-07-02",
-            "billing_amount": "$150.00",
-            "operation": "View"
-        },
-        {
-            "date": "2024-07-03",
-            "billing_amount": "$200.00",
-            "operation": "View"
-        }
-    ]
-
-    billing_summary = {
-        "expenses": 100,
-        "charges_this_month": 500,
-        "charges_last_hour": 50,
-    }
-
-    context = {
-        'segment': 'billing',
-        'billing_records': billing_records,
-        'billing_summary': billing_summary
-    }
-    return render(request, "pages/billing.html", context)
-
-
-def financial(request):
-    context = {
-        'segment': 'financial'
-    }
-    return render(request, "pages/dynamic-tables.html", context)
-
-
 def support(request):
     context = {
         'segment': 'support'
@@ -610,37 +496,6 @@ def notifications(request):
     return render(request, "pages/notifications.html", context)
 
 
-@csrf_exempt
-def vps_calculator(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-
-        # Extract configuration
-        plan = data.get('plan', {})
-        additional_ipv4 = data.get('ipv4', 'None')
-        additional_ram = data.get('ram', 'None')
-        additional_ssd = data.get('ssd', 'None')
-        bandwidth = data.get('bandwidth', 'None')
-
-        # Calculate total cost (example logic)
-        total_cost = plan.get('price', 0)
-        if isinstance(plan, str):
-            total_cost = float(plan.replace(',', '.'))
-
-        if additional_ipv4 != 'None':
-            total_cost += 2.00  # Example cost for additional IPv4
-        if additional_ram != 'None':
-            total_cost += 5.00  # Example cost for additional RAM
-        if additional_ssd != 'None':
-            total_cost += 10.00  # Example cost for additional SSD
-        if bandwidth != 'None':
-            total_cost += 3.00  # Example cost for additional bandwidth
-
-        return JsonResponse({'total_cost': total_cost})
-
-    return JsonResponse({'error': 'Invalid request'}, status=400)
-
-
 # In-memory storage for tokens (for demonstration purposes)
 tokens = []
 
@@ -781,32 +636,6 @@ invoices_data = [
         'total': round(random.uniform(50, 500), 2)
     } for i in range(1, 51)
 ]
-
-
-def invoices_view(request):
-    search_query = request.GET.get('search', '')
-    status_filter = request.GET.get('status', '')
-    sort_order = request.GET.get('sort', 'created')
-    items_per_page = int(request.GET.get('items', 10))
-
-    invoices = invoices_data
-
-    if search_query:
-        invoices = [invoice for invoice in invoices if search_query.lower() in invoice['code'].lower()]
-
-    if status_filter:
-        invoices = [invoice for invoice in invoices if invoice['status'] == status_filter]
-
-    if sort_order.startswith('-'):
-        invoices = sorted(invoices, key=lambda x: x[sort_order[1:]], reverse=True)
-    else:
-        invoices = sorted(invoices, key=lambda x: x[sort_order])
-
-    paginator = Paginator(invoices, items_per_page)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
-    return render(request, 'pages/invoices.html', {'invoices': page_obj, 'items_per_page': items_per_page})
 
 
 def vps_history(request):

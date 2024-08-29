@@ -59,6 +59,7 @@
             <th scope="col">Server</th>
             <th scope="col">Location</th>
             <th scope="col">IP Address</th>
+            <th scope="col">End Date</th>
             <th scope="col">Status</th>
             <th scope="col">Operation</th>
         </tr>
@@ -148,7 +149,7 @@
                     if (data.data.length === 0) {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td colspan="6" class="no-instances">
+                            <td colspan="7" class="no-instances">
                                 <img src="/static/assets/images/custom/vps.png" alt="No Instances">
                                 <h4>No Instances</h4>
                                 <p>Deploy a new server at any of our worldwide datacenter locations</p>
@@ -166,6 +167,7 @@
                                 <td>${ item.hostname }</td>
                                 <td>${item.location }</td>
                                 <td>${ item.ip }</td>
+                                <td>${ item.end_time }</td>
                                 <td>${ item.status }</td>
                                 <td>
                                     <a href="/instance/${item.id}" class="btn btn-sm btn-outline-primary">Manage</a>

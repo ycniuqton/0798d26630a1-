@@ -1,5 +1,6 @@
 import time
 import json
+from datetime import datetime, timedelta
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 
@@ -9,6 +10,7 @@ from django.http import JsonResponse
 from adapters.redis_service import CachedPlan, CachedOS, CachedServer
 from adapters.kafka_adapter import make_kafka_publisher
 from config import KafkaConfig
+from services.invoice import InvoiceRepository
 from services.vps_log import VPSLogger
 from services.balance import BalanceRepository
 
@@ -25,6 +27,7 @@ def create_vps(request):
     serid = data.get('location', {}).get('id', 0)
     plid = data.get('plan', {}).get('id', 0)
     image_version = data.get('image', {}).get('version', 'None')
+    duration = data.get('duration', 1)
 
     osid = None
     plans = CachedPlan().get()
@@ -46,8 +49,9 @@ def create_vps(request):
 
     if not osid or not plan or not server:
         return JsonResponse({'error': 'Invalid request'}, status=400)
-
-    if user.balance.amount < plan['price']:
+    total_fee = plan['price'] * duration
+    end_time = datetime.utcnow() + timedelta(days=30*duration)
+    if user.balance.amount < total_fee:
         return JsonResponse({'error': 'Insufficient balance'}, status=400)
 
     vps = Vps(
@@ -62,11 +66,15 @@ def create_vps(request):
         virt=server['virt'],
         plan_id=plan['id'],
         user_id=user.id,
-        os=image_version
+        os=image_version,
+        end_time=end_time
     )
     vps.save()
+    vps.plan = plan
 
-    BalanceRepository().charge(user.id, plan['price'])
+    invoice_repo = InvoiceRepository()
+    invoice = invoice_repo.create(user.id, items=[vps])
+    invoice_repo.charge(invoice)
 
     VPSLogger().log(user, vps, 'create', 'creating')
 

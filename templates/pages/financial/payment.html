@@ -99,7 +99,7 @@
                     </div>
                 </div  >
                 <div class="tab-pane fade tab-content" id="balance-record" style="    float: left;
-    position: absolute;" role="tabpanel" aria-labelledby="balance-record-tab">
+    position: absolute;    width: 100%;" role="tabpanel" aria-labelledby="balance-record-tab">
                     <h3>Balance Record</h3>
                     <!-- Your Balance Record content here -->
                     <div class="row mt-3">
@@ -160,7 +160,7 @@
         var otherAmountInput = document.getElementById('other-amount');
         otherAmountInput.style.display = otherAmountInput.style.display === 'none' ? 'block' : 'none';
     });
-
+z`
     var amountButtons = document.querySelectorAll('.amount-btn');
     amountButtons.forEach(function(button) {
         button.addEventListener('click', function() {
