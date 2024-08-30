@@ -9,10 +9,11 @@ from django.db.models import Q
 def get_vps_logs(request):
     user = request.user
 
-    filterable_fields = ['hostname', 'action', 'status']
+    filterable_fields = ['hostname', 'action', 'status', 'user__username']
     search_fields = ['hostname', 'action', 'status', 'performed_by']
     page = int(request.GET.get('page', 1))
     page_size = int(request.GET.get('page_size', 10))
+    page_size = 5
     sort_by = request.GET.get('sort_by', '-datetime')
     filters = {field: request.GET.get(field) for field in filterable_fields if request.GET.get(field)}
     search_value = request.GET.get('search')
@@ -35,7 +36,7 @@ def get_vps_logs(request):
 
     return JsonResponse({
         'logs': logs_data,
-        'total_pages': total // page_size + 1,
+        'total_pages': (total - 1) // page_size + 1,
         'current_page': page,
         'has_next': total > page * page_size,
         'has_previous': page > 1,

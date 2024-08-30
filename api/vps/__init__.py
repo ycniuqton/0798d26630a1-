@@ -12,7 +12,7 @@ class VPSAPI(APIView):
 
     def get(self, request):
         user = request.user
-        filterable_fields = ['hostname', 'location', 'ip_address', 'status']
+        filterable_fields = ['hostname', 'location', 'ip_address', 'status', 'user__username']
         search_fields = ['hostname', 'location', 'ip_address', 'status']
         sortable_fields = ['hostname', 'location', 'ip_address', 'status', '_created']
         page = int(request.GET.get('page', 1))

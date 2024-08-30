@@ -1,4 +1,4 @@
-from adapters.kafka_adapter import SkippableException
+from adapters.kafka_adapter._exceptions import SkippableException
 
 
 class DBInsertFailed(SkippableException):

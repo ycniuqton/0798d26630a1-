@@ -66,7 +66,8 @@ def create_vps(request):
         virt=server['virt'],
         plan_id=plan['id'],
         user_id=user.id,
-        os=image_version,
+        os_version=image_version,
+        os=os['distro'],
         end_time=end_time
     )
     vps.save()

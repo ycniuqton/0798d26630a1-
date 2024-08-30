@@ -4,7 +4,7 @@ from django.contrib.auth import views as auth_views
 from home import views
 from .views import manage_tokens, delete_token, set_introducer, \
     current_introducer, tickets_view, faqs_view
-from home.views.instances import instances, create_instances, instance_detail
+from home.views.instances import instances, create_instances, instance_detail, vps_history
 from home.views.statics import FlagAPI, OSIconAPI
 from home.views.accounts import *
 from home.views.financial import invoices_view, financial_view, payment_view, billing_view, resource_record
@@ -18,6 +18,7 @@ urlpatterns = [
     path('instances/', instances, name='instances'),
     path('instances/create/', create_instances, name='create_instances'),
     path('instance/<str:instance_id>/', instance_detail, name='instance_detail'),
+    path('instances/history/', vps_history, name='vps_history'),
 
     path('accounts/login/', CustomUserLoginView.as_view(), name='login'),
     path('accounts/register/', UserRegistrationView.as_view(), name='register'),
@@ -58,7 +59,6 @@ urlpatterns = [
     path('invoices/', invoices_view, name='invoices'),
     path('api/vps/<int:instance_id>/vnc-link/', views.get_vnc_link, name='get_vnc_link'),
     path('api/vps/<int:instance_id>/snapshots/', views.get_snapshots, name='get_snapshots'),
-    path('api/vps/history/', views.vps_history, name='vps_history'),
 
     path('api/static/flags/<str:country_code>/', FlagAPI.as_view(), name='country_flag_api'),
     path('api/static/os_icon/<str:os_code>/', OSIconAPI.as_view(), name='os_icon_api'),

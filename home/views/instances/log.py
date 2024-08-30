@@ -12,7 +12,7 @@ from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 
 from services.vps import VPSService
-from home.models import Vps
+from home.models import Vps, VPSLog
 
 from django.http import JsonResponse, HttpResponse
 from django.conf import settings
@@ -20,20 +20,16 @@ from django.views import View
 import os
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def instances(request):
+def vps_history(request):
     user = request.user
-    instances_data = []
     list_user = []
 
     if user.is_staff:
-        list_user = Vps.objects.values('user__username').distinct()
+        list_user = VPSLog.objects.values('user__username').distinct()
         list_user = [user['user__username'] for user in list_user]
 
     context = {
-        'segment': 'instances',
-        'instances': instances_data,
-        'list_user': list_user
+        'list_user': list_user,
+        'logs': []
     }
-    return render(request, "pages/instances/instances.html", context)
+    return render(request, 'pages/instances/history/history.html', context)

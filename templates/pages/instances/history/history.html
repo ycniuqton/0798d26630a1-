@@ -39,7 +39,15 @@
 <div class="container mt-4">
     <h2>VPS Action Logs</h2>
     <div class="search-bar">
+        {% if request.user.is_staff %}
+        <select class="form-control width-auto mr-1"  id="username_fitler">
+            <option selected>All user</option>
+            {% for username in list_user %}
+            <option>{{ username }}</option>
+            {% endfor %}
 
+        </select>
+        {% endif %}
         <select class="form-control width-auto mr-1" id="action-filter-select">
             <option value="">All Actions</option>
             <option value="Create">Create</option>
@@ -56,11 +64,15 @@
         </select>
         <input type="text" class="form-control width-auto " id="search-input" placeholder="Search" aria-label="Search"
                style="height: 43px;">
-        <button class="btn btn-outline-secondary m-0"  style="height: 43px;" id="search-button"><i class="fas fa-search"></i></button>
+        <button class="btn btn-outline-secondary m-0" style="height: 43px; display:none" id="search-button"><i
+                class="fas fa-search"></i></button>
     </div>
     <table class="table table-hover">
         <thead>
         <tr>
+            {% if request.user.is_staff %}
+            <th scope="col">User</th>
+            {% endif %}
             <th scope="col" data-sort="instance_name">Instance Name</th>
             <th scope="col" data-sort="action">Action</th>
             <th scope="col" data-sort="status">Status</th>
@@ -89,7 +101,7 @@
         let currentFilter = {};
         let currentSearch = '';
 
-        window.load_table = function(page = 1, sort = '-datetime', filter = {}, search = '') {
+        window.load_table = function(page = 1, sort = currentSort, filter = currentFilter, search = currentSearch) {
 
         document.getElementById('loader').style.display = 'block';
 
@@ -103,6 +115,9 @@
                     data.logs.forEach(log => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
+                        {% if request.user.is_staff %}
+                                <td>${ log.user }</td>
+                                {% endif %}
                             <td>${log.hostname}</td>
                             <td>${log.action}</td>
                             <td>${log.status}</td>
@@ -118,7 +133,7 @@
                     for (let i = 1; i <= data.total_pages; i++) {
                         const pageItem = document.createElement('li');
                         pageItem.className = 'page-item' + (i === data.current_page ? ' active' : '');
-                        pageItem.innerHTML = `<a class="page-link" onclick="load_table(${i}, '${sort}', '${filter}')">${i}</a>`;
+                        pageItem.innerHTML = `<a class="page-link" onclick="load_table(${i})">${i}</a>`;
                         pagination.appendChild(pageItem);
                     }
                     document.getElementById('loader').style.display = 'none';
@@ -155,6 +170,21 @@
                 load_table(currentPage, currentSort, currentFilter, currentSearch);
             });
         });
+
+        username_fitler = document.getElementById('username_fitler')
+        if(username_fitler){
+            username_fitler.addEventListener('change', function() {
+            if (this.value === 'All user') {
+                currentFilter = {};
+                load_table(currentPage, currentSort, currentFilter, currentSearch);
+                return;
+            }
+            currentFilter = {user__username: this.value};
+            console.log(currentFilter);
+            load_table(currentPage, currentSort, currentFilter, currentSearch);
+        });
+        }
+
 
         load_table();
     });

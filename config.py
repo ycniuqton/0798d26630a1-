@@ -46,3 +46,6 @@ class PGDBConfig:
 
     DB_URI = _data.get('DB_URI')
 
+
+class APPConfig:
+    APP_ROLE = 'ctv'

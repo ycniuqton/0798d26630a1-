@@ -638,13 +638,6 @@ invoices_data = [
 ]
 
 
-def vps_history(request):
-    context = {
-        'logs': []
-    }
-    return render(request, 'pages/instances/history/history.html', context)
-
-
 def get_vnc_link(request, instance_id):
     # Fetch the instance to ensure it exists
 

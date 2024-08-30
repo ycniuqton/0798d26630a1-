@@ -1,3 +1,4 @@
+from django.db import transaction, close_old_connections
 from adapters.kafka_adapter._base import BaseHandler
 from marshmallow import Schema, fields, INCLUDE
 from typing import Dict, Any
@@ -25,7 +26,11 @@ class CreateVPS(BaseHandler):
 
         return MySchema()
 
+    def __make_connection(self):
+        close_old_connections()
+
     def _handle(self, payload: Dict[str, Any]) -> None:
+        close_old_connections()
         vps = Vps.objects.filter(id=payload['vps_id']).first()
         if not vps:
             raise DBInsertFailed("Missing Order")
