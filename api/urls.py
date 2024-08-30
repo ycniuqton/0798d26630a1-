@@ -1,5 +1,6 @@
 from django.urls import path
 
+from .support import TicketCollectionAPI, TicketAPI
 from .account import AccountAPI, AccountBalanceAPI
 from .invoices import InvoiceAPI
 from .views import RegisterAPI, LoginAPI, LogoutAPI
@@ -21,4 +22,6 @@ urlpatterns = [
     path('account/balance/', AccountBalanceAPI.as_view(), name='user-balance'),
     path('account/balance/topup', topup, name='user-balance'),
     path('invoice/', InvoiceAPI.as_view(), name='invoice'),
+    path('tickets/', TicketCollectionAPI.as_view(), name='tickets_view'),
+    path('tickets/<str:ticket_id>/', TicketAPI.as_view(), name='ticket_view'),
 ]

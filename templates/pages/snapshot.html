@@ -177,7 +177,7 @@
                     alert(`Failed to ${action.toLowerCase()} snapshots.`);
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => console.log('Error:', error));
         };
     }
 
@@ -209,7 +209,7 @@
                     alert(`Failed to restore snapshot "${snapshotName}".`);
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => console.log('Error:', error));
         };
     }
 
@@ -241,7 +241,7 @@
                     alert(`Failed to delete snapshot "${snapshotName}".`);
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => console.log('Error:', error));
         };
     }
 </script>

@@ -98,7 +98,7 @@
 
         window.loadTickets = function(page = 1, sort = '-submission_time', filter = '') {
             const searchQuery = document.getElementById('search-input').value;
-            fetch(`/api/your_tickets/?page=${page}&page_size=10&sort_by=${sort}&${filter}&search=${searchQuery}`)
+            fetch(`/api/tickets/?page=${page}&page_size=10&sort_by=${sort}&${filter}&search=${searchQuery}`)
                 .then(response => response.json())
                 .then(data => {
                     ticketsData = data.tickets; // Store ticket data
@@ -107,13 +107,13 @@
                     ticketsData.forEach((ticket, index) => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${ticket.ticket_id}</td>
+                            <td>${ticket.id}</td>
                             <td>${ticket.subject}</td>
                             <td>${ticket.ticket_type}</td>
                             <td>${ticket.submission_time}</td>
                             <td>${ticket.status}</td>
                             <td>
-                                <button class="btn btn-sm btn-outline-primary" onclick="showTicketDetails('${ticket.ticket_id}')">Details</button>
+                                <button class="btn btn-sm btn-outline-primary" onclick="showTicketDetails('${ticket.id}')">Details</button>
                             </td>
                         `;
                         tbody.appendChild(row);
@@ -128,20 +128,21 @@
                         pagination.appendChild(pageItem);
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => console.log('Error:', error));
         }
 
         window.showTicketDetails = function(ticket_id) {
-            fetch(`/api/your_tickets/${ticket_id}/`)
+            console.log('showTicketDetails', ticket_id);
+            fetch(`/api/tickets/${ticket_id}/`)
                 .then(response => response.json())
                 .then(data => {
                     const ticketDetailsContent = document.getElementById('ticket-details-content');
                     ticketDetailsContent.innerHTML = `
                         <div class="post">
                             <div class="user">
-                                <img src="${data.user_avatar}" alt="${data.username}" class="avatar">
-                                <span class="username">${data.username}</span>
-                                <span class="role">${data.user_role}</span>
+                                <img src="/static/assets/images/user/avatar-1.jpg" alt="${data.username}" class="avatar">
+                                <span class="username">${data.user}</span>
+<!--                                <span class="role">${data.user_role}</span>-->
                             </div>
                             <div class="content">
                                 <span class="date">${data.submission_time}</span>
@@ -149,7 +150,7 @@
                             </div>
                         </div>
                     `;
-                    data.replies.forEach(reply => {
+                    data.messages.forEach(reply => {
                         ticketDetailsContent.innerHTML += `
                             <div class="post">
                                 <div class="user">
@@ -170,7 +171,7 @@
                     // Store ticket_id in reply button
                     document.getElementById('reply-button').setAttribute('data-ticket-id', ticket_id);
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => console.log('Error:', error));
 
             $('#ticketModal').modal('show');
         }
@@ -181,7 +182,7 @@
             if (message.trim() !== '') {
                 $('#ticketModal').modal('hide');
                  console.log('close')
-                fetch(`/api/your_tickets/${ticket_id}/reply/`, {
+                fetch(`/api/tickets/${ticket_id}/reply/`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

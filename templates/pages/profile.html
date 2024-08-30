@@ -97,7 +97,7 @@ function fetchUserProfile() {
         document.getElementById('phoneNumber').value = data.phone_number;
         document.getElementById('subscribeEmail').checked = data.subscribe_email;
     })
-    .catch(error => console.error('Error fetching profile:', error));
+    .catch(error => console.log('Error fetching profile:', error));
 }
 
 function enableEmailEdit() {
@@ -133,7 +133,7 @@ function saveProfile() {
             alert('Failed to update profile.');
         }
     })
-    .catch(error => console.error('Error saving profile:', error));
+    .catch(error => console.log('Error saving profile:', error));
 }
 </script>
 {% endblock content %}

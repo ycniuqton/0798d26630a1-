@@ -85,7 +85,7 @@
         fetch('/api/tokens/')
             .then(response => response.json())
             .then(data => renderTokenList(data))
-            .catch(error => console.error('Error fetching tokens:', error));
+            .catch(error => console.log('Error fetching tokens:', error));
     }
 
     function renderTokenList(tokens) {
@@ -137,7 +137,7 @@
             fetchTokens();
             alert('Token generated successfully!');
         })
-        .catch(error => console.error('Error creating token:', error));
+        .catch(error => console.log('Error creating token:', error));
     }
 
     function deleteToken(token) {
@@ -155,14 +155,14 @@
                 alert('Failed to delete token.');
             }
         })
-        .catch(error => console.error('Error deleting token:', error));
+        .catch(error => console.log('Error deleting token:', error));
     }
 
     function copyToken(token) {
         navigator.clipboard.writeText(token).then(function() {
             alert('Token copied to clipboard!');
         }, function(err) {
-            console.error('Could not copy text: ', err);
+            console.log('Could not copy text: ', err);
         });
     }
 

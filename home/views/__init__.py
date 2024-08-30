@@ -384,7 +384,7 @@ def ticket_detail_view(request, ticket_id):
             'user': {
                 'profile': {
                     'avatar': {'url': '/media/avatars/reply_avatar1.png'},
-                    'role': 'Support'
+                    'role': 'support'
                 },
                 'username': 'supportuser1'
             },
@@ -596,28 +596,6 @@ faq_data = [
      "answer": "LightNode follows a pay-as-you-go billing model where you are billed based on the resources you use."}
 ]
 
-
-@csrf_exempt
-def tickets_view(request):
-    if request.method == 'POST':
-        try:
-            data = json.loads(request.body)
-            ticket_id = len(tickets) + 1
-            ticket = {
-                'ticket_id': ticket_id,
-                'subject': data['subject'],
-                'ticket_type': data['ticket_type'],
-                'description': data['description'],
-                'submission_time': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
-                'status': 'Open',
-                'operation': 'View'
-            }
-            tickets.append(ticket)
-            return JsonResponse({'success': True, 'ticket': ticket})
-        except Exception as e:
-            return JsonResponse({'success': False, 'error': str(e)}, status=400)
-    elif request.method == 'GET':
-        return JsonResponse({'tickets': tickets})
 
 
 @csrf_exempt

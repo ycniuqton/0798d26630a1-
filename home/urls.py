@@ -3,7 +3,7 @@ from django.contrib.auth import views as auth_views
 
 from home import views
 from .views import manage_tokens, delete_token, set_introducer, \
-    current_introducer, tickets_view, faqs_view
+    current_introducer, faqs_view
 from home.views.instances import instances, create_instances, instance_detail, vps_history
 from home.views.statics import FlagAPI, OSIconAPI
 from home.views.accounts import *
@@ -40,7 +40,6 @@ urlpatterns = [
     path('ticket/', views.ticket, name='ticket'),
     path('your_tickets/', views.your_tickets, name='your_tickets'),
     path('api/your_tickets/', views.api_your_tickets, name='api_your_tickets'),
-    path('api/tickets/', tickets_view, name='tickets_view'),
     path('api/your_tickets/<str:ticket_id>/', views.ticket_detail_view, name='ticket_detail'),
     path('affiliate/', views.affiliate, name='affiliate'),
     path('your_introducer/', views.your_introducer, name='your_introducer'),

@@ -95,7 +95,7 @@
             document.getElementById('loader').style.display = 'none';
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.log('Error:', error);
             document.getElementById('summary-total').innerText = '$0.00/mo';
             document.getElementById('summary-hourly').innerText = '$0.0000/h';
             document.getElementById('loader').style.display = 'none';
@@ -135,7 +135,7 @@
                 alert('Failed to create VPS.');
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => console.log('Error:', error));
     });
 
     // Monitor changes to the hidden input field
@@ -169,7 +169,7 @@
             document.getElementById('current-balance').innerText = '$' + currentBalance.toFixed(2);
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.log('Error:', error);
             document.getElementById('current-balance').innerText = '$0.00';
         });
     }

@@ -157,3 +157,25 @@ class InvoiceLine(BaseModel):
 
     def __str__(self):
         return f'{self.amount} ({self.status})'
+
+
+class Ticket(BaseModel):
+    subject = models.CharField(max_length=200)
+    ticket_type = models.CharField(max_length=200)
+    description = models.TextField()
+    submission_time = models.DateTimeField(default=timezone.now)
+    status = models.CharField(max_length=200)
+    operation = models.CharField(max_length=200)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.subject
+
+
+class TicketChat(BaseModel):
+    message = models.TextField()
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='messages')
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.message

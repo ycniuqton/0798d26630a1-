@@ -62,7 +62,7 @@
                 document.getElementById('set-introducer-section').style.display = 'block';
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => console.log('Error:', error));
     }
 
     function setIntroducer() {
@@ -86,7 +86,7 @@
                 alert('Failed to set introducer. Please try again.');
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => console.log('Error:', error));
     }
 </script>
 {% endblock content %}

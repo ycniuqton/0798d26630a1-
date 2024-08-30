@@ -48,4 +48,5 @@ class PGDBConfig:
 
 
 class APPConfig:
+    APP_ROLE = 'user'
     APP_ROLE = 'ctv'

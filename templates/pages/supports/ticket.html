@@ -15,6 +15,7 @@
     .no-records h4 { margin-top: 20px; }
     .ticket-form { margin-bottom: 20px; }
     .ticket-form textarea { resize: none; }
+
 </style>
 {% endblock extrastyle %}
 
@@ -52,8 +53,8 @@
 </div>
 
 <script>
+    const ticketForm = document.getElementById('ticket-form');
     document.addEventListener('DOMContentLoaded', function() {
-        const ticketForm = document.getElementById('ticket-form');
         ticketForm.addEventListener('submit', function(event) {
             event.preventDefault();
             submitTicket();
@@ -76,13 +77,13 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                addTicketToTable(data.ticket);
+<!--                addTicketToTable(data.ticket);-->
                 ticketForm.reset();
             } else {
                 alert('Failed to submit ticket. Please try again.');
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => console.log('Error:', error));
     }
 
     function addTicketToTable(ticket) {
@@ -127,9 +128,10 @@
                 faqAccordion.innerHTML += faqItem;
             });
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => console.log('Error:', error));
     }
     fetchFaqs();
+
 
 
 </script>
