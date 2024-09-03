@@ -20,6 +20,7 @@ import os
 
 class FlagAPI(View):
     def get(self, request, country_code):
+        country_code = country_code.lower()
         # Define the path to the flag
         flag_path = os.path.join(settings.STATICFILES_DIRS[0], 'assets', 'country_flags', '4x3', f'{country_code}.svg')
 
