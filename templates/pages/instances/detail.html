@@ -37,7 +37,8 @@
 {% block content %}
 
 <script>
-        var instanceData = {{ instance|safe }};
+        var instanceData = '{{ instance.hostname|safe }}';
+        var instance_id = '{{ instance.id }}';
     </script>
 
 <div class="container detail-container">
@@ -64,6 +65,12 @@
                 class="fas fa-user-plus"></i><span>Give to Other User</span></button>
         <!--                    <button class="action-button" data-color="#6c757d" onclick="performAction('set_info')"><i-->
         <!--                            class="fas fa-edit"></i><span>Update Hostname</span></button>-->
+        {% if request.user.is_staff %}
+        <button class="action-button" data-color="#000000" onclick="performAction('suspend')"><i
+                class="fas fa-lock"></i><span>Suspend</span></button>
+        <button class="action-button" data-color="#0ec8dd" onclick="performAction('unsuspend')"><i
+                class="fas fa-unlock-alt"></i><span>Unsuspend</span></button>
+        {% endif %}
     </div>
 
 

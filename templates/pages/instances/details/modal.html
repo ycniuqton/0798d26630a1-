@@ -50,7 +50,7 @@
 
         if (action === 'vnc') {
             // Call API to get VNC link
-            fetch(`/api/vps/${instanceData.id}/vnc-link/`)
+            fetch(`/api/vps/${instance.id}/vnc-link/`)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('vncLinkHref').href = data.link;
@@ -61,7 +61,7 @@
 
         } else if (action === 'restore') {
             // Call API to get snapshots
-            fetch(`/api/vps/${instanceData.id}/snapshots/`)
+            fetch(`/api/vps/${instance.id}/snapshots/`)
                 .then(response => response.json())
                 .then(data => {
                     const snapshotSelect = document.getElementById('snapshotSelect');
@@ -90,7 +90,7 @@
         document.getElementById('confirmAction').onclick = function() {
             $('#confirmationModal').modal('hide');
 
-            let body = { instance_id: instanceData.id };
+            let body = { vps_ids: [instance_id] };
             if (action === 'give') {
                 body.user_email = document.getElementById('userEmail').value;
             }
@@ -127,7 +127,7 @@
             $('#confirmationModal').modal('hide');
 
             // Make API call
-            fetch(`/api/vps/${instanceData.id}/restore/`, {
+            fetch(`/api/vps/${instance.id}/restore/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

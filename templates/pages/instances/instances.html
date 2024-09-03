@@ -39,6 +39,12 @@
                 class="fas fa-database"></i><span>Backup</span></button>
         <button class="action-button" data-color="#007bff" onclick="handleAction('give')"><i
                 class="fas fa-user-plus"></i><span>Give to Other User</span></button>
+        {% if request.user.is_staff %}
+        <button class="action-button" data-color="#000000" onclick="handleAction('suspend')"><i
+                class="fas fa-lock"></i><span>Suspend</span></button>
+        <button class="action-button" data-color="#0ec8dd" onclick="handleAction('unsuspend')"><i
+                class="fas fa-unlock-alt"></i><span>Unsuspend</span></button>
+        {% endif %}
     </div>
     <div class="input-group mb-3">
         {% if request.user.is_staff %}
@@ -180,7 +186,7 @@
                         data.data.forEach(item => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
-                                <td><input type="checkbox" class="instance-checkbox" data-instance-id="{{ item.id }}"></td>
+                                <td><input type="checkbox" class="instance-checkbox" data-instance-id="${item.id}"></td>
                                 {% if request.user.is_staff %}
                                 <td>${ item.user }</td>
                                 {% endif %}

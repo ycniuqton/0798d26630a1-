@@ -113,6 +113,13 @@ document.addEventListener('DOMContentLoaded', function() {
             // Trigger configuration update
             document.getElementById('config_updated').value = 'true';
             document.getElementById('config_updated').dispatchEvent(new Event('change'));
+
+            // update user
+            if ( imageName == 'windows') {
+                document.getElementById('login').value = 'Administrator';
+            } else {
+                document.getElementById('login').value = 'root';
+            }
         });
     });
 

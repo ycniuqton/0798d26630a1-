@@ -5,6 +5,11 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from home.models import Vps
 from django.http import JsonResponse, HttpResponse
+from .start import start_vps
+from .stop import stop_vps
+from .restart import restart_vps
+from .suspend import suspend_vps
+from .un_suspend import unsuspend_vps
 
 
 class VPSAPI(APIView):

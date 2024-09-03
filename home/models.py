@@ -62,7 +62,14 @@ class VpsStatus:
     ON = "on"
     OFF = "off"
     SUSPENDED = "suspended"
+    SUSPENDING = "suspending"
+    UNSUSPENDING = "unsuspending"
     SUSPENDED_NETWORK = "suspended_network"
+    RESTARTING = "restarting"
+    DELETING = "deleting"
+    DELETED = "deleted"
+    STOPPING = "stopping"
+    STARTING = "starting"
 
 
 class Vps(BaseModel):

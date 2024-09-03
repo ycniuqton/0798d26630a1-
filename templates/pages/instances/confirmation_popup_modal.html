@@ -72,7 +72,7 @@
         document.getElementById('confirmAction').onclick = function() {
             $('#confirmationModal').modal('hide');
 
-            var body = { instance_ids: selectedInstanceIds };
+            var body = { vps_ids: selectedInstanceIds };
             if (action.toLowerCase() === 'give') {
                 body.user_email = document.getElementById('userEmail').value;
             }
