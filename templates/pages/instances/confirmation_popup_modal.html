@@ -36,7 +36,11 @@
         var selectedInstanceNames = [];
         selectedInstances.forEach(function(instance) {
             selectedInstanceIds.push(instance.getAttribute('data-instance-id'));
+            {% if user.is_staff %}
+            selectedInstanceNames.push(instance.closest('tr').children[2].textContent);
+            {% else %}
             selectedInstanceNames.push(instance.closest('tr').children[1].textContent);
+            {% endif %}
         });
 
         // Show confirmation modal
