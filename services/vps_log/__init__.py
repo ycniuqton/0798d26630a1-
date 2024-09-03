@@ -37,14 +37,14 @@ class VPSLogger:
         }
 
     @staticmethod
-    def _log(user, vps, action, status):
+    def _log(user, vps, action, status, description=''):
         model = VPSLogger.model
-        model.objects.create(vps_id=vps.id, action=action, status=status, user_id=user.id)
+        model.objects.create(vps_id=vps.id, action=action, status=status, user_id=user.id, description=description)
 
-    def log(self, user, vps, action, status):
+    def log(self, user, vps, action, status, description=''):
         handler = self.action_mapping.get(action, self._log)
-        handler(user, vps, action, status)
+        handler(user, vps, action, status, description)
 
     @staticmethod
-    def _create(user, vps, action, status):
-        VPSLog.objects.create(vps_id=vps.id, action=action, status=status, user_id=user.id)
+    def _create(user, vps, action, status, description=''):
+        VPSLog.objects.create(vps_id=vps.id, action=action, status=status, user_id=user.id, description=description)

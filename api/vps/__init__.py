@@ -10,6 +10,7 @@ from .stop import stop_vps
 from .restart import restart_vps
 from .suspend import suspend_vps
 from .un_suspend import unsuspend_vps
+from .give import give_vps
 
 
 class VPSAPI(APIView):
@@ -17,9 +18,9 @@ class VPSAPI(APIView):
 
     def get(self, request):
         user = request.user
-        filterable_fields = ['hostname', 'location', 'ip_address', 'status', 'user__username']
-        search_fields = ['hostname', 'location', 'ip_address', 'status']
-        sortable_fields = ['hostname', 'location', 'ip_address', 'status', '_created']
+        filterable_fields = ['hostname', 'location', 'ip', 'status', 'user__username']
+        search_fields = ['hostname', 'location', 'ip', 'status', 'user__username']
+        sortable_fields = ['hostname', 'location', 'ip', 'status', '_created']
         page = int(request.GET.get('page', 1))
         page_size = int(request.GET.get('page_size', 10))
         sort_by = request.GET.get('sort_by', '-_created')

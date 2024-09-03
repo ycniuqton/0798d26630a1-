@@ -1,5 +1,5 @@
 from config import KafkaConfig
-from .__handlers__ import CreateVPS, StartVPS, StopVPS, SuspendVPS, UnSuspendVPS, RestartVPS
+from .__handlers__ import CreateVPS, StartVPS, StopVPS, SuspendVPS, UnSuspendVPS, RestartVPS, GiveVPS
 from adapters.kafka_adapter import HandlerFactory
 from adapters.kafka_adapter.consumer import KafkaListener
 
@@ -10,6 +10,7 @@ handlers = {
     'restart_vps': RestartVPS(),
     'suspend_vps': SuspendVPS(),
     'unsuspend_vps': UnSuspendVPS(),
+    'give_vps': GiveVPS()
 }
 
 

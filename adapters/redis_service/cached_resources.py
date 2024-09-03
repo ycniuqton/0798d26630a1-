@@ -36,9 +36,9 @@ class CachedServer(CachedResource):
 
 
 if __name__ == "__main__":
-    # plan = CachedPlan()
-    # print(plan.get())
-    # plan.delete()
+    plan = CachedPlan()
+    print(plan.get())
+    plan.delete()
     #
     # os = CachedOS()
     # print(os.get())
@@ -46,8 +46,8 @@ if __name__ == "__main__":
     # server = CachedServer()
     # print(server.get())
 
-    server = CachedServer()
+    # server = CachedServer()
     # server.delete()
-    print(server.get())
+    # print(server.get())
 
 

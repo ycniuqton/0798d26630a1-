@@ -58,10 +58,10 @@
             </select>
         </div>
         {% endif %}
-        <input type="text" class="form-control" placeholder="Please enter" aria-label="Server Name"
+        <input type="text" class="form-control" placeholder="Please enter" aria-label="Server Name" id="search-input"
                aria-describedby="basic-addon2">
         <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+            <button class="btn btn-outline-secondary" type="button" id="search-button"><i class="fas fa-search"></i></button>
             <select class="custom-select">
                 <option selected>Server Name</option>
                 <!-- Add more options here -->
@@ -170,6 +170,7 @@
                 .then(data => {
                     const tbody = document.getElementById('general-tbody');
                     if (data.data.length === 0) {
+                        tbody.innerHTML = '';
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td colspan="8" class="no-instances">
@@ -216,6 +217,18 @@
                     document.getElementById('loader').style.display = 'none';
                 })
         }
+
+        document.getElementById('search-button').addEventListener('click', () => {
+            currentSearch = document.getElementById('search-input').value.toLowerCase();
+            load_table(currentPage, currentSort, currentFilter, currentSearch);
+        });
+
+        document.getElementById('search-input').addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                currentSearch = document.getElementById('search-input').value.toLowerCase();
+                load_table(currentPage, currentSort, currentFilter, currentSearch);
+            }
+        });
 
         document.querySelectorAll('th[data-sort]').forEach(th => {
             th.addEventListener('click', () => {

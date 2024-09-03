@@ -104,6 +104,7 @@ class VPSLog(BaseModel):
     details = models.TextField()
     hostname = models.CharField(max_length=200)
     performed_by = models.CharField(max_length=200)
+    description = models.TextField()
     vps = models.ForeignKey(Vps, on_delete=models.CASCADE)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, default=None)
 

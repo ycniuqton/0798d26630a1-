@@ -5,7 +5,13 @@ from home.models import Vps
 
 
 def instance_detail(request, instance_id):
-    vps = Vps.objects.filter(id=instance_id).first()
+    user = request.user
+    vps = Vps.objects.filter(id=instance_id)
+    if not user.is_staff:
+        vps = vps.filter(user_id=user.id)
+
+    vps = vps.first()
+
     plans = CachedPlan().get()
     if not vps:
         instance = {

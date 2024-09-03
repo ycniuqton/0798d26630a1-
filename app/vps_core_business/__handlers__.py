@@ -4,8 +4,9 @@ from marshmallow import Schema, fields, INCLUDE
 from typing import Dict, Any
 
 from services.vps import VPSService
-from home.models import Vps, VpsStatus
+from home.models import Vps, VpsStatus, User
 from adapters.kafka_adapter._exceptions import SkippableException
+from services.vps_log import VPSLogger
 from .exception import DBInsertFailed
 
 
@@ -223,3 +224,38 @@ class UnSuspendVPS(BaseHandler):
             vps.save()
         except:
             raise SkippableException("Failed to unsuspend VPS")
+
+
+class GiveVPS(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            vps_id = fields.String(required=True)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        close_old_connections()
+        vps = Vps.objects.filter(id=payload['vps_id']).first()
+        if not vps:
+            raise DBInsertFailed("Missing Order")
+        sender_email = vps.user.email
+        receiver = User.objects.filter(id=payload.get('receiver_id')).first()
+
+        if not receiver:
+            return False
+
+        vps.user = receiver
+        vps.save()
+
+        VPSLogger().log(receiver, vps, 'receive', 'received', f'Received VPS from {sender_email}')
+
+
