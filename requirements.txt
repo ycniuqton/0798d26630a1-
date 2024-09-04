@@ -32,3 +32,4 @@ dj-database-url
 # psycopg2
 logging_context
 tenacity
+click

@@ -24,7 +24,7 @@ class ADMIN_CONFIG:
     data = config_data.get("ADMIN_CONFIG", {})
 
     API_KEY = data.get("API_KEY")
-    URL = data.get("API_KEY")
+    URL = data.get("URL")
 
 
 class REDIS_CONFIG:
