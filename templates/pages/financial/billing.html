@@ -29,6 +29,7 @@
 .no-records h4 {
     margin-top: 20px;
 }
+
 </style>
 {% endblock extrastyle %}
 
@@ -36,34 +37,35 @@
 <div class="container mt-4">
     <h2>Billing</h2>
     <div class="alert alert-warning">
-        💡 The bill list only displays the total amount of the bill. Please refer to the export bill details for details.
+        💡 The bill list only displays the total amount of the bill. Please refer to the export bill details for
+        details.
     </div>
     <div class="row text-center mb-4">
-    <div class="col-md-4">
-        <div class="card bg-primary text-white">
-            <div class="card-body">
-                <h4>$ {{ billing_summary.expenses }}</h4>
-                <p>Accumulated expenses</p>
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h4>$ {{ billing_summary.expenses }}</h4>
+                    <p>Accumulated expenses</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h4>$ {{ billing_summary.charges_this_month }}</h4>
+                    <p>Charges This Month</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <h4>$ {{ billing_summary.charges_last_hour }}</h4>
+                    <p>Charges Last Hour</p>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card bg-warning text-white">
-            <div class="card-body">
-                <h4>$ {{ billing_summary.charges_this_month }}</h4>
-                <p>Charges This Month</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card bg-warning text-white">
-            <div class="card-body">
-                <h4>$ {{ billing_summary.charges_last_hour }}</h4>
-                <p>Charges Last Hour</p>
-            </div>
-        </div>
-    </div>
-</div>
     <div class="search-bar mb-4">
         <input type="month" class="form-control">
         <input type="month" class="form-control ml-2">
@@ -74,31 +76,31 @@
     </div>
     <table class="table table-hover">
         <thead>
-            <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Billing amount</th>
-                <th scope="col">Operation</th>
-            </tr>
+        <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Billing amount</th>
+            <th scope="col">Operation</th>
+        </tr>
         </thead>
         <tbody>
-            {% if billing_records %}
-                {% for record in billing_records %}
-                    <tr>
-                        <td>{{ record.cycle }}</td>
-                        <td>{{ record.amount }}</td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-primary">{{ record.operation }}</button>
-                        </td>
-                    </tr>
-                {% endfor %}
-            {% else %}
-                <tr>
-                    <td colspan="3" class="no-records text-center">
-                        <img src="/static/assets/images/custom/invoice.png" alt="No Records">
-                        <h4>No Records</h4>
-                    </td>
-                </tr>
-            {% endif %}
+        {% if billing_records %}
+        {% for record in billing_records %}
+        <tr>
+            <td>{{ record.cycle }}</td>
+            <td>{{ record.amount }}</td>
+            <td>
+                <button class="btn btn-sm btn-outline-primary">{{ record.operation }}</button>
+            </td>
+        </tr>
+        {% endfor %}
+        {% else %}
+        <tr>
+            <td colspan="3" class="no-records text-center">
+                <img src="/static/assets/images/custom/invoice.png" alt="No Records">
+                <h4>No Records</h4>
+            </td>
+        </tr>
+        {% endif %}
         </tbody>
     </table>
 </div>

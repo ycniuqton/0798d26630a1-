@@ -86,7 +86,8 @@ def create_vps(request):
             "serid": serid,
             "plid": plid,
             "osid": str(osid),
-            "vps_id": vps.id
+            "vps_id": vps.id,
+            "raw_data": data
         }
         publisher = make_kafka_publisher(KafkaConfig)
         publisher.publish('create_vps', payload)

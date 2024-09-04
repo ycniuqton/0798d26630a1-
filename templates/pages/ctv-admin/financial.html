@@ -1,0 +1,164 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block extrastyle %}
+<style>
+.iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+.parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+.nav-tabs {
+    margin-bottom: 20px;
+}
+.tab-content {
+    padding: 20px;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+}
+.balance-block {
+    border: 1px solid #e9ecef;
+    padding: 20px;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    height: 100%;
+}
+.balance-block h5 {
+    margin-bottom: 10px;
+}
+.balance-block h2 {
+    color: #007bff;
+    font-size: 2.5em;
+}
+.balance-block .badge {
+    font-size: 0.8em;
+}
+
+
+
+
+
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Payments</h2>
+    <div class="row">
+        <div class="col-md">
+
+            <div class="row text-center mb-4">
+                <div class="col-md-4">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body">
+                            <h4>$ {{ balance}}</h4>
+                            <p>Balance</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <h4>$ {{ billing_summary.expenses }}</h4>
+                            <p>Accumulated expenses</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body">
+                            <h4>$ {{ billing_summary.charges_this_month }}</h4>
+                            <p>Charges This Month</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="tab-pane tab-content" id="balance-record" style="    float: left;
+    position: absolute;    width: 100%;" role="tabpanel" aria-labelledby="balance-record-tab">
+                <h3>Balance Record</h3>
+                <!-- Your Balance Record content here -->
+                <div class="row mt-3">
+                    <div class="col">
+                        <input type="date" class="form-control">
+                    </div>
+                    <div class="col">
+                        <input type="date" class="form-control">
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-outline-secondary"><i class="fas fa-sync-alt"></i></button>
+                    </div>
+                </div>
+                <table class="table table-hover mt-3">
+                    <thead>
+                    <tr>
+                        <th scope="col">Account</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Method</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Amount</th>
+                        <th scope="col">Operation</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if balance_records %}
+                    {% for record in balance_records %}
+                    <tr>
+                        <td>{{ record.payment_account }}</td>
+                        <td>{{ record.payment_type }}</td>
+                        <td>{{ record.payment_method }}</td>
+                        <td>{{ record.time }}</td>
+                        <td>{{ record.recharge_amount }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">{{ record.operation }}</button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="no-records">
+                            <img src="https://via.placeholder.com/150" alt="No Records">
+                            <h4>No Records</h4>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.getElementById('other-btn').addEventListener('click', function() {
+        var otherAmountInput = document.getElementById('other-amount');
+        otherAmountInput.style.display = otherAmountInput.style.display === 'none' ? 'block' : 'none';
+    });
+
+    var amountButtons = document.querySelectorAll('.amount-btn');
+    amountButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var otherAmountInput = document.getElementById('other-amount');
+            otherAmountInput.style.display = 'none';
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var triggerTabList = [].slice.call(document.querySelectorAll('#paymentTabs a'))
+        triggerTabList.forEach(function (triggerEl) {
+            var tabTrigger = new bootstrap.Tab(triggerEl)
+
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault()
+                tabTrigger.show()
+            })
+        })
+    });
+
+
+
+
+
+</script>
+{% endblock content %}

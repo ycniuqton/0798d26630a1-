@@ -7,11 +7,11 @@
 <html lang="en">
 
 <head>
-  {% include 'includes/head.html' %}
-  {% block extrastyle %}{% endblock extrastyle %}
-  {% block extrahead %}{% endblock extrahead %}
+    {% include 'includes/head.html' %}
+    {% block extrastyle %}{% endblock extrastyle %}
+    {% block extrahead %}{% endblock extrahead %}
 
-  <style>
+    <style>
     .action-block {
         display: flex;
         justify-content: space-around;
@@ -55,6 +55,15 @@
             left: 0;
             animation: loading 2s linear infinite; /* Loading animation */
         }
+            .sidebar-selected {
+      background: #474df3;
+    }
+    ul.pcoded-submenu li:hover {
+        background: #474df3;
+    }
+    ul.pcoded-submenu li a {
+        text-decoration: none;
+    }
 
     /* Animation keyframes for the loader */
         @keyframes loading {
@@ -68,45 +77,46 @@
                 transform: translateX(100%);
             }
         }
-  </style>
+
+    </style>
 </head>
 <body>
-  <div class="loader-line" id="loader"></div>
+<div class="loader-line" id="loader"></div>
 
-  {% block pre_loader %}
-    {% include 'includes/pre-loader.html' %}
-  {% endblock pre_loader %}
-  
-  {% block sidebar %}
-    {% include 'includes/sidebar.html' %}
-  {% endblock sidebar %}
+{% block pre_loader %}
+{% include 'includes/pre-loader.html' %}
+{% endblock pre_loader %}
 
-  {% block header %}
-    {% include 'includes/navigation.html' %}
-  {% endblock header %}
+{% block sidebar %}
+{% include 'includes/sidebar.html' %}
+{% endblock sidebar %}
 
-  <!-- [ Main Content ] start -->
-  <div class="pcoded-main-container">
+{% block header %}
+{% include 'includes/navigation.html' %}
+{% endblock header %}
+
+<!-- [ Main Content ] start -->
+<div class="pcoded-main-container">
     <div class="pcoded-wrapper">
-      <div class="pcoded-content">
-        <div class="pcoded-inner-content">
-          <!-- [ breadcrumb ] start -->
-          {% block breadcrumbs %}
-            {% include 'includes/breadcrumb.html' %}
-          {% endblock breadcrumbs %}
-          <!-- [ breadcrumb ] end -->
-          <div class="main-body">
-            <div class="page-wrapper">
-              {% block content %}{% endblock content %}
+        <div class="pcoded-content">
+            <div class="pcoded-inner-content">
+                <!-- [ breadcrumb ] start -->
+                {% block breadcrumbs %}
+                {% include 'includes/breadcrumb.html' %}
+                {% endblock breadcrumbs %}
+                <!-- [ breadcrumb ] end -->
+                <div class="main-body">
+                    <div class="page-wrapper">
+                        {% block content %}{% endblock content %}
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 
-  {% include 'includes/scripts.html' %}
-  {% block extra_js %}{% endblock extra_js %}
+{% include 'includes/scripts.html' %}
+{% block extra_js %}{% endblock extra_js %}
 
 
 <script>
@@ -149,6 +159,7 @@
             button.style.transform = 'translateY(0)';
         });
     });
+
 </script>
 </body>
 </html>

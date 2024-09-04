@@ -22,13 +22,13 @@ redis
 marshmallow
 kafka-python
 # DB Layer
-# psycopg2-binary
+psycopg2-binary
 # mysqlclient
 
 pyaml
 djangorestframework-simplejwt
 dj-database-url
 
-psycopg2
+# psycopg2
 logging_context
 tenacity

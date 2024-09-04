@@ -8,6 +8,7 @@ from home.views.instances import instances, create_instances, instance_detail, v
 from home.views.statics import FlagAPI, OSIconAPI
 from home.views.accounts import *
 from home.views.financial import invoices_view, financial_view, payment_view, billing_view, resource_record
+from home.views.ctv_admin import ctv_financial, ctv_settings
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -61,4 +62,7 @@ urlpatterns = [
 
     path('api/static/flags/<str:country_code>/', FlagAPI.as_view(), name='country_flag_api'),
     path('api/static/os_icon/<str:os_code>/', OSIconAPI.as_view(), name='os_icon_api'),
+
+    path('admin/financial/', ctv_financial, name='ctv-financial'),
+    path('admin/settings/', ctv_settings, name='ctv-settings'),
 ]

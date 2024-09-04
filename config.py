@@ -20,6 +20,13 @@ class VIRTUALIZOR_CONFIG:
     MANAGER_URL = data.get("MANAGER_URL")
 
 
+class ADMIN_CONFIG:
+    data = config_data.get("ADMIN_CONFIG", {})
+
+    API_KEY = data.get("API_KEY")
+    URL = data.get("API_KEY")
+
+
 class REDIS_CONFIG:
     data = config_data.get("REDIS_CONFIG")
 
@@ -50,3 +57,4 @@ class PGDBConfig:
 class APPConfig:
     APP_ROLE = 'user'
     APP_ROLE = 'ctv'
+    APP_ROLE = 'admin'

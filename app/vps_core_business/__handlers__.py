@@ -3,10 +3,16 @@ from adapters.kafka_adapter._base import BaseHandler
 from marshmallow import Schema, fields, INCLUDE
 from typing import Dict, Any
 
-from services.vps import VPSService
 from home.models import Vps, VpsStatus, User
 from adapters.kafka_adapter._exceptions import SkippableException
 from services.vps_log import VPSLogger
+from core import settings
+
+if settings.APPConfig.APP_ROLE == 'admin':
+    from services.vps import VPSService
+else:
+    from services.vps import CtvVPSService as VPSService
+
 from .exception import DBInsertFailed
 
 
@@ -36,8 +42,8 @@ class CreateVPS(BaseHandler):
         if not vps:
             raise DBInsertFailed("Missing Order")
 
-        base_url = "http://127.0.0.1:5000"
-        api_key = "scrypt:32768:8:1$RL6X6J7bJJiROtTL$5bd54c34882906e9cf41e596c0a2b67f2a256b1492e266642f3c40521e4b4521ff56dfcf84e9deb9e34ea63d6e89de3c089d32041b5269d76f4c11078636aebd"
+        base_url = settings.ADMIN_CONFIG.URL
+        api_key = settings.ADMIN_CONFIG.API_KEY
 
         service = VPSService(base_url, api_key)
 
@@ -73,8 +79,8 @@ class StartVPS(BaseHandler):
         if not vps:
             raise DBInsertFailed("Missing Order")
 
-        base_url = "http://127.0.0.1:5000"
-        api_key = "scrypt:32768:8:1$RL6X6J7bJJiROtTL$5bd54c34882906e9cf41e596c0a2b67f2a256b1492e266642f3c40521e4b4521ff56dfcf84e9deb9e34ea63d6e89de3c089d32041b5269d76f4c11078636aebd"
+        base_url = settings.ADMIN_CONFIG.URL
+        api_key = settings.ADMIN_CONFIG.API_KEY
 
         service = VPSService(base_url, api_key)
 
@@ -108,8 +114,8 @@ class StopVPS(BaseHandler):
         if not vps:
             raise DBInsertFailed("Missing Order")
 
-        base_url = "http://127.0.0.1:5000"
-        api_key = "scrypt:32768:8:1$RL6X6J7bJJiROtTL$5bd54c34882906e9cf41e596c0a2b67f2a256b1492e266642f3c40521e4b4521ff56dfcf84e9deb9e34ea63d6e89de3c089d32041b5269d76f4c11078636aebd"
+        base_url = settings.ADMIN_CONFIG.URL
+        api_key = settings.ADMIN_CONFIG.API_KEY
 
         service = VPSService(base_url, api_key)
 
@@ -143,8 +149,8 @@ class RestartVPS(BaseHandler):
         if not vps:
             raise DBInsertFailed("Missing Order")
 
-        base_url = "http://127.0.0.1:5000"
-        api_key = "scrypt:32768:8:1$RL6X6J7bJJiROtTL$5bd54c34882906e9cf41e596c0a2b67f2a256b1492e266642f3c40521e4b4521ff56dfcf84e9deb9e34ea63d6e89de3c089d32041b5269d76f4c11078636aebd"
+        base_url = settings.ADMIN_CONFIG.URL
+        api_key = settings.ADMIN_CONFIG.API_KEY
 
         service = VPSService(base_url, api_key)
 
@@ -178,8 +184,8 @@ class SuspendVPS(BaseHandler):
         if not vps:
             raise DBInsertFailed("Missing Order")
 
-        base_url = "http://127.0.0.1:5000"
-        api_key = "scrypt:32768:8:1$RL6X6J7bJJiROtTL$5bd54c34882906e9cf41e596c0a2b67f2a256b1492e266642f3c40521e4b4521ff56dfcf84e9deb9e34ea63d6e89de3c089d32041b5269d76f4c11078636aebd"
+        base_url = settings.ADMIN_CONFIG.URL
+        api_key = settings.ADMIN_CONFIG.API_KEY
 
         service = VPSService(base_url, api_key)
 
@@ -213,8 +219,8 @@ class UnSuspendVPS(BaseHandler):
         if not vps:
             raise DBInsertFailed("Missing Order")
 
-        base_url = "http://127.0.0.1:5000"
-        api_key = "scrypt:32768:8:1$RL6X6J7bJJiROtTL$5bd54c34882906e9cf41e596c0a2b67f2a256b1492e266642f3c40521e4b4521ff56dfcf84e9deb9e34ea63d6e89de3c089d32041b5269d76f4c11078636aebd"
+        base_url = settings.ADMIN_CONFIG.URL
+        api_key = settings.ADMIN_CONFIG.API_KEY
 
         service = VPSService(base_url, api_key)
 
