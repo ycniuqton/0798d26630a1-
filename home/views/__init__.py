@@ -524,13 +524,6 @@ def manage_tokens(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 
-@csrf_exempt
-def delete_token(request, token_id):
-    global tokens
-    tokens = [token for token in tokens if token['token'] != token_id]
-    return JsonResponse({'status': 'success', 'message': 'Token deleted successfully'})
-
-
 # In-memory storage for demo purposes
 introducer_email_storage = {}
 

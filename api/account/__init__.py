@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from home.models import Vps
 from django.http import JsonResponse, HttpResponse
+from .token import *
 
 
 class AccountAPI(APIView):

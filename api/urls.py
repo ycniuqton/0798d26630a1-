@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .support import TicketCollectionAPI, TicketAPI
-from .account import AccountAPI, AccountBalanceAPI
+from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token
 from .invoices import InvoiceAPI
 from .views import RegisterAPI, LoginAPI, LogoutAPI
 from .vps.create import create_vps
@@ -31,4 +31,7 @@ urlpatterns = [
     path('invoice/', InvoiceAPI.as_view(), name='invoice'),
     path('tickets/', TicketCollectionAPI.as_view(), name='tickets_view'),
     path('tickets/<str:ticket_id>/', TicketAPI.as_view(), name='ticket_view'),
+
+    path('tokens/', UserTokenAPI.as_view(), name='user-tokens'),
+    path('tokens/<str:token_id>/', delete_token, name='delete-token'),
 ]

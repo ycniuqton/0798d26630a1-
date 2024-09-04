@@ -187,3 +187,15 @@ class TicketChat(BaseModel):
 
     def __str__(self):
         return self.message
+
+
+class UserToken(BaseModel):
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    token = models.CharField(max_length=200)
+    description = models.TextField()
+    ttl = models.IntegerField()
+    is_default = models.BooleanField(default=False)
+    expired_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.token

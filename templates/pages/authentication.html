@@ -63,7 +63,7 @@
         <tbody id="token-list">
             <tr>
                 <td colspan="6" class="no-records text-center">
-                    <img src="https://via.placeholder.com/150" alt="No Records">
+                    <img src="/static/assets/images/custom/api_key.png" alt="No Records">
                     <h4>No Records</h4>
                 </td>
             </tr>
@@ -96,7 +96,7 @@
             tokenList.innerHTML = `
                 <tr>
                     <td colspan="6" class="no-records text-center">
-                        <img src="https://via.placeholder.com/150" alt="No Records">
+                        <img src="/static/assets/images/custom/api_key.png" alt="No Records">
                         <h4>No Records</h4>
                     </td>
                 </tr>`;
@@ -108,11 +108,11 @@
             row.innerHTML = `
                 <td>${token.token}</td>
                 <td>${token.description}</td>
-                <td>${new Date(token.create_time).toLocaleString()}</td>
-                <td>${token.expiry_time === 'Never' ? 'Never' : new Date(token.expiry_time).toLocaleString()}</td>
+                <td>${token._created}</td>
+                <td>${token.expired_at}</td>
                 <td>${token.status}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm" onclick="deleteToken('${token.token}')">Delete</button>
+                    <button class="btn btn-danger btn-sm" onclick="deleteToken('${token.id}')">Delete</button>
                     <button class="btn btn-secondary btn-sm" onclick="copyToken('${token.token}')">Copy</button>
                     <button class="btn btn-success btn-sm" onclick="downloadToken('${token.token}')">Download</button>
                 </td>`;

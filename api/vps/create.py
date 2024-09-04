@@ -51,7 +51,7 @@ def create_vps(request):
         return JsonResponse({'error': 'Invalid request'}, status=400)
     total_fee = plan['price'] * duration
     end_time = datetime.utcnow() + timedelta(days=30*duration)
-    if user.balance.amount < total_fee:
+    if user.balance.amount < total_fee and not user.is_staff:
         return JsonResponse({'error': 'Insufficient balance'}, status=400)
 
     vps = Vps(

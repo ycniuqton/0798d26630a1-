@@ -13,11 +13,14 @@ from services.account import AccountRepository
 class CustomUserLoginView(UserLoginView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
-        token, created = Token.objects.get_or_create(user=request.user)
-        expired = datetime.utcnow() + timedelta(days=7)
-        expired = expired.strftime("%A %B %D %Y %I:%M:%S")
-        response.headers[
-            'set-cookie'] = f'basic_token={token.key}; expires={expired}; Max-Age=31449600; Path=/; SameSite=Lax'
+        try:
+            token, created = Token.objects.get_or_create(user=request.user)
+            expired = datetime.utcnow() + timedelta(days=7)
+            expired = expired.strftime("%A %B %D %Y %I:%M:%S")
+            response.headers[
+                'set-cookie'] = f'basic_token={token.key}; expires={expired}; Max-Age=31449600; Path=/; SameSite=Lax'
+        except:
+            pass
         return response
 
 
