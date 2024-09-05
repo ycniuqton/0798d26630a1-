@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .support import TicketCollectionAPI, TicketAPI
-from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token
+from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token, AccountCollectionAPI
 from .invoices import InvoiceAPI
 from .views import RegisterAPI, LoginAPI, LogoutAPI
 from .vps.create import create_vps
@@ -28,6 +28,7 @@ urlpatterns = [
     path('vps/calculator', vps_calculator, name='vps_calculator'),
     path('vps/logs/', get_vps_logs, name='get_vps_logs'),
     path('vps/', VPSAPI.as_view(), name='vps'),
+    path('accounts/', AccountCollectionAPI.as_view(), name='account-collection'),
     path('account/profile/', AccountAPI.as_view(), name='user-profile'),
     path('account/balance/', AccountBalanceAPI.as_view(), name='user-balance'),
     path('account/balance/topup', topup, name='user-balance'),

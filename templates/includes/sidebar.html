@@ -94,6 +94,14 @@
                         </a>
                     </ul>
                 </li>
+                {% if user.is_staff %}
+                <li
+                        class="nav-item pcoded-hasmenu  ">
+                    <a href="{% url 'list_customer' %}" class="nav-link "><span class="pcoded-micon"><i
+                            class="feather icon-users"></i></span><span class="pcoded-mtext">Customer</span></a>
+
+                </li>
+                {% endif %}
 
                 <li
                         class="nav-item pcoded-hasmenu  ">
