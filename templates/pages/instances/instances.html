@@ -151,6 +151,30 @@
 </script>
 
 <script>
+
+function htmlEncode(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+function copyErrorMessage(element) {
+    // Get the error message from the data-error-message attribute
+    const errorMessage = element.getAttribute('data-error-message');
+
+    // Copy the error message to the clipboard
+    navigator.clipboard.writeText(errorMessage).then(function() {
+        alert('Copied to clipboard!\n\n' + errorMessage);
+    }).catch(function(err) {
+        console.error('Could not copy text: ', err);
+    });
+}
+</script>
+
+<script>
     document.addEventListener('DOMContentLoaded', function() {
         let currentPage = 1;
         let currentSort = '-_created';
@@ -184,7 +208,16 @@
                     }
                     else{
                         tbody.innerHTML = '';
+
                         data.data.forEach(item => {
+                            if (item.status == 'error') {
+                                operation_button = `<a href="#" class="btn btn-sm btn-outline-danger" data-error-message="${htmlEncode(item.error_message)}" onclick="copyErrorMessage(this); event.preventDefault();">Copy Error</a>`;
+
+
+                            }
+                            else {
+                                operation_button = `<a href="/instance/${item.id}" class="btn btn-sm btn-outline-primary" >Manage</a>`;
+                            }
                             const row = document.createElement('tr');
                             row.innerHTML = `
                                 <td><input type="checkbox" class="instance-checkbox" data-instance-id="${item.id}"></td>
@@ -198,9 +231,7 @@
                                 <td>${ item.ip }</td>
                                 <td>${ item.end_time }</td>
                                 <td>${ item.status }</td>
-                                <td>
-                                    <a href="/instance/${item.id}" class="btn btn-sm btn-outline-primary">Manage</a>
-                                </td>
+                                <td> ${operation_button} </td>
                             `;
                             tbody.appendChild(row);
                         });

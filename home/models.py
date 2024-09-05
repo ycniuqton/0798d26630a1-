@@ -70,6 +70,7 @@ class VpsStatus:
     DELETED = "deleted"
     STOPPING = "stopping"
     STARTING = "starting"
+    ERROR = "error"
 
 
 class Vps(BaseModel):
@@ -90,6 +91,7 @@ class Vps(BaseModel):
     os_version = models.CharField(max_length=200, null=True, blank=True)
     os = models.CharField(max_length=200, null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
+    error_message = models.TextField(null=True, blank=True)
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 

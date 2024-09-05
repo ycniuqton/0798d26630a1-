@@ -2,6 +2,7 @@ from django.db import transaction, close_old_connections
 from adapters.kafka_adapter._base import BaseHandler
 from marshmallow import Schema, fields, INCLUDE
 from typing import Dict, Any
+from tenacity import RetryError
 
 from home.models import Vps, VpsStatus, User
 from adapters.kafka_adapter._exceptions import SkippableException
@@ -46,15 +47,22 @@ class CreateVPS(BaseHandler):
         api_key = settings.ADMIN_CONFIG.API_KEY
 
         service = VPSService(base_url, api_key)
-
+        error = ""
         try:
             response = service.create(payload)
             vps.ip = response.get('ip')
             vps.linked_id = response.get('id')
             vps.status = VpsStatus.ON
             vps.save()
-        except:
-            raise SkippableException("Failed to create VPS")
+            return True
+        except RetryError as e:
+            error = e.last_attempt.exception()
+        except Exception as e:
+            error = e
+
+        VPSService.error(vps.id, error)
+
+
 
 
 class StartVPS(BaseHandler):
