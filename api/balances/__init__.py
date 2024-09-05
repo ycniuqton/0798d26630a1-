@@ -5,7 +5,7 @@ from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from home.models import Vps
+from home.models import Vps, User
 from django.http import JsonResponse, HttpResponse
 from services.balance import BalanceRepository
 
@@ -17,9 +17,14 @@ def topup(request):
     user = request.user
     amount = data.get('amount', 0)
 
-    if not amount:
+    if not user.is_staff:
+        return JsonResponse({'error': 'Permission denied'}, status=403)
+
+    acc = User.objects.filter(email=data.get('email')).first()
+
+    if not amount or not acc:
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
-    BalanceRepository().topup(user.id, amount)
+    BalanceRepository().topup(acc.id, amount)
 
     return JsonResponse({'message': 'Topup success'})
