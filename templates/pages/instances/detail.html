@@ -39,7 +39,7 @@
 <script>
         var instanceData = '{{ instance.hostname|safe }}';
         var instance_id = '{{ instance.id }}';
-    </script>
+</script>
 
 <div class="container detail-container">
     <h2 style="display:flex;align-items: center;">Server-01 <span class="badge badge-success status-badge">{{ instance.status }}</span>
@@ -59,12 +59,8 @@
                 class="fas fa-database"></i><span>Backup</span></button>
         <button class="action-button" data-color="#6c757d" onclick="performAction('restore')"><i
                 class="fas fa-undo"></i><span>Restore</span></button>
-        <!--                    <button class="action-button" data-color="#007bff" onclick="performAction('upgrade')"><i-->
-        <!--                            class="fas fa-arrow-up"></i><span>Upgrade</span></button>-->
         <button class="action-button" data-color="#007bff" onclick="performAction('give')"><i
                 class="fas fa-user-plus"></i><span>Give to Other User</span></button>
-        <!--                    <button class="action-button" data-color="#6c757d" onclick="performAction('set_info')"><i-->
-        <!--                            class="fas fa-edit"></i><span>Update Hostname</span></button>-->
         {% if request.user.is_staff %}
         <button class="action-button" data-color="#000000" onclick="performAction('suspend')"><i
                 class="fas fa-lock"></i><span>Suspend</span></button>
@@ -73,18 +69,61 @@
         {% endif %}
     </div>
 
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs" id="instanceTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">Instance Info</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="resources-tab" data-toggle="tab" href="#resources" role="tab" aria-controls="resources" aria-selected="false">Resources</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="login-tab" data-toggle="tab" href="#login" role="tab" aria-controls="login" aria-selected="false">Login Info</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="monitor-tab" data-toggle="tab" href="#monitor" role="tab" aria-controls="monitor" aria-selected="false">Monitor</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="logs-tab" data-toggle="tab" href="#logs" role="tab" aria-controls="logs" aria-selected="false">Logs</a>
+        </li>
+    </ul>
 
-    <!-- Instance Information -->
-    {% include 'pages/instances/details/info_block.html' %}
-    {% include 'pages/instances/details/resources.html' %}
-    {% include 'pages/instances/details/login.html' %}
-    {% include 'pages/instances/details/monitor.html' %}
-    {% include 'pages/instances/details/modal.html' %}
+    <!-- Tab Content -->
+    <div class="tab-content" id="instanceTabsContent">
+        <!-- Instance Info Tab -->
+        <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+            {% include 'pages/instances/details/info_block.html' %}
+        </div>
 
+        <!-- Resources Tab -->
+        <div class="tab-pane fade" id="resources" role="tabpanel" aria-labelledby="resources-tab">
+            {% include 'pages/instances/details/resources.html' %}
+        </div>
 
-    <a class="action-button" data-color="#154BFF" href="{% url 'instances' %}" class="btn btn-primary mt-4">Back to
-        Instances</a>
+        <!-- Login Info Tab -->
+        <div class="tab-pane fade" id="login" role="tabpanel" aria-labelledby="login-tab">
+            {% include 'pages/instances/details/login.html' %}
+        </div>
+
+        <!-- Monitor Tab -->
+        <div class="tab-pane fade" id="monitor" role="tabpanel" aria-labelledby="monitor-tab">
+            {% include 'pages/instances/details/monitor.html' %}
+        </div>
+        <div class="tab-pane fade" id="logs" role="tabpanel" aria-labelledby="monitor-tab">
+            {% include 'pages/instances/details/logs.html' %}
+        </div>
+    </div>
+
+    <a class="action-button" data-color="#154BFF" href="{% url 'instances' %}" class="btn btn-primary mt-4">Back to Instances</a>
 </div>
 
+<script>
+    $(document).ready(function () {
+        $('#instanceTabs a').on('click', function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
+    });
+</script>
 
 {% endblock content %}

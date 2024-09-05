@@ -1,0 +1,162 @@
+
+{% block extrastyle %}
+<style>
+    .search-bar {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .search-bar input {
+        flex: 1;
+        margin-right: 10px;
+    }
+    .search-bar select, .search-bar button {
+        margin-right: 10px;
+    }
+    .table thead th {
+        background-color: #f8f9fa;
+        cursor: pointer;
+    }
+    .no-logs {
+        text-align: center;
+        padding: 50px 0;
+    }
+    .no-logs img {
+        max-width: 150px;
+        margin-bottom: 20px;
+    }
+        .width-auto{
+            width: auto;
+        }
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="search-bar">
+
+        <select class="form-control width-auto mr-1" id="action-filter-select">
+            <option value="">All Actions</option>
+            <option value="Create">Create</option>
+            <option value="Delete">Delete</option>
+            <option value="Suspend">Suspend</option>
+            <option value="Upgrade">Upgrade</option>
+            <!-- Add more options here if needed -->
+        </select>
+        <select class="form-control width-auto mr-1" id="status-filter-select">
+            <option value="">All Statuses</option>
+            <option value="Success">Success</option>
+            <option value="Failure">Failure</option>
+            <!-- Add more options here if needed -->
+        </select>
+        <input type="text" class="form-control width-auto " id="search-input" placeholder="Search" aria-label="Search"
+               style="height: 43px;">
+        <button class="btn btn-outline-secondary m-0" style="height: 43px; display:none" id="search-button"><i
+                class="fas fa-search"></i></button>
+    </div>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col" data-sort="instance_name">Instance Name</th>
+            <th scope="col" data-sort="action">Action</th>
+            <th scope="col" data-sort="status">Status</th>
+            <th scope="col" data-sort="performed_by">Performed By</th>
+            <th scope="col" data-sort="datetime">Date and Time</th>
+            <th scope="col">Details</th>
+        </tr>
+        </thead>
+        <tbody id="general-tbody">
+        <!-- Logs will be loaded here via AJAX -->
+        </tbody>
+    </table>
+    <nav>
+        <ul class="pagination" id="pagination">
+            <!-- Pagination will be loaded here via AJAX -->
+        </ul>
+    </nav>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentPage = 1;
+        let currentSort = '-datetime';
+        let currentActionFilter = '';
+        let currentStatusFilter = '';
+        let currentFilter = {'vps_id': '{{ instance.id }}'};
+        let currentSearch = '';
+
+        window.load_table = function(page = 1, sort = currentSort, filter = currentFilter, search = currentSearch) {
+
+        document.getElementById('loader').style.display = 'block';
+
+            console.log("triggered");
+            filter_str = Object.keys(filter).map(key => key + "=" + filter[key]).join('&');
+            fetch(`/api/vps/logs/?page=${page}&page_size=10&sort_by=${sort}&${filter_str}&search=${search}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('general-tbody');
+                    tbody.innerHTML = '';
+                    data.logs.forEach(log => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+
+                            <td>${log.hostname}</td>
+                            <td>${log.action}</td>
+                            <td>${log.status}</td>
+                            <td>${log.performed_by}</td>
+                            <td>${log.datetime}</td>
+                            <td>${log.description}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    const pagination = document.getElementById('pagination');
+                    pagination.innerHTML = '';
+                    for (let i = 1; i <= data.total_pages; i++) {
+                        const pageItem = document.createElement('li');
+                        pageItem.className = 'page-item' + (i === data.current_page ? ' active' : '');
+                        pageItem.innerHTML = `<a class="page-link" onclick="load_table(${i})">${i}</a>`;
+                        pagination.appendChild(pageItem);
+                    }
+                    document.getElementById('loader').style.display = 'none';
+                })
+                .catch(error => console.log('Error:', error));
+        }
+
+        document.getElementById('search-button').addEventListener('click', () => {
+            currentSearch = document.getElementById('search-input').value.toLowerCase();
+            load_table(currentPage, currentSort, currentFilter, currentSearch);
+        });
+
+        document.getElementById('search-input').addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                currentSearch = document.getElementById('search-input').value.toLowerCase();
+                load_table(currentPage, currentSort, currentFilter, currentSearch);
+            }
+        });
+
+        document.getElementById('action-filter-select').addEventListener('change', (event) => {
+            currentFilter["action"] = event.target.value.toLowerCase();
+            load_table(currentPage, currentSort, currentFilter, currentSearch);
+        });
+
+        document.getElementById('status-filter-select').addEventListener('change', (event) => {
+            currentFilter["status"] = event.target.value.toLowerCase();
+            load_table(currentPage, currentSort, currentFilter, currentSearch);
+        });
+
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const sortField = th.getAttribute('data-sort');
+                currentSort = currentSort === sortField ? `-${sortField}` : sortField;
+                load_table(currentPage, currentSort, currentFilter, currentSearch);
+            });
+        });
+
+
+
+
+        load_table();
+    });
+</script>
+{% endblock content %}
