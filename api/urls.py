@@ -5,7 +5,8 @@ from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token
 from .invoices import InvoiceAPI
 from .views import RegisterAPI, LoginAPI, LogoutAPI
 from .vps.create import create_vps
-from .vps import VPSAPI, start_vps, stop_vps, restart_vps, suspend_vps, unsuspend_vps, give_vps
+from .vps import VPSAPI, start_vps, stop_vps, restart_vps, suspend_vps, unsuspend_vps, give_vps, change_vps_plan
+from .vps.rebuild import rebuild_vps
 from .vps_log import get_vps_logs
 from .balances import topup
 from .vps.calculator import vps_calculator
@@ -18,9 +19,11 @@ urlpatterns = [
     path('vps/start/', start_vps, name='start-vps'),
     path('vps/stop/', stop_vps, name='stop-vps'),
     path('vps/restart/', restart_vps, name='restart-vps'),
+    path('vps/rebuild/', rebuild_vps, name='rebuild-vps'),
     path('vps/suspend/', suspend_vps, name='suspend-vps'),
     path('vps/unsuspend/', unsuspend_vps, name='unsuspend-vps'),
     path('vps/give/', give_vps, name='give-vps'),
+    path('vps/<str:vps_id>/change_plan', change_vps_plan, name='change_vps_plan'),
 
     path('vps/calculator', vps_calculator, name='vps_calculator'),
     path('vps/logs/', get_vps_logs, name='get_vps_logs'),

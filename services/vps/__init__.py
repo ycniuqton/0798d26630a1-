@@ -94,6 +94,25 @@ class VPSService:
         vps.error_message = message
         vps.save()
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+    def rebuild(self, payload):
+        vps_id = payload.get('vps_id')
+        url = f"{self.base_url}/system/vpss/{vps_id}/rebuild"
+        response = requests.post(url, headers=self.headers, json=payload)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            try:
+                if response.json().get('success'):
+                    return True
+                else:
+                    return False
+            except Exception as e:
+                raise e
+        else:
+            # Raise an HTTP error for non-200 status codes
+            response.raise_for_status()
+
 
 class CtvVPSService(VPSService):
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
@@ -162,6 +181,19 @@ class CtvVPSService(VPSService):
     def unsuspend(self, vps_id):
         url = f"{self.base_url}/api/vps/unsuspend/"
         response = requests.post(url, headers=self.headers, json={'vps_id': [vps_id]})
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            return response.json()
+        else:
+            # Raise an HTTP error for non-200 status codes
+            response.raise_for_status()
+
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+    def rebuild(self, payload):
+        vps_id = payload.get('vps_id')
+        url = f"{self.base_url}/system/vpss/{vps_id}/rebuild"
+        response = requests.post(url, headers=self.headers, json=payload.get('raw_data'))
 
         # Check if the request was successful
         if response.status_code == 200:

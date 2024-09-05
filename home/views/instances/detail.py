@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from adapters.redis_service import CachedPlan
+from adapters.redis_service import CachedPlan, CachedOS
 from home.models import Vps
 
 
@@ -48,13 +48,27 @@ def instance_detail(request, instance_id):
         except:
             instance.plan_name = ""
 
+    oses = CachedOS().get()
+    oses_dict = {}
+    for os in oses:
+        distro = os.get("distro")
+        if distro not in oses_dict:
+            oses_dict[distro] = {
+                "name": distro,
+                "versions": [os.get("name")],
+                "category": "System Image",
+                "image_url": distro.lower() + ".png"
+            }
+        else:
+            oses_dict[distro]["versions"].append(os.get("name"))
 
-    os_options = ['Ubuntu 20.04 LTS', 'AlmaLinux 8.4', 'CentOS 7', 'Debian 10']
+    images = list(oses_dict.values())
+
     instance_types = plans
 
     context = {
         'instance': instance,
-        'os_options': os_options,
+        'images': images,
         'instance_types': instance_types,
     }
 

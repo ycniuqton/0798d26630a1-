@@ -1,4 +1,3 @@
-
 <div class="card card-custom">
     <div class="card-header">
         <h4>Instance Information</h4>
@@ -26,14 +25,24 @@
                 <th>Image</th>
                 <td>
                     <span id="os-text">{{ instance.os_version }}</span>
-<!--                    <i class="fas fa-edit" id="change-os-icon" style="cursor: pointer;" onclick="showOsDropdown()"></i>-->
-<!--                    <select id="os-dropdown" class="form-control d-none">-->
-<!--                        {% for os in os_options %}-->
-<!--                        <option value="{{ os }}">{{ os }}</option>-->
-<!--                        {% endfor %}-->
-<!--                    </select>-->
-<!--                    <button id="update-os-btn" class="btn btn-primary d-none" onclick="updateOs()">Update</button>-->
-<!--                    <button id="cancel-os-btn" class="btn btn-secondary d-none" onclick="cancelOsChange()">Cancel</button>-->
+                    <i class="fas fa-edit" id="change-os-icon" style="cursor: pointer;" onclick="showOsDropdown()"></i>
+
+                    <!-- OS Dropdown populated dynamically -->
+                    <select id="os-dropdown" class="form-control d-none">
+                        {% for image in images %}
+                        <optgroup label="{{ image.name }}">
+                            {% for version in image.versions %}
+                            <option value="{{ version }}">{{ version }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endfor %}
+                    </select>
+
+                    <!-- Password input, hidden initially -->
+                    <input type="password" id="os-password" class="form-control d-none mt-2 mb-2" placeholder="Enter password">
+
+                    <button id="update-os-btn" class="btn btn-primary d-none" onclick="updateOs()">Update</button>
+                    <button id="cancel-os-btn" class="btn btn-secondary d-none" onclick="cancelOsChange()">Cancel</button>
                 </td>
             </tr>
             <tr>
@@ -57,21 +66,56 @@
         document.getElementById('os-text').classList.add('d-none');
         document.getElementById('change-os-icon').classList.add('d-none');
         document.getElementById('os-dropdown').classList.remove('d-none');
+        document.getElementById('os-password').classList.remove('d-none');
         document.getElementById('update-os-btn').classList.remove('d-none');
         document.getElementById('cancel-os-btn').classList.remove('d-none');
     }
 
     function updateOs() {
-        const newOs = document.getElementById('os-dropdown').value;
-        document.getElementById('os-text').textContent = newOs;
-        cancelOsChange();
-        // Optionally, you can add code here to make an API call to update the OS on the server
+        const selectedVersion = document.getElementById('os-dropdown').value;
+        const password = document.getElementById('os-password').value;
+        const vpsId = "{{ instance.id }}";  // Assuming vps_id is the instance ID
+
+        if (!password) {
+            alert("Please enter your password.");
+            return;
+        }
+
+        const payload = {
+            vps_id: vpsId,
+            image_version: selectedVersion,
+            password: password
+        };
+
+        // Send API request to rebuild the VPS
+        fetch('/api/vps/rebuild/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(response => {
+            if (response.status == 200) {
+                alert("OS Rebuilding.");
+                // Optionally reload the page or update the UI
+            } else {
+                alert("Error: " + data.message);
+            }
+        })
+        .catch(error => {
+            console.log('Error:', error);
+            alert("An error occurred while rebuilding the OS.");
+        });
+
+        cancelOsChange();  // Hide the dropdown and reset the form
     }
 
     function cancelOsChange() {
         document.getElementById('os-text').classList.remove('d-none');
         document.getElementById('change-os-icon').classList.remove('d-none');
         document.getElementById('os-dropdown').classList.add('d-none');
+        document.getElementById('os-password').classList.add('d-none');
         document.getElementById('update-os-btn').classList.add('d-none');
         document.getElementById('cancel-os-btn').classList.add('d-none');
     }

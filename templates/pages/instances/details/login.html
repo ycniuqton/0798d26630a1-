@@ -9,7 +9,7 @@
                 <td>
                     <span id="hostname-text">{{ instance.hostname }}</span>
                     <i class="fas fa-edit" id="change-hostname-icon" style="cursor: pointer;" onclick="showHostnameInput()"></i>
-                    <input type="text" id="hostname-input" class="form-control d-none" value="{{ instance.hostname }}">
+                    <input type="text" id="hostname-input" class="form-control d-none mb-2" value="{{ instance.hostname }}">
                     <button id="update-hostname-btn" class="btn btn-primary d-none" onclick="updateHostname()">Update</button>
                     <button id="cancel-hostname-btn" class="btn btn-secondary d-none" onclick="cancelHostnameChange()">Cancel</button>
                 </td>

@@ -11,6 +11,7 @@ from .restart import restart_vps
 from .suspend import suspend_vps
 from .un_suspend import unsuspend_vps
 from .give import give_vps
+from .change_plan import change_vps_plan
 
 
 class VPSAPI(APIView):

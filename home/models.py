@@ -66,6 +66,7 @@ class VpsStatus:
     UNSUSPENDING = "unsuspending"
     SUSPENDED_NETWORK = "suspended_network"
     RESTARTING = "restarting"
+    REBUILDING = "rebuilding"
     DELETING = "deleting"
     DELETED = "deleted"
     STOPPING = "stopping"

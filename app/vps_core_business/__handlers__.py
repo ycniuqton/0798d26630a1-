@@ -63,8 +63,6 @@ class CreateVPS(BaseHandler):
         VPSService.error(vps.id, error)
 
 
-
-
 class StartVPS(BaseHandler):
     def __init__(self) -> None:
         super().__init__()
@@ -273,3 +271,45 @@ class GiveVPS(BaseHandler):
         VPSLogger().log(receiver, vps, 'receive', 'received', f'Received VPS from {sender_email}')
 
 
+class RebuildVPS(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            vps_id = fields.String(required=True)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        close_old_connections()
+        vps = Vps.objects.filter(id=payload['vps_id']).first()
+        if not vps:
+            raise DBInsertFailed("Missing Order")
+        payload['vps_id'] = vps.linked_id
+        image_version = payload.get('raw_data').get('image_version')
+        username = payload.get('username')
+        base_url = settings.ADMIN_CONFIG.URL
+        api_key = settings.ADMIN_CONFIG.API_KEY
+
+        service = VPSService(base_url, api_key)
+
+        try:
+            response = service.rebuild(payload)
+            if response:
+                vps.status = VpsStatus.ON
+                vps.os_version = image_version
+                vps.username = username
+                vps.save()
+            else:
+                service.error(vps.id, "Failed to rebuild VPS")
+                raise SkippableException("Failed to rebuild VPS")
+        except:
+            service.error(vps.id, "Failed to rebuild VPS")
+            raise SkippableException("Failed to rebuild VPS")
