@@ -1,6 +1,7 @@
+from django.db.models import Sum
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from .models import Vps, User, Balance
+from .models import Vps, User, Balance, Transaction
 
 
 @receiver(post_save, sender=Vps)
@@ -21,4 +22,12 @@ def update_vps_len_on_delete(sender, instance, **kwargs):
 def update_balance_amount_on_save(sender, instance, **kwargs):
     user = instance.user
     user.balance_amount = instance.amount
+    user.save()
+
+
+@receiver(post_save, sender=Transaction)
+def update_account_statistic_on_save(sender, instance, **kwargs):
+    user = instance.user
+    user.total_paid = - Transaction.objects.filter(user=user, type='charge').aggregate(Sum('amount'))['amount__sum']
+    user.total_topup = Transaction.objects.filter(user=user, type='topup').aggregate(Sum('amount'))['amount__sum']
     user.save()

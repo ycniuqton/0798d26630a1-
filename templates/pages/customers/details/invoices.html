@@ -1,7 +1,3 @@
-{% extends 'layouts/base.html' %}
-{% load static %}
-
-{% block breadcrumbs %}{% endblock breadcrumbs %}
 
 {% block extrastyle %}
 <style>
@@ -32,25 +28,21 @@
 {% endblock extrastyle %}
 
 {% block content %}
-<div class="container" >
-    <h2>Invoices</h2>
+<div class="" >
     <div class="invoice-filters d-flex align-items-center">
-        <input type="text" class="form-control" id="search-input" placeholder="Search invoices">
-        <select class="form-control" id="status-filter-select">
+        <input type="text" class="form-control" id="search-input-1" placeholder="Search invoices">
+        <select class="form-control" id="status-filter-select-1">
             <option value="">All Statuses</option>
             <option value="paid">Paid</option>
             <option value="unpaid">Unpaid</option>
             <option value="overdue">Overdue</option>
         </select>
 
-        <button class="btn btn-primary" id="search-button">Apply Filters</button>
+        <button class="btn btn-primary" id="search-button-1">Apply Filters</button>
     </div>
     <table class="table table-hover">
         <thead>
             <tr>
-                {% if user.is_staff %}
-                    <th scope="col" id="th-customer">User</th>
-                {% endif %}
                 <th scope="col" id="th-code">Code</th>
                 <th scope="col" id="th-created">Created</th>
                 <th scope="col" id="th-due-date">Due Date</th>
@@ -59,7 +51,7 @@
                 <th scope="col">Operation</th>
             </tr>
         </thead>
-        <tbody id="general-tbody">
+        <tbody id="general-tbody-1">
 <!--            {% if invoices %}-->
 <!--                {% for invoice in invoices %}-->
 <!--                    <tr>-->
@@ -81,67 +73,11 @@
         </tbody>
     </table>
     <nav>
-        <ul class="pagination" id="pagination">
+        <ul class="pagination" id="pagination-1">
             <!-- Pagination will be loaded here via AJAX -->
         </ul>
     </nav>
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('search-invoices');
-    const statusSelect = document.getElementById('filter-status');
-    const itemsPerPageSelect = document.getElementById('items-per-page');
-    const applyFiltersButton = document.getElementById('apply-filters');
-
-    const urlParams = new URLSearchParams(window.location.search);
-    searchInput.value = urlParams.get('search') || '';
-    statusSelect.value = urlParams.get('status') || '';
-    itemsPerPageSelect.value = urlParams.get('items') || '10';
-
-    applyFiltersButton.addEventListener('click', function() {
-        const search = searchInput.value;
-        const status = statusSelect.value;
-        const items = itemsPerPageSelect.value;
-        const params = new URLSearchParams(window.location.search);
-
-        if (search) {
-            params.set('search', search);
-        } else {
-            params.delete('search');
-        }
-
-        if (status) {
-            params.set('status', status);
-        } else {
-            params.delete('status');
-        }
-
-        params.set('items', items);
-
-        window.location.search = params.toString();
-    });
-
-    const thCode = document.getElementById('th-code');
-    const thCreated = document.getElementById('th-created');
-    const thDueDate = document.getElementById('th-due-date');
-    const thStatus = document.getElementById('th-status');
-    const thTotal = document.getElementById('th-total');
-
-    [thCode, thCreated, thDueDate, thStatus, thTotal].forEach(th => {
-        th.addEventListener('click', function() {
-            const params = new URLSearchParams(window.location.search);
-            const sortField = th.id.replace('th-', '');
-            const currentSort = params.get('sort');
-            const sortOrder = currentSort === sortField ? '-' + sortField : sortField;
-
-            params.set('sort', sortOrder);
-            window.location.search = params.toString();
-        });
-    });
-});
-</script>
-
 
 
 <script>
@@ -150,18 +86,18 @@ document.addEventListener('DOMContentLoaded', function() {
         let currentSort = '-_created';
         let currentActionFilter = '';
         let currentStatusFilter = '';
-        let currentFilter = {};
+        let currentFilter = {'user_id': '{{customer.id}}'};
         let currentSearch = '';
         let api_url = '/api/invoice/';
 
         window.load_table = function(page = 1, sort = '-_created', filter = {}, search = '') {
 
         document.getElementById('loader').style.display = 'block';
-            filter_str = Object.keys(filter).map(key => key + "=" + filter[key]).join('&');
+            filter_str = Object.keys(currentFilter).map(key => key + "=" + currentFilter[key]).join('&');
             fetch(`${api_url}?page=${page}&page_size=10&sort_by=${sort}&${filter_str}&search=${search}`)
                 .then(response => response.json())
                 .then(data => {
-                    const tbody = document.getElementById('general-tbody');
+                    const tbody = document.getElementById('general-tbody-1');
                     if (data.data.length === 0) {
                         tbody.innerHTML = '';
                         const row = document.createElement('tr');
@@ -178,9 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         data.data.forEach(item => {
                             const row = document.createElement('tr');
                             row.innerHTML = `
-                                {% if user.is_staff %}
-                                    <td>${item.user}</td>
-                                {% endif %}
                                 <td>${item.code.toUpperCase()}</td>
                                 <td>${item._created}</td>
                                 <td>${item.due_date}</td>
@@ -194,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     }
 
-                    const pagination = document.getElementById('pagination');
+                    const pagination = document.getElementById('pagination-1');
                     pagination.innerHTML = '';
                     for (let i = 1; i <= data.total_pages; i++) {
                         const pageItem = document.createElement('li');
@@ -206,20 +139,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
         }
 
-        document.getElementById('search-button').addEventListener('click', () => {
-            currentSearch = document.getElementById('search-input').value.toLowerCase();
+        document.getElementById('search-button-1').addEventListener('click', () => {
+            currentSearch = document.getElementById('search-input-1').value.toLowerCase();
             load_table(currentPage, currentSort, currentFilter, currentSearch);
         });
 
-        document.getElementById('search-input').addEventListener('keypress', (event) => {
+        document.getElementById('search-input-1').addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
-                currentSearch = document.getElementById('search-input').value.toLowerCase();
+                currentSearch = document.getElementById('search-input-1').value.toLowerCase();
                 load_table(currentPage, currentSort, currentFilter, currentSearch);
             }
         });
 
 
-        document.getElementById('status-filter-select').addEventListener('change', (event) => {
+        document.getElementById('status-filter-select-1').addEventListener('change', (event) => {
             currentFilter["status"] = event.target.value.toLowerCase();
             load_table(currentPage, currentSort, currentFilter, currentSearch);
         });

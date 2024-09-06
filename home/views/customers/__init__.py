@@ -18,6 +18,7 @@ from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 from django.views import View
 import os
+from .detail import *
 
 
 def list_customer(request):

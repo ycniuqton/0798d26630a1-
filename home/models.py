@@ -57,6 +57,8 @@ class User(AbstractUser, BaseModel):
     subscribe_email = models.BooleanField(default=True)
     vps_len = models.PositiveIntegerField(default=0)
     balance_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_topup = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    total_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
 
 class VpsStatus:

@@ -38,4 +38,6 @@ urlpatterns = [
 
     path('tokens/', UserTokenAPI.as_view(), name='user-tokens'),
     path('tokens/<str:token_id>/', delete_token, name='delete-token'),
+
+    path('invoices/', InvoiceAPI.as_view(), name='api-invoices'),
 ]

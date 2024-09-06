@@ -15,9 +15,9 @@ class InvoiceAPI(APIView):
 
     def get(self, request):
         user = request.user
-        filterable_fields = ['code', '_created', 'status', 'total']
-        search_fields = ['code', '_created', 'status', 'total']
-        sortable_fields = ['code', '_created', 'status', 'total']
+        filterable_fields = ['code', '_created', 'status', 'amount', 'user__username', 'user_id']
+        search_fields = ['code', '_created', 'status', 'amount', 'user__username']
+        sortable_fields = ['code', '_created', 'status', 'amount']
         page = int(request.GET.get('page', 1))
         page_size = int(request.GET.get('page_size', 10))
         sort_by = request.GET.get('sort_by', '-_created')

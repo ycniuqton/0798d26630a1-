@@ -65,7 +65,7 @@ class TicketCollectionAPI(APIView):
             data.append(obj_data)
 
         return JsonResponse({
-            'tickets': data,
+            'data': data,
             'total_pages': (total - 1) // page_size + 1,
             'current_page': page,
             'has_next': total > page * page_size,

@@ -1,0 +1,144 @@
+{% extends 'layouts/base.html' %}
+{% load static %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block extrastyle %}
+<style>
+    .detail-container {
+        margin-top: 20px;
+    }
+    .section-title {
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    .card-custom {
+        margin-bottom: 20px;
+    }
+    .status-badge {
+        font-size: 0.8rem;
+        padding: 0.5em;
+        margin-left: 1em;
+    }
+    .modal-content {
+        overflow-y: auto;
+        max-height: 70vh;
+    }
+    .navbar-custom {
+        background-color: #333;
+        color: #fff;
+    }
+    .navbar-custom a {
+        color: #fff;
+    }
+
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+
+<script>
+
+        var customer_id = '{{ customer.id }}';
+</script>
+
+<div class="container detail-container" style="min-width:90%">
+    <h2 style="display:flex;align-items: center;">{{customer.email|upper}} <span class="badge badge-success status-badge"></span>
+    </h2>
+
+
+
+    <!-- Tabs Navigation -->
+    <ul class="nav nav-tabs" id="customerTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">
+                <label> Customer Info</label></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="invoices-tab" data-toggle="tab" href="#invoices" role="tab" aria-controls="invoices" aria-selected="false">
+                {% if customer.vps_len > 0 %}
+                <label> Invoices ({{customer.vps_len}})</label>
+                {% else %}
+                <label> Invoices</label>
+                {% endif %}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="vps-tab" data-toggle="tab" href="#vps" role="tab" aria-controls="vps" aria-selected="false">
+                {% if customer.vps_len > 0 %}
+                <label> Vps ({{customer.vps_len}})</label>
+                {% else %}
+                <label> Vps</label>
+                {% endif %}
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="ticket-tab" data-toggle="tab" href="#ticket" role="tab" aria-controls="ticket" aria-selected="false">
+                <label> Ticket</label>
+            </a>
+        </li>
+
+    </ul>
+
+    <!-- Tab Content -->
+    <div class="tab-content" id="customerTabsContent">
+        <!-- Instance Info Tab -->
+        <div class="tab-pane fade show active" id="info" role="tabpanel" aria-labelledby="info-tab">
+            {% include 'pages/customers/details/user_info.html' %}
+        </div>
+
+        <!-- invoices Tab -->
+        <div class="tab-pane fade" id="invoices" role="tabpanel" aria-labelledby="invoices-tab">
+            {% include 'pages/customers/details/invoices.html' %}
+        </div>
+
+        <!-- vps Info Tab -->
+        <div class="tab-pane fade" id="vps" role="tabpanel" aria-labelledby="vps-tab">
+            {% include 'pages/customers/details/vps.html' %}
+        </div>
+
+        <!-- ticket Tab -->
+        <div class="tab-pane fade" id="ticket" role="tabpanel" aria-labelledby="ticket-tab">
+            {% include 'pages/customers/details/ticket.html' %}
+        </div>
+
+    </div>
+
+    <a class="action-button mt-4" data-color="#154BFF" href="{% url 'instances' %}" class="btn btn-primary mt-4">Back to Instances</a>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        // Function to show the tab based on the hash in the URL
+        function showTabFromHash() {
+            var hash = window.location.hash;
+            if (hash) {
+                var tabLink = $('a[href="' + hash + '"]');
+                if (tabLink.length) {
+                    tabLink.tab('show');
+                }
+            }
+        }
+
+        // Show the tab based on the current URL hash when the page loads
+        showTabFromHash();
+
+        // Listen for tab click events
+        $('#customerTabs a').on('click', function (e) {
+            e.preventDefault();
+            // Update the URL hash when a tab is clicked
+            var tabId = $(this).attr('href');
+            window.location.hash = tabId;
+            $(this).tab('show');
+        });
+
+        // Listen for the hash change event (if the hash is changed manually)
+        $(window).on('hashchange', function () {
+            showTabFromHash();
+        });
+    });
+</script>
+
+
+{% endblock content %}

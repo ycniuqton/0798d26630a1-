@@ -101,7 +101,7 @@
             fetch(`/api/tickets/?page=${page}&page_size=10&sort_by=${sort}&${filter}&search=${searchQuery}`)
                 .then(response => response.json())
                 .then(data => {
-                    ticketsData = data.tickets; // Store ticket data
+                    ticketsData = data.data; // Store ticket data
                     const tbody = document.getElementById('ticket-list');
                     tbody.innerHTML = '';
                     ticketsData.forEach((ticket, index) => {
