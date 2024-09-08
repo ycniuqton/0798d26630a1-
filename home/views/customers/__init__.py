@@ -22,7 +22,13 @@ from .detail import *
 
 
 def list_customer(request):
+    user = request.user
+    list_email = []
+    if user.is_staff:
+        customers = User.objects.filter(is_staff=False)
+        list_email = [customer.email for customer in customers]
 
     context = {
+        'list_email': list_email
     }
     return render(request, 'pages/customers/page.html', context)

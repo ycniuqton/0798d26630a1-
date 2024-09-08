@@ -29,36 +29,70 @@
         max-width: 150px;
         margin-bottom: 20px;
     }
-        .width-auto{
-            width: auto;
-        }
+    .width-auto{
+        width: auto;
+    }
+    /* Modal Styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
+        padding-top: 100px;
+    }
+    .modal-content {
+        background-color: #fff;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 400px;
+        border-radius: 8px;
+    }
+    .modal-header {
+        font-weight: bold;
+        margin-bottom: 15px;
+    }
+    .modal-footer {
+        text-align: right;
+        margin-top: 15px;
+    }
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+
 {% endblock extrastyle %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Customers</h2>
-    <div class="search-bar">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>Customers</h2>
+        <button class="btn btn-primary" id="open-topup-modal">Topup</button>
+    </div>
 
+    <div class="search-bar">
         <select class="form-control width-auto mr-1" id="status-filter-select">
             <option value="">All Statuses</option>
             <option value="Success">Success</option>
             <option value="Failure">Failure</option>
-            <!-- Add more options here if needed -->
         </select>
-        <input type="text" class="form-control width-auto " id="search-input" placeholder="Search" aria-label="Search"
+        <input type="text" class="form-control width-auto" id="search-input" placeholder="Search" aria-label="Search"
                style="height: 43px;">
         <button class="btn btn-outline-secondary m-0" style="height: 43px; display:none" id="search-button"><i
                 class="fas fa-search"></i></button>
     </div>
+
     <table class="table table-hover">
         <thead>
         <tr>
             <th scope="col">Email</th>
             <th scope="col" data-sort="username">Username</th>
             <th scope="col" data-sort="phone_number">Phone</th>
-            <th scope="col" >Vps</th>
-            <th scope="col" >Balance</th>
+            <th scope="col">Vps</th>
+            <th scope="col">Balance</th>
             <th scope="col" data-sort="_created">Created</th>
             <th scope="col">Details</th>
         </tr>
@@ -74,6 +108,57 @@
     </nav>
 </div>
 
+<!-- Topup Modal -->
+<div id="topup-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">Topup</div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="user-email-select">Select User by Email</label>
+                <select class="form-control" id="user-email-select">
+                    <option value="" disabled selected>Select a user</option>
+                    {% for email in list_email %}
+                    <option value="{{ email }}">{{ email }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="topup-amount">Topup Amount</label>
+                <input type="number" class="form-control" id="topup-amount" placeholder="Enter topup amount">
+            </div>
+            <div class="form-group">
+                <label for="topup-note">Note</label>
+                <input type="text" class="form-control" id="topup-note" placeholder="Enter a note">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancel-topup">Cancel</button>
+            <button class="btn btn-primary" id="confirm-topup">Topup</button>
+        </div>
+    </div>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Choices.js on the user email select field
+        const emailSelectElement = document.getElementById('user-email-select');
+
+        const choices = new Choices(emailSelectElement, {
+            removeItemButton: true, // Allows clearing of selections
+            placeholder: true,
+            placeholderValue: 'Select or paste an email',
+            paste: true, // Allows pasting emails
+            duplicateItemsAllowed: false, // Prevent duplicate email entries
+            searchEnabled: true, // Enables searching within the dropdown
+            addItems: true, // Allows adding new items by typing or pasting
+        });
+
+        // You can now paste and search for emails in the select field
+    });
+</script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         let currentPage = 1;
@@ -83,11 +168,60 @@
         let currentFilter = {};
         let currentSearch = '';
 
+        // Modal handling
+        const topupModal = document.getElementById('topup-modal');
+        const openTopupModal = document.getElementById('open-topup-modal');
+        const cancelTopup = document.getElementById('cancel-topup');
+        const confirmTopup = document.getElementById('confirm-topup');
+
+        openTopupModal.onclick = function() {
+            topupModal.style.display = 'block';
+        }
+
+        cancelTopup.onclick = function() {
+            topupModal.style.display = 'none';
+        }
+
+        confirmTopup.onclick = function() {
+            const email = document.getElementById('user-email-select').value;
+            const amount = document.getElementById('topup-amount').value;
+            const note = document.getElementById('topup-note').value;
+
+            if (!email || !amount) {
+                alert("Please fill in all fields");
+                return;
+            }
+
+            // Send the topup request via AJAX
+            fetch('/api/account/balance/topup/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: email,
+                    amount: Number(amount),
+                    note: note,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Topup successful');
+                topupModal.style.display = 'none';
+                // Optionally refresh table or data here
+            })
+            .catch(error => console.error('Error:', error));
+        }
+
+        window.onclick = function(event) {
+            if (event.target == topupModal) {
+                topupModal.style.display = 'none';
+            }
+        }
+
         window.load_table = function(page = 1, sort = currentSort, filter = currentFilter, search = currentSearch) {
+            document.getElementById('loader').style.display = 'block';
 
-        document.getElementById('loader').style.display = 'block';
-
-            console.log("triggered");
             filter_str = Object.keys(filter).map(key => key + "=" + filter[key]).join('&');
             fetch(`/api/accounts/?page=${page}&page_size=10&sort_by=${sort}&${filter_str}&search=${search}`)
                 .then(response => response.json())
@@ -103,8 +237,7 @@
                             <td>${item.vps_len}</td>
                             <td>${item.balance_amount}</td>
                             <td>${item._created}</td>
-                            <td><a href="/customer/${item.id}"><button  class="btn btn-sm btn-outline-primary">View</button> </a>
-                    </td>
+                            <td><a href="/customer/${item.id}"><button  class="btn btn-sm btn-outline-primary">View</button> </a></td>
                         `;
                         tbody.appendChild(row);
                     });
@@ -134,7 +267,6 @@
             }
         });
 
-
         document.querySelectorAll('th[data-sort]').forEach(th => {
             th.addEventListener('click', () => {
                 const sortField = th.getAttribute('data-sort');
@@ -142,9 +274,6 @@
                 load_table(currentPage, currentSort, currentFilter, currentSearch);
             });
         });
-
-
-
 
         load_table();
     });
