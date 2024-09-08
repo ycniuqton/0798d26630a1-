@@ -113,6 +113,21 @@ class VPSService:
             # Raise an HTTP error for non-200 status codes
             response.raise_for_status()
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+    def get_stat(self, vps_ids):
+        url = f"{self.base_url}/system/vpss/stat"
+        if not vps_ids:
+            response = requests.post(url, headers=self.headers)
+        else:
+            response = requests.post(url, headers=self.headers, json={'vps_ids': vps_ids})
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            return response.json()
+        else:
+            # Raise an HTTP error for non-200 status codes
+            response.raise_for_status()
+
 
 class CtvVPSService(VPSService):
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))

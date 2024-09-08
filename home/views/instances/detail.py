@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from adapters.redis_service import CachedPlan, CachedOS
+from adapters.redis_service import CachedPlan, CachedOS, CachedVpsStatRepository
 from home.models import Vps
 
 
@@ -66,10 +66,35 @@ def instance_detail(request, instance_id):
 
     instance_types = plans
 
+    cvr = CachedVpsStatRepository()
+    if instance.linked_id:
+        stats = cvr.get(instance.linked_id)
+    else:
+        stats = {
+            "bandwidth": "0",
+            "disk": "0",
+            "inode": 0,
+            "io_read": 0,
+            "io_write": 0,
+            "lock_status": False,
+            "net_in": "0",
+            "net_out": "0",
+            "network_status": False,
+            "ram": "0",
+            "status": 0,
+            "used_bandwidth": "0",
+            "used_cpu": "0",
+            "used_disk": 0,
+            "used_inode": "0",
+            "used_ram": 0,
+            "virt": "kvm"
+        }
+
     context = {
         'instance': instance,
         'images': images,
         'instance_types': instance_types,
+        'stats': stats,
     }
 
     return render(request, 'pages/instances/detail.html', context)

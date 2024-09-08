@@ -1,4 +1,91 @@
-<div class="card card-custom">
+<style>
+
+.utilization-container {
+
+    margin: 0 auto;
+    text-align: center;
+}
+
+h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.utilization-box {
+    display: flex;
+    justify-content: space-around;
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.item {
+    text-align: center;
+}
+
+.item .title {
+    font-size: 14px;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+.item .value {
+    font-size: 20px;
+    color: #007bff;
+    margin-bottom: 10px;
+}
+
+.item .value span {
+    font-size: 14px;
+    color: #888;
+}
+
+.icon img {
+    width: 40px;
+    height: auto;
+    opacity: 0.3;
+}
+
+</style>
+<div class="utilization-container">
+        <div class="utilization-box">
+            <div class="item">
+                <div class="title">CPU</div>
+                <div class="value">{{stats.used_cpu}}% <span>of {{instance.cpu}} CPU</span></div>
+                <div class="icon">
+                    <i class="icon feather icon-cpu"></i>
+                </div>
+            </div>
+            <div class="item">
+                <div class="title">RAM</div>
+                <div class="value">{{stats.used_ram}}MB <span>of {{instance.ram}}MB</span></div>
+                <div class="icon">
+                    <i class="icon feather icon-film"></i>
+                </div>
+            </div>
+            <div class="item">
+                <div class="title">DISK</div>
+                <div class="value">{{stats.used_disk}}GB <span>of {{instance.disk}}GB</span></div>
+                <div class="icon">
+                    <i class="icon feather icon-inbox"></i>
+                </div>
+            </div>
+            <div class="item">
+                <div class="title">TRAFFIC</div>
+                <div class="value">{{stats.used_bandwidth}}GB <span>of {{instance.network_speed}}GB</span></div>
+                <div class="icon">
+                    <i class="icon feather icon-bar-chart-2"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="card card-custom mt-2">
+
+
+
     <div class="card-header">
         <h4>Instance Information</h4>
         <span class="float-right">Instance ID: {{ instance.id }}</span>
@@ -15,7 +102,7 @@
             </tr>
             <tr>
                 <th>Location</th>
-                <td>{{ instance.detailed_location }}</td>
+                <td>{{ instance.location }}</td>
             </tr>
             <tr>
                 <th>Country</th>

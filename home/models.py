@@ -40,7 +40,7 @@ class BaseModel(models.Model):
             if isinstance(value, (str, int, float, bool, list, dict)):
                 return value
             if isinstance(value, timezone.datetime):
-                return value.strftime("%B %d, %Y at %I:%M %p")
+                return value.strftime("%d/%m/%Y")
             return str(value)
 
         return {field.name: convert_build_in_types(getattr(self, field.name)) for field in self._meta.fields}
@@ -97,6 +97,7 @@ class Vps(BaseModel):
     os = models.CharField(max_length=200, null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
+
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 

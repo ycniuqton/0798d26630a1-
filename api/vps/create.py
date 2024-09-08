@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from home.models import Vps
 
 from django.http import JsonResponse
-from adapters.redis_service import CachedPlan, CachedOS, CachedServer
+from adapters.redis_service import CachedPlan, CachedOS, CachedServer, CachedServerGroup
 from adapters.kafka_adapter import make_kafka_publisher
 from config import KafkaConfig
 from services.invoice import InvoiceRepository
@@ -24,14 +24,15 @@ def create_vps(request):
     hostname = data.get('login', {}).get('hostname', f'hostname-{time.time()}')
     password = data.get('login', {}).get('password', f'default-{time.time()}')
     username = data.get('login', {}).get('username', f'default-{time.time()}')
-    serid = data.get('location', {}).get('id', 0)
+    sg_id = data.get('location', {}).get('id', 0)
+
     plid = data.get('plan', {}).get('id', 0)
     image_version = data.get('image', {}).get('version', 'None')
     duration = data.get('duration', 1)
 
     osid = None
     plans = CachedPlan().get()
-    servers = CachedServer().get()
+    server_groups = CachedServerGroup().get()
     oses = CachedOS().get()
     for os in oses:
         if os['name'] == image_version:
@@ -43,11 +44,11 @@ def create_vps(request):
         plan = None
 
     try:
-        server = [server for server in servers if server['id'] == int(serid)][0]
+        server_group = [sg for sg in server_groups if sg['id'] == int(sg_id)][0]
     except:
-        server = None
+        server_group = None
 
-    if not osid or not plan or not server:
+    if not osid or not plan or not server_group:
         return JsonResponse({'error': 'Invalid request'}, status=400)
     total_fee = plan['price'] * duration
     end_time = datetime.utcnow() + timedelta(days=30*duration)
@@ -63,10 +64,11 @@ def create_vps(request):
         hostname=hostname,
         password=password,
         username=username,
-        virt=server['virt'],
+        virt='kvm',
         plan_id=plan['id'],
         user_id=user.id,
         os_version=image_version,
+        location=server_group['name'],
         os=os['distro'],
         end_time=end_time
     )
@@ -83,11 +85,12 @@ def create_vps(request):
         payload = {
             "hostname": hostname,
             "password": password,
-            "serid": serid,
+            # "serid": serid,
             "plid": plid,
             "osid": str(osid),
             "vps_id": vps.id,
-            "raw_data": data
+            "raw_data": data,
+            "server_group": server_group['id']
         }
         publisher = make_kafka_publisher(KafkaConfig)
         publisher.publish('create_vps', payload)

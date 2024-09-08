@@ -56,7 +56,7 @@
                 {% if region.name == "ALL" or location.region == region.name %}
                 <div class="col-6 col-md-4 col-lg-3 mb-3">
                     <div class="card country-card {% if location.status == 'off' %}sold-out{% endif %}"
-                         data-name="{{ location.name }}" data-country="{{ location.country }}" server-id="{{ location.server_id }}"
+                         data-name="{{ location.name }}" data-country="{{ location.country }}" group-id="{{ location.group_id }}"
                          {% if location.status == 'off' %}style="pointer-events: none; opacity: 0.5;"{% endif %}>
                         <div class="card-body text-center">
                             <img src="/api/static/flags/{{ location.country_short }}" alt="{{ location.name }}" class="mb-2">
@@ -109,7 +109,7 @@
                 vpsConfiguration.location = {
                     name: card.getAttribute('data-name'),
                     country: card.getAttribute('data-country'),
-                    id: card.getAttribute('server-id')
+                    id: card.getAttribute('group-id')
                 };
 
                 // Trigger configuration update

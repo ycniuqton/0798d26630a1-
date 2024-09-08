@@ -35,10 +35,21 @@ class CachedServer(CachedResource):
         super().__init__(redis_uri=redis_uri, data_url=data_url, auth_header=auth_header, ex=ex)
 
 
+class CachedServerGroup(CachedResource):
+    key_name = "cached_server_groups"
+
+    def __init__(self):
+        redis_uri = settings.REDIS_CONFIG.REDIS_URI
+        data_url = settings.VIRTUALIZOR_CONFIG.MANAGER_URL + "/system/server_groups"
+        auth_header = {"x-api-key": settings.VIRTUALIZOR_CONFIG.API_KEY}
+        ex = 60 * 60 * 24  # 24 hours
+        super().__init__(redis_uri=redis_uri, data_url=data_url, auth_header=auth_header, ex=ex)
+
+
 if __name__ == "__main__":
-    plan = CachedPlan()
-    print(plan.get())
-    plan.delete()
+    # plan = CachedPlan()
+    # print(plan.get())
+    # plan.delete()
     #
     # os = CachedOS()
     # print(os.get())
@@ -50,4 +61,6 @@ if __name__ == "__main__":
     # server.delete()
     # print(server.get())
 
-
+    server_group = CachedServerGroup()
+    server_group.delete()
+    print(server_group.get())

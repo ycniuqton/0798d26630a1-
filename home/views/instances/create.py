@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-from adapters.redis_service import CachedPlan, CachedOS, CachedServer
+from adapters.redis_service import CachedPlan, CachedOS, CachedServer, CachedServerGroup
 from utils import country_mapping, country_short_to_region
 
 
@@ -36,6 +36,7 @@ def create_instances(request):
     ]
 
     servers = CachedServer().get()
+    server_groups = CachedServerGroup().get()
     locations = [
         {"name": "Washington", "country": "USA", "region": "North America", "status": "off", "country_short": "US"},
         {"name": "Silicon Valley", "country": "USA", "region": "North America", "status": "off", "country_short": "US"},
@@ -60,14 +61,14 @@ def create_instances(request):
         {"name": "Dubai", "country": "UAE", "region": "Middle East", "status": "off", "country_short": "AE"},
         {"name": "Riyadh", "country": "Saudi Arabia", "region": "Middle East", "status": "off", "country_short": "SA"}
     ]
-    for server in servers:
+    for sg in server_groups:
         locations.append({
-            "name": server.get("name"),
-            "country": country_mapping.get(server.get("country")),
-            "region": country_short_to_region.get(server.get("country")),
+            "name": sg.get("name"),
+            "country": country_mapping.get(sg.get("country").upper()),
+            "region": country_short_to_region.get(sg.get("country").upper()),
             "status": "on",
-            "country_short": server.get("country"),
-            "server_id": server.get("id")
+            "country_short": sg.get("country").upper(),
+            "group_id": sg.get("id")
         })
 
     locations = sorted(locations, key=lambda x: x['status'], reverse=True)

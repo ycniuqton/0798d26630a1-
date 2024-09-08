@@ -33,3 +33,5 @@ dj-database-url
 logging_context
 tenacity
 click
+
+apscheduler

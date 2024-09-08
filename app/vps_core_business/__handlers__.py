@@ -25,7 +25,7 @@ class CreateVPS(BaseHandler):
         class MySchema(Schema):
             hostname = fields.String(required=True)
             password = fields.String(required=True)
-            serid = fields.String(required=True)
+            serid = fields.String(required=False)
             plid = fields.String(required=True)
             osid = fields.String(required=True)
 
