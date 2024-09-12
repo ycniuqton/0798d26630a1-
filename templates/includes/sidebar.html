@@ -2,19 +2,30 @@
 
 
 <style>
-  {% if APP_ROLE == 'ctv' %}
+  {% if APP_ROLE == 'admin' %}
     .navbar-brand {
-      background: rebeccapurple;
+      background: #202020;
     }
     .pcoded-navbar {
-      background: rebeccapurple;
+      background: #202020;
     }
     .pcoded-navbar .pcoded-submenu {
-      background: rebeccapurple;
+      background: #202020;
     }
     .pcoded-navbar .pcoded-inner-navbar > li.active > a, .pcoded-navbar .pcoded-inner-navbar > li.pcoded-trigger > a {
-      background: rebeccapurple;
+      background: #202020;
     }
+    .sidebar-selected {
+    background: #47485b;
+    color: white !important;
+}
+    ul.pcoded-submenu li:hover {
+    background: #47485b;
+}
+    .pcoded-submenu  li a:hover {
+    color: white !important;
+    }
+
   {% endif %}
 
 </style>
@@ -27,9 +38,9 @@
                     <i class="feather icon-trending-up"></i>
                 </div>
                 {% if APP_ROLE == 'ctv' %}
-                <span class="b-title">TrumpVPS-CTV</span>
+                <span class="b-title">TrumVPS.v2</span>
                 {% else %}
-                <span class="b-title">TrumpVPS.v2</span>
+                <span class="b-title">Admin</span>
                 {% endif %}
             </a>
             <a class="mobile-menu" id="mobile-collapse" href="javascript:"><span></span></a>
