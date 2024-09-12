@@ -21,6 +21,8 @@ def rebuild_vps(request):
     data = json.loads(request.body)
     user = request.user
     vps_id = data.get('vps_id')
+    vps_linked_id = data.get('linked_id')
+
     image_version = data.get('image_version')
     password = data.get('password')
 
@@ -31,7 +33,10 @@ def rebuild_vps(request):
             osid = os['id']
             break
     username = "Administrator" if os.get('distro') == 'windows' else 'root'
-    vps = Vps.objects.filter(id=vps_id)
+    if vps_id:
+        vps = Vps.objects.filter(id=vps_id)
+    else:
+        vps = Vps.objects.filter(linked_id=vps_linked_id)
     if not user.is_staff:
         vps.filter(user_id=user.id)
     vps = vps.first()

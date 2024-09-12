@@ -21,8 +21,12 @@ def stop_vps(request):
     data = json.loads(request.body)
     user = request.user
     vps_ids = data.get('vps_ids', [])
+    vps_linked_ids = data.get('linked_ids', [])
 
-    list_vps = Vps.objects.filter(id__in=vps_ids)
+    if vps_ids:
+        list_vps = Vps.objects.filter(id__in=vps_ids)
+    else:
+        list_vps = Vps.objects.filter(linked_id__in=vps_linked_ids)
     if not user.is_staff:
         list_vps.filter(user_id=user.id)
     list_vps = list(list_vps)

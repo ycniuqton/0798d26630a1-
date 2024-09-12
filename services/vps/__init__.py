@@ -147,7 +147,7 @@ class CtvVPSService(VPSService):
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def stop(self, vps_id):
         url = f"{self.base_url}/api/vps/stop/"
-        response = requests.post(url, headers=self.headers, json={'vps_id': [vps_id]})
+        response = requests.post(url, headers=self.headers, json={'linked_ids': [vps_id]})
 
         # Check if the request was successful
         if response.status_code == 200:
@@ -159,7 +159,7 @@ class CtvVPSService(VPSService):
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def restart(self, vps_id):
         url = f"{self.base_url}/api/vps/restart/"
-        response = requests.post(url, headers=self.headers, json={'vps_id': [vps_id]})
+        response = requests.post(url, headers=self.headers, json={'linked_ids': [vps_id]})
 
         # Check if the request was successful
         if response.status_code == 200:
@@ -171,7 +171,7 @@ class CtvVPSService(VPSService):
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def start(self, vps_id):
         url = f"{self.base_url}/api/vps/start/"
-        response = requests.post(url, headers=self.headers, json={'vps_id': [vps_id]})
+        response = requests.post(url, headers=self.headers, json={'linked_ids': [vps_id]})
 
         # Check if the request was successful
         if response.status_code == 200:
@@ -183,7 +183,7 @@ class CtvVPSService(VPSService):
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def suspend(self, vps_id):
         url = f"{self.base_url}/api/vps/suspend/"
-        response = requests.post(url, headers=self.headers, json={'vps_id': [vps_id]})
+        response = requests.post(url, headers=self.headers, json={'linked_ids': [vps_id]})
 
         # Check if the request was successful
         if response.status_code == 200:
@@ -195,7 +195,7 @@ class CtvVPSService(VPSService):
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def unsuspend(self, vps_id):
         url = f"{self.base_url}/api/vps/unsuspend/"
-        response = requests.post(url, headers=self.headers, json={'vps_id': [vps_id]})
+        response = requests.post(url, headers=self.headers, json={'linked_ids': [vps_id]})
 
         # Check if the request was successful
         if response.status_code == 200:
@@ -207,7 +207,10 @@ class CtvVPSService(VPSService):
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def rebuild(self, payload):
         vps_id = payload.get('vps_id')
-        url = f"{self.base_url}/system/vpss/{vps_id}/rebuild"
+        url = f"{self.base_url}/api/vps/rebuild/"
+        raw_data = payload.get('raw_data')
+        raw_data['linked_id'] = vps_id
+        raw_data.pop('vps_id', None)
         response = requests.post(url, headers=self.headers, json=payload.get('raw_data'))
 
         # Check if the request was successful
