@@ -28,6 +28,10 @@ def update_balance_amount_on_save(sender, instance, **kwargs):
 @receiver(post_save, sender=Transaction)
 def update_account_statistic_on_save(sender, instance, **kwargs):
     user = instance.user
-    user.total_paid = - Transaction.objects.filter(user=user, type='charge').aggregate(Sum('amount'))['amount__sum']
-    user.total_topup = Transaction.objects.filter(user=user, type='topup').aggregate(Sum('amount'))['amount__sum']
+    total_paid = Transaction.objects.filter(user=user, type='charge').aggregate(Sum('amount'))['amount__sum']
+    if total_paid:
+        user.total_paid = - total_paid
+    total_topup = Transaction.objects.filter(user=user, type='topup').aggregate(Sum('amount'))['amount__sum']
+    if total_topup:
+        user.total_topup = total_topup
     user.save()
