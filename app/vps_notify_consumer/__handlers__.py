@@ -42,6 +42,8 @@ class VPSCreated(BaseHandler):
             return False
 
         vps = Vps.objects.filter(identifier=identifier).first()
+        if not vps:
+            return False
 
         ips = data.get('ips', {})
         vps.ip = next(iter(ips.values()), None)
@@ -75,6 +77,8 @@ class VPSCreatedError(BaseHandler):
             return False
 
         vps = Vps.objects.filter(identifier=identifier).first()
+        if not vps:
+            return False
 
         vps.status = VpsStatus.ERROR
         vps.meta_data = data
