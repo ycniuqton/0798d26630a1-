@@ -17,6 +17,7 @@ setup_app_level_logger(
     name=__name__, level="DEBUG"
 )
 
+
 @click.group()
 def cli():
     """
@@ -35,6 +36,12 @@ def run_core_business():
 def run_schedular():
     from app.schedular import main as run_schedular
     run_schedular()
+
+
+@cli.command()
+def run_notify_consumer():
+    from app.vps_notify_consumer import run as vps_notify_consumer
+    vps_notify_consumer()
 
 
 if __name__ == '__main__':

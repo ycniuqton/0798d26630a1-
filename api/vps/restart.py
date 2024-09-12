@@ -29,8 +29,8 @@ def restart_vps(request):
 
     publisher = make_kafka_publisher(KafkaConfig)
     for vps in list_vps:
-        # if vps.status != VpsStatus.ON:
-        #     continue
+        if vps.status not in [VpsStatus.ON, VpsStatus.OFF, VpsStatus.ERROR, VpsStatus.RESTARTING, VpsStatus.STARTING, VpsStatus.STOPPING]:
+            continue
         vps.status = VpsStatus.RESTARTING
         vps.save()
         VPSLogger().log(user, vps, 'restart', VpsStatus.RESTARTING)

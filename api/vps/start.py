@@ -29,8 +29,8 @@ def start_vps(request):
 
     publisher = make_kafka_publisher(KafkaConfig)
     for vps in list_vps:
-        # if vps.status != VpsStatus.OFF:
-        #     continue
+        if vps.status not in [VpsStatus.OFF, VpsStatus.ERROR, VpsStatus.STOPPING]:
+            continue
         vps.status = VpsStatus.STARTING
         vps.save()
         VPSLogger().log(user, vps, 'start', VpsStatus.STARTING)

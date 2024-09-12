@@ -29,8 +29,8 @@ def stop_vps(request):
 
     publisher = make_kafka_publisher(KafkaConfig)
     for vps in list_vps:
-        # if vps.status != VpsStatus.ON:
-        #     continue
+        if vps.status not in [VpsStatus.ON, VpsStatus.STARTING, VpsStatus.ERROR]:
+            continue
         vps.status = VpsStatus.STOPPING
         vps.save()
         VPSLogger().log(user, vps, 'stop', VpsStatus.STOPPING)

@@ -7,6 +7,7 @@ class HandlerFactory:
             handler = self._handlers[event_type]
             return handler
         except KeyError as e:
+            return None
             raise Exception(f"'{event_type}' is invalid event type") from e
 
 

@@ -1,10 +1,10 @@
 from kafka import KafkaProducer
 
 # Create a Kafka producer instance
-producer = KafkaProducer(bootstrap_servers='157.66.24.255:9092')
+producer = KafkaProducer(bootstrap_servers='157.66.25.1:9092')
 
 # Define the topic you want to send the message to
-topic = 'my_topic'
+topic = 'vps-manager-events'
 
 # Define the message you want to send
 message = 'Hello, Kafka!'

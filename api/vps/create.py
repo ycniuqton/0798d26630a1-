@@ -25,6 +25,7 @@ def create_vps(request):
     password = data.get('login', {}).get('password', f'default-{time.time()}')
     username = data.get('login', {}).get('username', f'default-{time.time()}')
     sg_id = data.get('location', {}).get('id', 0)
+    identifier = data.get('identifier', '')
 
     plid = data.get('plan', {}).get('id', 0)
     image_version = data.get('image', {}).get('version', 'None')
@@ -70,7 +71,8 @@ def create_vps(request):
         os_version=image_version,
         location=server_group['name'],
         os=os['distro'],
-        end_time=end_time
+        end_time=end_time,
+        identifier=identifier
     )
     vps.save()
     vps.plan = plan
@@ -90,7 +92,8 @@ def create_vps(request):
             "osid": str(osid),
             "vps_id": vps.id,
             "raw_data": data,
-            "server_group": server_group['id']
+            "server_group": server_group['id'],
+            "identifier": identifier,
         }
         publisher = make_kafka_publisher(KafkaConfig)
         publisher.publish('create_vps', payload)

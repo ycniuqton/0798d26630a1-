@@ -1,5 +1,5 @@
 import uuid
-
+from django.db.models import JSONField
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -97,7 +97,8 @@ class Vps(BaseModel):
     os = models.CharField(max_length=200, null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
     error_message = models.TextField(null=True, blank=True)
-
+    identifier = models.CharField(max_length=200, null=True, blank=True)
+    meta_data = JSONField(null=True, blank=True)
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 

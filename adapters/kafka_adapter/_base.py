@@ -163,6 +163,9 @@ class Listener(ABC):
             return
 
         handler = self.handler_factory.create(event_type=event_type)
+        if not handler:
+            logger.warning("HANDLER FOR EVENT %s NOT FOUND", event_type)
+            return
         result = handler.handle(data)
 
         if self._after_handle_callback:

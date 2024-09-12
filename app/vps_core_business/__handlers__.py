@@ -50,10 +50,6 @@ class CreateVPS(BaseHandler):
         error = ""
         try:
             response = service.create(payload)
-            vps.ip = response.get('ip')
-            vps.linked_id = response.get('id')
-            vps.status = VpsStatus.ON
-            vps.save()
             return True
         except RetryError as e:
             error = e.last_attempt.exception()
@@ -92,8 +88,6 @@ class StartVPS(BaseHandler):
 
         try:
             response = service.start(vps.linked_id)
-            vps.status = VpsStatus.ON
-            vps.save()
         except:
             raise SkippableException("Failed to start VPS")
 
@@ -127,8 +121,6 @@ class StopVPS(BaseHandler):
 
         try:
             response = service.stop(vps.linked_id)
-            vps.status = VpsStatus.OFF
-            vps.save()
         except:
             raise SkippableException("Failed to stop VPS")
 
@@ -162,8 +154,6 @@ class RestartVPS(BaseHandler):
 
         try:
             response = service.restart(vps.linked_id)
-            vps.status = VpsStatus.ON
-            vps.save()
         except:
             raise SkippableException("Failed to restart VPS")
 
@@ -197,8 +187,6 @@ class SuspendVPS(BaseHandler):
 
         try:
             response = service.suspend(vps.linked_id)
-            vps.status = VpsStatus.SUSPENDED
-            vps.save()
         except:
             raise SkippableException("Failed to suspend VPS")
 
@@ -232,8 +220,6 @@ class UnSuspendVPS(BaseHandler):
 
         try:
             response = service.unsuspend(vps.linked_id)
-            vps.status = VpsStatus.ON
-            vps.save()
         except:
             raise SkippableException("Failed to unsuspend VPS")
 
@@ -302,14 +288,6 @@ class RebuildVPS(BaseHandler):
 
         try:
             response = service.rebuild(payload)
-            if response:
-                vps.status = VpsStatus.ON
-                vps.os_version = image_version
-                vps.username = username
-                vps.save()
-            else:
-                service.error(vps.id, "Failed to rebuild VPS")
-                raise SkippableException("Failed to rebuild VPS")
         except:
             service.error(vps.id, "Failed to rebuild VPS")
             raise SkippableException("Failed to rebuild VPS")
