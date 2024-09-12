@@ -43,7 +43,7 @@ class VPSCreated(BaseHandler):
 
         vps = Vps.objects.filter(identifier=identifier).first()
 
-        ips = data.get('ips')
+        ips = data.get('ips', {})
         vps.ip = next(iter(ips.values()), None)
         vps.linked_id = data.get('vpsid')
         vps.status = VpsStatus.ON
