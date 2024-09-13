@@ -41,9 +41,15 @@ ALLOWED_HOSTS = ['*']
 
 # Add here your deployment HOSTS
 CSRF_TRUSTED_ORIGINS = ['http://localhost:8000', 'http://localhost:5085', 'http://127.0.0.1:8000',
-                        'http://127.0.0.1:5085']
+                        'http://127.0.0.1:5085', 'https://worldsever.com']
 
 X_FRAME_OPTIONS = "SAMEORIGIN"
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+
+
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
