@@ -23,7 +23,6 @@
 <div class="container mt-4">
     <h2>Support Tickets</h2>
     <div class="ticket-form mb-4">
-        <h5>Submit a Ticket</h5>
         <form id="ticket-form">
             <div class="form-group">
                 <label for="ticket-subject">Subject</label>
@@ -78,7 +77,8 @@
         .then(data => {
             if (data.success) {
 <!--                addTicketToTable(data.ticket);-->
-                ticketForm.reset();
+<!--                ticketForm.reset();-->
+                window.location = '/your_tickets/';
             } else {
                 alert('Failed to submit ticket. Please try again.');
             }
@@ -108,17 +108,18 @@
         .then(data => {
             const faqAccordion = document.getElementById('faq-accordion');
             faqAccordion.innerHTML = '';
+            show_index = -1
             data.faqs.forEach((faq, index) => {
                 const faqItem = `
-                    <div class="card">
-                        <div class="card-header" id="heading${index}">
+                    <div class="card mb-2">
+                        <div class="card-header py-1" id="heading${index}">
                             <h5 class="mb-0">
-                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse${index}" aria-expanded="${index === 0}" aria-controls="collapse${index}">
+                                <button class="btn btn-link" data-toggle="collapse" data-target="#collapse${index}" aria-expanded="${index === show_index}" aria-controls="collapse${index}">
                                     ${faq.question}
                                 </button>
                             </h5>
                         </div>
-                        <div id="collapse${index}" class="collapse ${index === 0 ? 'show' : ''}" aria-labelledby="heading${index}" data-parent="#faq-accordion">
+                        <div id="collapse${index}" class="collapse ${index === show_index ? 'show' : ''}" aria-labelledby="heading${index}" data-parent="#faq-accordion">
                             <div class="card-body">
                                 ${faq.answer}
                             </div>
