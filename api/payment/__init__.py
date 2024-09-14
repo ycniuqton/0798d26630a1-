@@ -117,5 +117,10 @@ def paypal_webook(request):
     # get url params
     params = request.GET.__dict__['_iterable']
 
+    print("########### Webhook ###########")
+    print(data)
+    print(params)
+
+
     # return the data
     return JsonResponse({'data': data, 'params': params}, status=200)
