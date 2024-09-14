@@ -223,6 +223,7 @@ class PaypalTransaction(BaseModel):
     status = models.CharField(max_length=200, choices=Status.choices, default=Status.PENDING)
     description = models.TextField()
     payment_id = models.CharField(max_length=200)
+    token = models.CharField(max_length=200)
 
     def __str__(self):
         return f'{self.amount} ({self.status})'

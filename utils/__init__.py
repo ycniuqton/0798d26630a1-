@@ -1,3 +1,5 @@
+from urllib.parse import urlparse, parse_qs
+
 country_mapping = {
     "US": "United States",
     "CA": "Canada",
@@ -18,7 +20,6 @@ country_mapping = {
     "AE": "United Arab Emirates",
     "SA": "Saudi Arabia"
 }
-
 
 country_short_to_region = {
     "AF": "Asia",
@@ -268,3 +269,11 @@ country_short_to_region = {
     "ZM": "Africa",
     "ZW": "Africa"
 }
+
+
+def extract_url_params(url):
+    parsed_url = urlparse(url)
+    query_params = parse_qs(parsed_url.query)
+
+    return query_params
+

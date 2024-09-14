@@ -103,7 +103,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Payments</h2>
+    <h2>Balance</h2>
     <div class="row">
         <div class="col-md-8">
             <div class="tab-content pt-3 ">
@@ -215,9 +215,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.payment_link) {
-                        document.getElementById('receiver-info').style.display = 'block';
-                        document.getElementById('receiver-details').textContent = `Receiver: ${data.receiver_name}, Email: ${data.receiver_email}`;
-                        window.open(data.payment_link, '_blank');
+                        window.location = data.payment_link;
                     } else {
                         alert('Failed to retrieve payment link.');
                     }

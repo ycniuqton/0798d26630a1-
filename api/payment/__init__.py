@@ -6,6 +6,7 @@ from adapters.paypal import PayPalClient
 from config import PaypalConfig
 from home.models import PaypalTransaction
 from services.balance import BalanceRepository
+from utils import extract_url_params
 
 
 def get_payment_url(request):
@@ -37,10 +38,14 @@ def get_payment_url(request):
                                                                 description='Deposit to wallet',
                                                                 return_url=PaypalConfig.RETURN_URL,
                                                                 cancel_url=PaypalConfig.CANCEL_URL)
+        # extract token
+        params = extract_url_params(payment_link)
+
         payment_transaction = PaypalTransaction()
         payment_transaction.amount = amount
         payment_transaction.user = user
         payment_transaction.payment_id = payment_id
+        payment_transaction.token = next(iter(params.get('token')), None)
         payment_transaction.save()
 
     else:
@@ -105,10 +110,17 @@ def paypal_success_callback(request):
 
 
 def paypal_cancel_callback(request):
-    # Mock payment success callback
-    data = json.loads(request.body)
+    token = request.GET.get('token')
 
-    return JsonResponse({'message': 'Payment failed', 'data': data}, status=400)
+    p_transaction = PaypalTransaction.objects.filter(token=token).first()
+    if not p_transaction:
+        return JsonResponse({'error': 'Payment not found'}, status=404)
+
+    else:
+        p_transaction.status = PaypalTransaction.Status.CANCELED
+        p_transaction.save()
+
+    return HttpResponseRedirect('/payment/')
 
 
 def paypal_webook(request):
