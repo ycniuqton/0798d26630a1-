@@ -20,7 +20,7 @@ class PayPalClient:
             "client_secret": self.client_secret
         })
 
-    def generate_payment_link(self, total, currency, description, return_url, cancel_url):
+    def generate_payment_link(self, total, currency='USD', description='', return_url='', cancel_url=''):
         """
         Generates a PayPal payment link for the client.
 
@@ -58,11 +58,10 @@ class PayPalClient:
             }]
         })
 
-        # Try to create the payment and return the approval URL
         if payment.create():
             for link in payment.links:
                 if link.rel == "approval_url":
-                    return link.href
+                    return link.href, payment.id
         else:
             print(f"Payment creation failed: {payment.error}")
             return None
@@ -83,7 +82,7 @@ class PayPalClient:
             if payment and payment.execute({"payer_id": payer_id}):
                 if payment.state == "approved":
                     print("Payment approved successfully")
-                    return payment
+                    return payment.transactions[0]
                 else:
                     print("Payment not approved")
                     return None

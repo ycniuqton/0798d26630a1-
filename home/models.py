@@ -139,6 +139,7 @@ class Transaction(BaseModel):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     type = models.CharField(max_length=200)
     status = models.CharField(max_length=200)
+    method = models.CharField(max_length=200, default='System')
     description = models.TextField()
     balance = models.ForeignKey(Balance, on_delete=models.CASCADE, related_name='transactions')
 
@@ -208,3 +209,20 @@ class UserToken(BaseModel):
 
     def __str__(self):
         return self.token
+
+
+class PaypalTransaction(BaseModel):
+    class Status(models.TextChoices):
+        PENDING = 'P', 'Pending'
+        PAID = 'A', 'Paid'
+        CANCELED = 'C', 'Canceled'
+
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    amount = models.FloatField()
+    currency = models.CharField(max_length=200, default='USD')
+    status = models.CharField(max_length=200, choices=Status.choices, default=Status.PENDING)
+    description = models.TextField()
+    payment_id = models.CharField(max_length=200)
+
+    def __str__(self):
+        return f'{self.amount} ({self.status})'

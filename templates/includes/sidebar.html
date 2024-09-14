@@ -104,6 +104,10 @@
                         <li class=""><a href="{% url 'billing' %}" class="">
                             <span class="pcoded-mtext">Bill Report</span></a></li>
                         </a>
+                        <li class=""><a href="{% url 'transaction_history' %}" class="">
+                            <span class="pcoded-mtext">Transactions</span></a></li>
+                        </a>
+
                     </ul>
                 </li>
                 {% if user.is_staff %}

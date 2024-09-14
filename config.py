@@ -73,3 +73,14 @@ class KafkaNotifierConfig:
     KAFKA_SASL_PLAIN_PASSWORD = _data.get('KAFKA_SASL_PLAIN_PASSWORD')
     KAFKA_SSL_CHECK_HOSTNAME = _data.get('KAFKA_SSL_CHECK_HOSTNAME')
     KAFKA_SSL_CA_FILE = _data.get('KAFKA_SSL_CA_FILE')
+
+
+class PaypalConfig:
+    _data = config_data.get("PAYPAL_CONFIG", {})
+
+    CLIENT_ID = _data.get("CLIENT_ID")
+    CLIENT_SECRET = _data.get("CLIENT_SECRET")
+    MODE = _data.get("MODE")
+    RETURN_URL = _data.get("RETURN_URL")
+    CANCEL_URL = _data.get("CANCEL_URL")
+

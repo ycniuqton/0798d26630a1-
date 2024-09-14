@@ -3,7 +3,6 @@ from django.shortcuts import render, get_object_or_404
 
 from home.models import Vps, Invoice
 
-
 from services.invoice import get_billing_cycle
 
 
@@ -15,7 +14,7 @@ def payment_view(request):
         {
             "payment_account": record.user.email,
             "payment_type": record.type,
-            "payment_method": "System",
+            "payment_method": record.method,
             "time": record._created,
             "recharge_amount": record.amount,
             "operation": "View"
@@ -127,3 +126,25 @@ def financial_view(request):
 
 def invoices_view(request):
     return render(request, 'pages/financial/invoices.html', {'segment': 'invoices'})
+
+
+def transaction_history(request):
+    user = request.user
+    balance = user.balance
+    balance_records = balance.transactions.all()
+    balance_records = [
+        {
+            "payment_account": record.user.email,
+            "payment_type": record.type,
+            "payment_method": record.method,
+            "time": record._created,
+            "recharge_amount": record.amount,
+            "operation": "View"
+        }
+        for record in balance_records
+    ]
+    context = {
+        'balance_records': balance_records,
+    }
+
+    return render(request, 'pages/financial/balance_record.html', context)

@@ -8,6 +8,7 @@
 build/
 env
 /staticfiles/
+env.yaml
 
 #src
 *.sqlite*
