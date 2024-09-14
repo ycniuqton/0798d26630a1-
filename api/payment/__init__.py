@@ -123,7 +123,7 @@ def paypal_cancel_callback(request):
     return HttpResponseRedirect('/payment/')
 
 
-def paypal_webook(request):
+def paypal_webhook(request):
     # Mock payment success callback
     data = json.loads(request.body)
     # get url params

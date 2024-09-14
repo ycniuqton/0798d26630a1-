@@ -10,7 +10,7 @@ from .vps.rebuild import rebuild_vps
 from .vps_log import get_vps_logs
 from .balances import topup
 from .vps.calculator import vps_calculator
-from .payment import get_payment_url, get_qr_code, paypal_success_callback, paypal_cancel_callback, paypal_webook
+from .payment import get_payment_url, get_qr_code, paypal_success_callback, paypal_cancel_callback, paypal_webhook
 
 urlpatterns = [
     path('register/', RegisterAPI.as_view(), name='register'),
@@ -38,7 +38,7 @@ urlpatterns = [
     path('payment/get_qr_code/', get_qr_code, name='get_qr_code'),
     path('payment/paypal/success/', paypal_success_callback, name='paypal_success_callback'),
     path('payment/paypal/cancel/', paypal_cancel_callback, name='paypal_cancel_callback'),
-    path('payment/paypal/webook/', paypal_webook, name='paypal_webook'),
+    path('payment/paypal/webhook/', paypal_webhook, name='paypal_webhook'),
 
     path('invoice/', InvoiceAPI.as_view(), name='invoice'),
     path('tickets/', TicketCollectionAPI.as_view(), name='tickets_view'),
