@@ -2,6 +2,9 @@ from django.http import JsonResponse
 from django.http import HttpResponseRedirect
 import json
 
+from rest_framework.decorators import permission_classes
+from rest_framework.permissions import AllowAny
+
 from adapters.paypal import PayPalClient
 from config import PaypalConfig
 from home.models import PaypalTransaction
@@ -123,6 +126,7 @@ def paypal_cancel_callback(request):
     return HttpResponseRedirect('/payment/')
 
 
+@permission_classes([AllowAny])
 def paypal_webhook(request):
     # Mock payment success callback
     data = json.loads(request.body)
