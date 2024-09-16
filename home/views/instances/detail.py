@@ -1,9 +1,13 @@
 from django.shortcuts import render
+from rest_framework.decorators import permission_classes, api_view
+from rest_framework.permissions import IsAuthenticated
 
 from adapters.redis_service import CachedPlan, CachedOS, CachedVpsStatRepository
 from home.models import Vps
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def instance_detail(request, instance_id):
     user = request.user
     vps = Vps.objects.filter(id=instance_id)

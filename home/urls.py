@@ -14,9 +14,8 @@ from .views.customers import list_customer, customer_detail
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('tables/', views.tables, name='tables'),
-
-    path('home/', views.home, name='home'),
+    # path('', views.home, name='index'),
+    # path('home/', views.home, name='home'),
 
     path('instances/', instances, name='instances'),
     path('instances/create/', create_instances, name='create_instances'),
@@ -44,10 +43,12 @@ urlpatterns = [
     path('your_tickets/', views.your_tickets, name='your_tickets'),
     path('api/your_tickets/', views.api_your_tickets, name='api_your_tickets'),
     path('api/your_tickets/<str:ticket_id>/', views.ticket_detail_view, name='ticket_detail'),
+
     path('affiliate/', views.affiliate, name='affiliate'),
     path('your_introducer/', views.your_introducer, name='your_introducer'),
     path('link_code/', views.link_code, name='link_code'),
     path('affiliate_stats/', views.affiliate_stats, name='affiliate_stats'),
+
     path('account/', views.account, name='account'),
     path('profile/', views.profile, name='profile'),
     path('authentication/', views.authentication, name='authentication'),
@@ -56,6 +57,7 @@ urlpatterns = [
     path('api/set-introducer/', set_introducer, name='set_introducer'),
     path('api/current-introducer/', current_introducer, name='current_introducer'),
     path('api/faqs/', faqs_view, name='faqs_view'),
+
     path('invoices/', invoices_view, name='invoices'),
     path('financial/bill_report/', transaction_history, name='transaction_history'),
     path('api/vps/<int:instance_id>/vnc-link/', views.get_vnc_link, name='get_vnc_link'),

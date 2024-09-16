@@ -11,6 +11,8 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 import random
 from django.shortcuts import render, get_object_or_404
+from rest_framework.decorators import permission_classes, api_view
+from rest_framework.permissions import IsAuthenticated
 
 from home.models import Vps
 
@@ -20,6 +22,8 @@ from django.views import View
 import os
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def index(request):
     context = {
         'segment': 'index',
@@ -306,6 +310,8 @@ def monitoring(request):
     return render(request, "pages/monitoring.html", context)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def support(request):
     context = {
         'segment': 'support'
@@ -313,6 +319,8 @@ def support(request):
     return render(request, "pages/dynamic-tables.html", context)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def ticket(request):
     context = {
         'segment': 'ticket',
@@ -321,6 +329,8 @@ def ticket(request):
     return render(request, "pages/supports/ticket.html", context)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def your_tickets(request):
     context = {
         'segment': 'ticket',
@@ -329,6 +339,8 @@ def your_tickets(request):
     return render(request, "pages/supports/your_tickets.html", context)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def api_your_tickets(request):
     # tickets = Ticket.objects.all()
     #
@@ -359,6 +371,8 @@ def api_your_tickets(request):
     return JsonResponse(data)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def ticket_detail_view(request, ticket_id):
     # ticket = get_object_or_404(Ticket, pk=ticket_id)
     # replies = TicketReply.objects.filter(ticket=ticket).order_by('created_at')
@@ -468,6 +482,8 @@ def affiliate_stats(request):
     return render(request, "pages/affiliate_stats.html", context)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def account(request):
     context = {
         'segment': 'account'
@@ -475,6 +491,8 @@ def account(request):
     return render(request, "pages/dynamic-tables.html", context)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def profile(request):
     context = {
         'segment': 'profile'
@@ -482,6 +500,8 @@ def profile(request):
     return render(request, "pages/profile.html", context)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def authentication(request):
     context = {
         'segment': 'authentication'
@@ -588,7 +608,6 @@ faq_data = [
     {"question": "What are the billing rules for LightNode?",
      "answer": "LightNode follows a pay-as-you-go billing model where you are billed based on the resources you use."}
 ]
-
 
 
 @csrf_exempt

@@ -1,11 +1,16 @@
 from datetime import datetime, timedelta, timezone
 from django.shortcuts import render, get_object_or_404
+from rest_framework.decorators import permission_classes, api_view
+from rest_framework.permissions import IsAuthenticated
+
 from config import APPConfig
 from home.models import Vps, Invoice
 
 from services.invoice import get_billing_cycle
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def payment_view(request):
     user = request.user
     balance = user.balance
@@ -20,6 +25,8 @@ def payment_view(request):
     return render(request, "pages/financial/payment.html", context)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def resource_record(request):
     sample_data = [
         {
@@ -71,6 +78,8 @@ def resource_record(request):
     return render(request, "pages/resource_record.html", context)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def billing_view(request):
     user = request.user
     if user.is_staff:
@@ -108,6 +117,8 @@ def billing_view(request):
     return render(request, "pages/financial/billing.html", context)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def financial_view(request):
     context = {
         'segment': 'financial'
@@ -115,10 +126,13 @@ def financial_view(request):
     return render(request, "pages/dynamic-tables.html", context)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def invoices_view(request):
     return render(request, 'pages/financial/invoices.html', {'segment': 'invoices'})
 
-
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def transaction_history(request):
     user = request.user
     balance = user.balance

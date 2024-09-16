@@ -20,6 +20,8 @@ from django.views import View
 import os
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def vps_history(request):
     user = request.user
     list_user = []
