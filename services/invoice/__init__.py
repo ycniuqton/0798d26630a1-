@@ -1,22 +1,40 @@
 from datetime import timedelta, datetime
 
+from adapters.redis_service import CachedPlan
 from home.models import User, Balance, Transaction, Invoice, InvoiceLine
+from services.app_setting import AppSettingRepository
 from services.balance import BalanceRepository
-from services.invoice.utils import get_billing_cycle
+from services.invoice.utils import get_billing_cycle, get_now
 
 
 class InvoiceRepository:
     def __init__(self):
         pass
 
-    def create(self, user_id, items=[]):
+    def create(self, user_id, items=[], cycle=None, from_time=None, to_time=None):
         user = User.objects.get(id=user_id)
 
-        items = [i for i in items if i.plan]
-        total_fee = sum([i.plan.get('price', 0) for i in items])
-        now = datetime.utcnow()
+        plans = CachedPlan().get()
+
+        # apply price
+        for item in items:
+            plan = next((p for p in plans if p.get('id') == item.plan_id), None)
+            if not plan:
+                item.price = 0
+                item.plan_name = ""
+            else:
+                item.price = plan.get('price', 0)
+                item.plan_name = plan.get('name', "")
+
+        total_fee = sum([i.price for i in items])
+        now = get_now()
         code = f"{user.id[-4:]}-{now.month}-{now.year}-{now.microsecond}"
-        cycle = get_billing_cycle(now)
+
+        if not cycle:
+            cycle, from_time, to_time = get_billing_cycle(now)
+
+        app_setting = AppSettingRepository()
+
         invoice = Invoice.objects.create(
             user=user,
             code=code,
@@ -24,18 +42,20 @@ class InvoiceRepository:
             status="open",
             description="Initial invoice",
             transaction=None,
-            due_date=datetime.utcnow() + timedelta(days=5),
+            due_date=now + timedelta(days=app_setting.INVOICE_DUE_DAYS),
             cycle=cycle,
+            start_time=from_time,
+            end_time=to_time,
         )
 
         for item in items:
             invoice_line = InvoiceLine.objects.create(
                 invoice=invoice,
                 vps=item,
-                amount=item.plan.get('price', 0),
-                description=f"VPS {item.plan.get('name', 'Unknown')}",
-                start_time=datetime.utcnow(),
-                end_time=item.end_time,
+                amount=item.price,
+                description=f"VPS {item.plan_name}",
+                start_time=from_time,
+                end_time=to_time,
             )
 
         return invoice

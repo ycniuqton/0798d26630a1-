@@ -39,6 +39,8 @@ handlers = {
     VirtualizorEvent.VPS_TURNED_OFF_FAILED: VPSStoppedError(),
     VirtualizorEvent.VPS_SUSPENDED: VPSSuspended(),
     VirtualizorEvent.VPS_SUSPENDED_FAILED: VPSSuspendedError(),
+    VirtualizorEvent.VPS_UNSUSPENDED: VPSUnSuspended(),
+    # VirtualizorEvent.VPS_UNSUSPENDED_FAILED: VPSUnSuspendedError(),
     VirtualizorEvent.VPS_RESTARTED: VPSRestarted(),
     VirtualizorEvent.VPS_RESTARTED_FAILED: VPSRestartedError(),
     VirtualizorEvent.VPS_REBUILT: VPSRebuilt(),

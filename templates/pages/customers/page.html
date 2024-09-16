@@ -70,8 +70,12 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center">
         <h2>Customers</h2>
-        <button class="btn btn-primary" id="open-topup-modal">Topup</button>
+        <div>
+            <button class="btn btn-primary" id="open-topup-modal">Topup</button>
+            <button class="btn btn-danger" id="open-reclaim-modal">Reclaim</button>
+        </div>
     </div>
+
 
     <div class="search-bar">
         <select class="form-control width-auto mr-1" id="status-filter-select">
@@ -106,6 +110,35 @@
             <!-- Pagination will be loaded here via AJAX -->
         </ul>
     </nav>
+</div>
+<!-- Reclaim Modal -->
+<div id="reclaim-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">Reclaim</div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="reclaim-user-email-select">Select User by Email</label>
+                <select class="form-control" id="reclaim-user-email-select">
+                    <option value="" disabled selected>Select a user</option>
+                    {% for email in list_email %}
+                    <option value="{{ email }}">{{ email }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="reclaim-amount">Reclaim Amount</label>
+                <input type="number" class="form-control" id="reclaim-amount" placeholder="Enter reclaim amount">
+            </div>
+            <div class="form-group">
+                <label for="reclaim-note">Note</label>
+                <input type="text" class="form-control" id="reclaim-note" placeholder="Enter a note">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" id="cancel-reclaim">Cancel</button>
+            <button class="btn btn-danger" id="confirm-reclaim">Reclaim</button>
+        </div>
+    </div>
 </div>
 
 <!-- Topup Modal -->
@@ -277,5 +310,63 @@
 
         load_table();
     });
+</script>
+
+
+<script>
+    // Reclaim Modal Elements (new)
+    const reclaimModal = document.getElementById('reclaim-modal');
+    const openReclaimModal = document.getElementById('open-reclaim-modal');
+    const cancelReclaim = document.getElementById('cancel-reclaim');
+    const confirmReclaim = document.getElementById('confirm-reclaim');
+
+    // Open Reclaim Modal
+    openReclaimModal.onclick = function() {
+        reclaimModal.style.display = 'block';
+    }
+
+    // Close Reclaim Modal
+    cancelReclaim.onclick = function() {
+        reclaimModal.style.display = 'none';
+    }
+
+    // Handle Reclaim Confirmation
+    confirmReclaim.onclick = function() {
+        const email = document.getElementById('reclaim-user-email-select').value;
+        const amount = document.getElementById('reclaim-amount').value;
+        const note = document.getElementById('reclaim-note').value;
+
+        if (!email || !amount) {
+            alert("Please fill in all fields");
+            return;
+        }
+
+        // Send the reclaim request via AJAX
+        fetch('/api/account/balance/reclaim/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                amount: Number(amount),
+                note: note,
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert('Reclaim successful');
+            reclaimModal.style.display = 'none';
+            // Optionally refresh table or data here
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    // Close modal if clicking outside
+    window.onclick = function(event) {
+        if (event.target == reclaimModal) {
+            reclaimModal.style.display = 'none';
+        }
+    }
 </script>
 {% endblock content %}

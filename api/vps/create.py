@@ -10,7 +10,8 @@ from django.http import JsonResponse
 from adapters.redis_service import CachedPlan, CachedOS, CachedServer, CachedServerGroup
 from adapters.kafka_adapter import make_kafka_publisher
 from config import KafkaConfig
-from services.invoice import InvoiceRepository
+from services.invoice import InvoiceRepository, get_billing_cycle
+from services.invoice.utils import get_now
 from services.vps_log import VPSLogger
 from services.balance import BalanceRepository
 
@@ -52,7 +53,7 @@ def create_vps(request):
     if not osid or not plan or not server_group:
         return JsonResponse({'error': 'Invalid request'}, status=400)
     total_fee = plan['price'] * duration
-    end_time = datetime.utcnow() + timedelta(days=30*duration)
+    cycle, from_time, to_time = get_billing_cycle(from_time=get_now(), type='monthly', num=duration)
     if user.balance.amount < total_fee and not user.is_staff:
         return JsonResponse({'error': 'Insufficient balance'}, status=400)
 
@@ -71,44 +72,39 @@ def create_vps(request):
         os_version=image_version,
         location=server_group['name'],
         os=os['distro'],
-        end_time=end_time,
         identifier=identifier
     )
-    vps.save()
     vps.plan = plan
-
-    invoice_repo = InvoiceRepository()
-    invoice = invoice_repo.create(user.id, items=[vps])
-    invoice_repo.charge(invoice)
+    vps.save()
 
     VPSLogger().log(user, vps, 'create', 'creating')
 
-    try:
-        payload = {
-            "hostname": hostname,
-            "password": password,
-            # "serid": serid,
-            "plid": plid,
-            "osid": str(osid),
-            "vps_id": vps.id,
-            "raw_data": data,
-            "server_group": server_group['id'],
-            "identifier": identifier,
-        }
-        publisher = make_kafka_publisher(KafkaConfig)
-        publisher.publish('create_vps', payload)
-        response_data = {
-            'status': 'success',
-            'message': 'VPS created successfully',
-            'vpsConfiguration': data
-        }
-        return JsonResponse(response_data)
-    except:
-        response_data = {
-            'status': 'error',
-            'message': 'Failed to create VPS',
-            'vpsConfiguration': {}
-        }
-        return JsonResponse(response_data)
+    publisher = make_kafka_publisher(KafkaConfig)
 
-    return JsonResponse({'error': 'Invalid request'}, status=400)
+    publisher.publish('gen_invoice', {
+        'user_id': user.id,
+        'items': [vps.id],
+        'cycle': cycle,
+        'from_time': from_time,
+        'to_time': to_time
+    })
+
+    payload = {
+        "hostname": hostname,
+        "password": password,
+        # "serid": serid,
+        "plid": plid,
+        "osid": str(osid),
+        "vps_id": vps.id,
+        "raw_data": data,
+        "server_group": server_group['id'],
+        "identifier": identifier,
+    }
+
+    publisher.publish('create_vps', payload)
+    response_data = {
+        'status': 'success',
+        'message': 'VPS created successfully',
+        'vpsConfiguration': data
+    }
+    return JsonResponse(response_data)

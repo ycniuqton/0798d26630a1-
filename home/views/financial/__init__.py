@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from django.shortcuts import render, get_object_or_404
-
+from config import APPConfig
 from home.models import Vps, Invoice
 
 from services.invoice import get_billing_cycle
@@ -9,22 +9,13 @@ from services.invoice import get_billing_cycle
 def payment_view(request):
     user = request.user
     balance = user.balance
-    balance_records = balance.transactions.all()
-    balance_records = [
-        {
-            "payment_account": record.user.email,
-            "payment_type": record.type,
-            "payment_method": record.method,
-            "time": record._created,
-            "recharge_amount": record.amount,
-            "operation": "View"
-        }
-        for record in balance_records
-    ]
+
     context = {
         'segment': 'payment',
-        'balance_records': balance_records,
-        'balance': balance.amount
+        'balance': balance.amount,
+        'BANK_NAME': APPConfig.BANK_NAME,
+        'BANK_ACCOUNT': APPConfig.BANK_ACCOUNT,
+        'BANK_USERNAME': APPConfig.BANK_USERNAME,
     }
     return render(request, "pages/financial/payment.html", context)
 
@@ -101,7 +92,7 @@ def billing_view(request):
     billing_records = sorted(billing_records, key=lambda x: x['cycle'], reverse=True)
 
     now = datetime.now(timezone.utc)
-    this_cycle = get_billing_cycle(now)
+    this_cycle, _, _ = get_billing_cycle(now)
     last_hour_invoices = [i for i in invoices if i._created > now - timedelta(hours=1)]
     billing_summary = {
         "expenses": sum([i.amount for i in invoices]),

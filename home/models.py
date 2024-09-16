@@ -1,4 +1,6 @@
 import uuid
+from datetime import datetime
+
 from django.db.models import JSONField
 from django.db import models
 from django.utils import timezone
@@ -99,11 +101,24 @@ class Vps(BaseModel):
     error_message = models.TextField(null=True, blank=True)
     identifier = models.CharField(max_length=200, null=True, blank=True)
     meta_data = JSONField(null=True, blank=True)
+    cycle = models.CharField(max_length=200, null=True, blank=True)
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
     def __str__(self):
         return self.hostname
+
+    def is_expire_triggered(self):
+        if not self.is_expired():
+            return None
+        event = TriggeredOnceEvent.objects.filter(event_name=TriggeredOnceEvent.EventName.VPS_EXPIRED,
+                                                  vps_id=self.id, key=self.cycle).first()
+        if event:
+            return True
+        return False
+
+    def is_expired(self):
+        return self.end_time < datetime.now(timezone.utc)
 
 
 class VPSLog(BaseModel):
@@ -162,6 +177,25 @@ class Invoice(BaseModel):
 
     def __str__(self):
         return f'{self.amount} ({self.status})'
+
+    def is_expired(self):
+        return self.due_date < datetime.now(timezone.utc)
+
+    def is_expire_triggered(self):
+        if not self.is_expired():
+            return None
+        event = TriggeredOnceEvent.objects.filter(event_name=TriggeredOnceEvent.EventName.INVOICE_EXPIRED,
+                                                  invoice_id=self.id).first()
+        if event:
+            return True
+        return False
+
+    def is_suspend_triggered(self):
+        event = TriggeredOnceEvent.objects.filter(event_name=TriggeredOnceEvent.EventName.INVOICE_SUSPENDED,
+                                                  invoice_id=self.id).first()
+        if event:
+            return True
+        return False
 
 
 class InvoiceLine(BaseModel):
@@ -227,3 +261,26 @@ class PaypalTransaction(BaseModel):
 
     def __str__(self):
         return f'{self.amount} ({self.status})'
+
+
+class TriggeredOnceEvent(BaseModel):
+    class EventName(models.TextChoices):
+        VPS_EXPIRED = 'VPS_EXPIRED', 'VPS Expired'
+        INVOICE_EXPIRED = 'INVOICE_EXPIRED', 'Invoice Expired'
+        INVOICE_SUSPENDED = 'INVOICE_SUSPENDED', 'Invoice Suspended'
+
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    event_name = models.CharField(max_length=200, choices=EventName.choices, null=True, blank=True)
+    key = models.CharField(max_length=200, null=True, blank=True)
+    vps_id = models.CharField(max_length=200, null=True, blank=True)
+    invoice_id = models.CharField(max_length=200, null=True, blank=True)
+    description = models.TextField()
+    triggered_at = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.event_name
+
+
+class AppSetting(BaseModel):
+    invoice_due_days = models.IntegerField(default=3)
+    sufficient_balance_suspend_days = models.IntegerField(default=0)

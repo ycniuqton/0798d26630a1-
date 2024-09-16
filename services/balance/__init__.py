@@ -33,5 +33,8 @@ class BalanceRepository:
     def topup(self, user_id, amount):
         return self.modify(user_id, amount, 'topup')
 
+    def reclaim(self, user_id, amount):
+        return self.modify(user_id, -amount, 'reclaim')
+
     def charge(self, user_id, amount):
         return self.modify(user_id, -amount, 'charge')

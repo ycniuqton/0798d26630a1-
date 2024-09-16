@@ -8,7 +8,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
 
 from apscheduler.schedulers.blocking import BlockingScheduler
-from app.schedular.jobs import UpdateVpsStat
+from app.schedular.jobs import UpdateVpsStat, CheckVPSExpired, CheckInvoiceExpired, CheckSuspendVPS
 
 
 def main():
@@ -16,9 +16,15 @@ def main():
     scheduler = BlockingScheduler()
 
     # Instantiate the job
-    job_instance = UpdateVpsStat()
+    # update_vps_stat = UpdateVpsStat()
+    check_vps_expired = CheckVPSExpired()
+    check_invoice_expired = CheckInvoiceExpired()
+    check_vps_suspend = CheckSuspendVPS()
 
-    scheduler.add_job(job_instance.run, 'cron', hour='*', minute='*')
+    # scheduler.add_job(update_vps_stat.run, 'cron', hour='*', minute='*')
+    scheduler.add_job(check_vps_expired.run, 'cron', hour='*', minute='*')
+    scheduler.add_job(check_invoice_expired.run, 'cron', hour='*', minute='*')
+    scheduler.add_job(check_vps_suspend.run, 'cron', hour='*', minute='*')
 
     # Start the scheduler
     print("Starting scheduler...")
@@ -26,6 +32,10 @@ def main():
 
 
 if __name__ == '__main__':
-    job_instance = UpdateVpsStat()
-    job_instance.run()
-    # main()
+    # job_instance = UpdateVpsStat()
+    # job_instance.run()
+
+    # check_vps_expired = CheckVPSExpired()
+    # check_vps_expired.run()
+
+    main()

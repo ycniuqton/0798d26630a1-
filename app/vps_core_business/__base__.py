@@ -1,5 +1,6 @@
 from config import KafkaConfig
-from .__handlers__ import CreateVPS, StartVPS, StopVPS, SuspendVPS, UnSuspendVPS, RestartVPS, GiveVPS, RebuildVPS
+from .__handlers__ import CreateVPS, StartVPS, StopVPS, SuspendVPS, UnSuspendVPS, RestartVPS, GiveVPS, RebuildVPS, \
+    ExpiredVPS, GenerateInvoice, ChargeInvoice, BalanceToppedUp, InvoiceExpired
 from adapters.kafka_adapter import HandlerFactory
 from adapters.kafka_adapter.consumer import KafkaListener
 
@@ -12,6 +13,11 @@ handlers = {
     'unsuspend_vps': UnSuspendVPS(),
     'give_vps': GiveVPS(),
     'rebuild_vps': RebuildVPS(),
+    'vps_expired': ExpiredVPS(),
+    'gen_invoice': GenerateInvoice(),
+    'charge_invoice': ChargeInvoice(),
+    'invoice_expired': InvoiceExpired(),
+    'balance_topped_up': BalanceToppedUp(),
 }
 
 

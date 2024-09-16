@@ -55,9 +55,11 @@ class PGDBConfig:
 
 
 class APPConfig:
-    APP_ROLE = 'user'
-    APP_ROLE = 'ctv'
-    APP_ROLE = 'admin'
+    _data = config_data.get('APP_CONFIG', {})
+    APP_ROLE = _data.get('APP_ROLE', 'ctv')
+    BANK_NAME = _data.get('BANK_NAME')
+    BANK_ACCOUNT = _data.get('BANK_ACCOUNT')
+    BANK_USERNAME = _data.get('BANK_USERNAME')
 
 
 class KafkaNotifierConfig:

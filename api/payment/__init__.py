@@ -133,6 +133,5 @@ def paypal_webhook(request):
     print(data)
     print(params)
 
-
     # return the data
     return JsonResponse({'data': data, 'params': params}, status=200)
