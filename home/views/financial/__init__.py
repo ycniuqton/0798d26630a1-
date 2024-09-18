@@ -17,7 +17,7 @@ def payment_view(request):
 
     context = {
         'segment': 'payment',
-        'balance': balance.amount,
+        'balance': "{:,.2f}".format(balance.amount).replace(",", "."),
         'BANK_NAME': APPConfig.BANK_NAME,
         'BANK_ACCOUNT': APPConfig.BANK_ACCOUNT,
         'BANK_USERNAME': APPConfig.BANK_USERNAME,

@@ -263,6 +263,31 @@ class PaypalTransaction(BaseModel):
         return f'{self.amount} ({self.status})'
 
 
+class BankTransaction(BaseModel):
+    class Status(models.TextChoices):
+        PENDING = 'P', 'Pending'
+        PAID = 'A', 'Paid'
+        CANCELED = 'C', 'Canceled'
+        UNDEFINED = 'U', 'Undefined'
+
+    class Gateway(models.TextChoices):
+        BIDV = 'BIDV', 'BIDV'
+        VIETCOMBANK = 'VIETCOMBANK', 'Vietcombank'
+        TECHCOMBANK = 'TECHCOMBANK', 'Techcombank'
+
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True, blank=True)
+    amount = models.FloatField()
+    currency = models.CharField(max_length=200, default='VND')
+    status = models.CharField(max_length=200, choices=Status.choices, default=Status.PENDING)
+    description = models.TextField()
+    gateway = models.CharField(max_length=200, choices=Gateway.choices, default=Gateway.BIDV)
+    payment_id = models.CharField(max_length=200)
+    raw_data = JSONField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.amount} ({self.status})'
+
+
 class TriggeredOnceEvent(BaseModel):
     class EventName(models.TextChoices):
         VPS_EXPIRED = 'VPS_EXPIRED', 'VPS Expired'
