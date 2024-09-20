@@ -45,7 +45,7 @@ handlers = {
     VirtualizorEvent.VPS_RESTARTED_FAILED: VPSRestartedError(),
     VirtualizorEvent.VPS_REBUILT: VPSRebuilt(),
     VirtualizorEvent.VPS_REBUILT_FAILED: VPSRebuiltError(),
-    VirtualizorEvent.VPS_DELETED_FAILED: VPSDeleted(),
+    VirtualizorEvent.VPS_DELETED: VPSDeleted(),
     # VirtualizorEvent.VPS_DELETED_FAILED: VPSDeletedError(),
 }
 
