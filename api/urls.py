@@ -6,6 +6,7 @@ from .invoices import InvoiceAPI
 from .views import RegisterAPI, LoginAPI, LogoutAPI
 from .vps.create import create_vps
 from .vps import VPSAPI, start_vps, stop_vps, restart_vps, suspend_vps, unsuspend_vps, give_vps, change_vps_plan
+from .vps.delete import delete_vps
 from .vps.rebuild import rebuild_vps
 from .vps_log import get_vps_logs
 from .balances import topup, reclaim
@@ -21,6 +22,7 @@ urlpatterns = [
     path('vps/start/', start_vps, name='start-vps'),
     path('vps/stop/', stop_vps, name='stop-vps'),
     path('vps/restart/', restart_vps, name='restart-vps'),
+    path('vps/delete/', delete_vps, name='delete-vps'),
     path('vps/rebuild/', rebuild_vps, name='rebuild-vps'),
     path('vps/suspend/', suspend_vps, name='suspend-vps'),
     path('vps/unsuspend/', unsuspend_vps, name='unsuspend-vps'),

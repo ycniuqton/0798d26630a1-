@@ -132,6 +132,39 @@ class StopVPS(BaseHandler):
             raise SkippableException("Failed to stop VPS")
 
 
+class DeleteVPS(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            vps_id = fields.String(required=True)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        close_old_connections()
+        vps = Vps.objects.filter(id=payload['vps_id']).first()
+        if not vps:
+            raise DBInsertFailed("Missing Order")
+
+        base_url = settings.ADMIN_CONFIG.URL
+        api_key = settings.ADMIN_CONFIG.API_KEY
+
+        service = VPSService(base_url, api_key)
+
+        try:
+            response = service.delete(vps.linked_id)
+        except:
+            raise SkippableException("Failed to delete VPS")
+
+
 class RestartVPS(BaseHandler):
     def __init__(self) -> None:
         super().__init__()
@@ -229,6 +262,10 @@ class DeleteVPS(BaseHandler):
 
         try:
             response = service.delete(vps.linked_id)
+            if not vps.linked_id:
+                vps._deleted = True
+                vps.status = VpsStatus.DELETED
+                vps.save()
         except:
             raise SkippableException("Failed to delete VPS")
 
@@ -360,13 +397,14 @@ class ExpiredVPS(BaseHandler):
         if not vps.is_expired():
             return False
 
-        # send suspend
-        publisher = make_kafka_publisher(KafkaConfig)
+        if vps.auto_renew:
+            # send suspend
+            publisher = make_kafka_publisher(KafkaConfig)
 
-        publisher.publish('gen_invoice', {
-            'user_id': vps.user_id,
-            'items': [vps.id]
-        })
+            publisher.publish('gen_invoice', {
+                'user_id': vps.user_id,
+                'items': [vps.id]
+            })
 
         VPSLogger().log(vps.user, vps, 'expire', 'expired', f'VPS has expired')
 

@@ -102,6 +102,7 @@ class Vps(BaseModel):
     identifier = models.CharField(max_length=200, null=True, blank=True)
     meta_data = JSONField(null=True, blank=True)
     cycle = models.CharField(max_length=200, null=True, blank=True)
+    auto_renew = models.BooleanField(default=True)
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 

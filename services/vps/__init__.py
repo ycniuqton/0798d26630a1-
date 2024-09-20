@@ -38,6 +38,18 @@ class VPSService:
             response.raise_for_status()
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+    def delete(self, vps_id):
+        url = f"{self.base_url}/system/vpss/{vps_id}/delete"
+        response = requests.post(url, headers=self.headers)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            return response.json()
+        else:
+            # Raise an HTTP error for non-200 status codes
+            response.raise_for_status()
+
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def restart(self, vps_id):
         url = f"{self.base_url}/system/vpss/{vps_id}/restart"
         response = requests.post(url, headers=self.headers)
@@ -147,6 +159,18 @@ class CtvVPSService(VPSService):
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def stop(self, vps_id):
         url = f"{self.base_url}/api/vps/stop/"
+        response = requests.post(url, headers=self.headers, json={'linked_ids': [vps_id]})
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            return response.json()
+        else:
+            # Raise an HTTP error for non-200 status codes
+            response.raise_for_status()
+
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+    def delete(self, vps_id):
+        url = f"{self.base_url}/api/vps/delete/"
         response = requests.post(url, headers=self.headers, json={'linked_ids': [vps_id]})
 
         # Check if the request was successful

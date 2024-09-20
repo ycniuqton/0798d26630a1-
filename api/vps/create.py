@@ -31,6 +31,7 @@ def create_vps(request):
     plid = data.get('plan', {}).get('id', 0)
     image_version = data.get('image', {}).get('version', 'None')
     duration = data.get('duration', 1)
+    auto_renew = data.get('auto_renew', True)
 
     osid = None
     plans = CachedPlan().get()
@@ -72,7 +73,8 @@ def create_vps(request):
         os_version=image_version,
         location=server_group['name'],
         os=os['distro'],
-        identifier=identifier
+        identifier=identifier,
+        auto_renew=auto_renew,
     )
     vps.plan = plan
     vps.save()

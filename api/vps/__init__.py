@@ -35,7 +35,7 @@ class VPSAPI(APIView):
         else:
             search_query = Q()
 
-        objects = Vps.objects.filter(**filters).filter(search_query)
+        objects = Vps.objects.filter(~Q(_deleted=True)).filter(**filters).filter(search_query)
         if not user.is_staff:
             objects = objects.filter(user_id=user.id)
         total = objects.count()

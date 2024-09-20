@@ -1,41 +1,70 @@
+<style>
+    .small-text{
+        font-size: small;
+    }
+    .green-text{
+        color: green;
+    }
+    .medium-text{
+        font-size: medium;
+    }
+    .red-text{
+        color: red;
+    }
+</style>
+
 <div class="card">
     <div class="card-body">
-        <h5 class="card-title">Summary</h5>
         <div class="mb-3">
-            <h6>Current Balance: <span id="current-balance">$0.00</span></h6>
+            <h4>Current Balance <span id="current-balance" class="green-text">$0.00</span></h4>
         </div>
-        <ul class="list-unstyled">
-            <li><strong>Location:</strong> <span id="summary-location">None</span></li>
-            <li><strong>Country:</strong> <span id="summary-country">None</span></li>
-            <li><strong>Image:</strong> <span id="summary-image">None</span></li>
-            <li><strong>Instance:</strong> <span id="summary-instance">None</span></li>
-            <li><strong>vCPU:</strong> <span id="summary-vcpu">None</span></li>
-            <li><strong>RAM:</strong> <span id="summary-ram">None</span></li>
-            <li><strong>Network:</strong> <span id="summary-network">None</span></li>
-            <li><strong>Storage:</strong> <span id="summary-storage">None</span></li>
-            <!--            <li><strong>Additional IPv4:</strong> <span id="summary-ipv4">None</span></li>-->
-            <!--            <li><strong>Additional RAM:</strong> <span id="summary-ram-add">None</span></li>-->
-            <!--            <li><strong>Additional SSD:</strong> <span id="summary-ssd">None</span></li>-->
-            <!--            <li><strong>Bandwidth (TB):</strong> <span id="summary-bandwidth">None</span></li>-->
+        <hr>
+        <ul class="list-unstyled small-text" style="line-height:28px">
+            <li><strong>Location:</strong> <span id="summary-location"></span></li>
+            <li><strong>Country:</strong> <span id="summary-country"></span></li>
+            <li><strong>Image:</strong> <span id="summary-image"></span></li>
+            <li><strong>Instance:</strong> <span id="summary-instance"></span></li>
+            <li><strong>vCPU:</strong> <span id="summary-vcpu"></span></li>
+            <li><strong>RAM:</strong> <span id="summary-ram"></span></li>
+            <li><strong>Network:</strong> <span id="summary-network"></span></li>
+            <li><strong>Storage:</strong> <span id="summary-storage"></span></li>
         </ul>
         <hr>
-        <div class="mb-3">
-            <label for="duration-input">Duration (months):</label>
+        <div class="mb-3 ">
+            <label class="small-text" for="duration-input" >Duration (months):</label>
             <div class="input-group">
                 <input type="number" class="form-control" id="duration-input" value="1" min="1">
             </div>
         </div>
 
         <div class="mb-3">
-            <label for="coupon-code">Add Coupon or Voucher:</label>
+            <label class="small-text" for="coupon-code">Add Coupon or Voucher:</label>
             <div>
-                <input type="text" class="form-control" id="coupon-code">
-                <button class="action-button mt-2 w-100 ml-0" data-color="#83f2b6" id="apply-coupon"><span>Apply</span>
+                <input type="text" class="form-control" id="coupon-code" style="
+    width: 60%;
+    float: left;
+    margin-right: 10px;
+">
+                <button class="action-button pb-2 ml-1" data-color="#83f2b6" id="apply-coupon" style="    width: 25%;"><span>Apply</span>
                 </button>
             </div>
         </div>
-        <h6>Total: <span id="summary-total">$0.00</span>/mo</h6>
-        <p class="text-muted">(<span id="summary-hourly">$0.0000</span>/h)</p>
+        <div class="mb-3" style="
+    display: flex;
+">
+            <label class="small-text" for="auto-renew" style="
+    float: left;
+">Auto Renew:</label>
+            <div class="form-check form-switch" style="
+">
+                <input class="form-check-input" type="checkbox" id="auto-renew" checked="" style="
+    width: -webkit-fill-available;
+">
+            </div>
+        </div>
+        <hr>
+        <h6>Total: <span id="summary-total" class="red-text">$0.00</span>/month</h6>
+        <p class="text-muted">(<span id="summary-hourly">$0.0000</span>/hour)</p>
         <button class="action-button w-100 ml-0" data-color="#007bff" id="submit-vps" disabled><span>Submit</span>
         </button>
         <input type="hidden" id="config_updated" value="false">
@@ -58,25 +87,22 @@
             password: ''
         },
         coupon: '',
-        duration: 1  , // Add duration to configuration,
+        duration: 1, // Add duration to configuration
+        auto_renew: true, // Auto-renew default to true
         identifier: generateUUID()
     };
 
     function render_summary_block() {
         document.getElementById('loader').style.display = 'block';
         // Update summary block with current configuration
-        document.getElementById('summary-location').innerText = vpsConfiguration.location.name || 'None';
-        document.getElementById('summary-country').innerText = vpsConfiguration.location.country || 'None';
-        document.getElementById('summary-image').innerText = (vpsConfiguration.image.name || 'None') + ' ' + (vpsConfiguration.image.version || '');
-        document.getElementById('summary-instance').innerText = vpsConfiguration.plan.name || 'None';
-        document.getElementById('summary-vcpu').innerText = vpsConfiguration.plan.vcpu || 'None';
-        document.getElementById('summary-ram').innerText = vpsConfiguration.plan.ram || 'None';
-        document.getElementById('summary-network').innerText = vpsConfiguration.plan.bandwidth || 'None';
-        document.getElementById('summary-storage').innerText = vpsConfiguration.plan.storage || 'None';
-<!--        document.getElementById('summary-ipv4').innerText = vpsConfiguration.ipv4;-->
-<!--        document.getElementById('summary-ram-add').innerText = vpsConfiguration.ram;-->
-<!--        document.getElementById('summary-ssd').innerText = vpsConfiguration.ssd;-->
-<!--        document.getElementById('summary-bandwidth').innerText = vpsConfiguration.bandwidth;-->
+        document.getElementById('summary-location').innerText = vpsConfiguration.location.name || '';
+        document.getElementById('summary-country').innerText = vpsConfiguration.location.country || '';
+        document.getElementById('summary-image').innerText = (vpsConfiguration.image.name || '') + ' ' + (vpsConfiguration.image.version || '');
+        document.getElementById('summary-instance').innerText = vpsConfiguration.plan.name || '';
+        document.getElementById('summary-vcpu').innerText = vpsConfiguration.plan.vcpu || '';
+        document.getElementById('summary-ram').innerText = vpsConfiguration.plan.ram || '';
+        document.getElementById('summary-network').innerText = vpsConfiguration.plan.bandwidth || '';
+        document.getElementById('summary-storage').innerText = vpsConfiguration.plan.storage || '';
 
         // Fetch the total cost from the calculator API
         fetch('/api/vps/calculator', {
@@ -90,15 +116,15 @@
         .then(response => response.json())
         .then(data => {
             var totalCost = data.total_cost;
-            document.getElementById('summary-total').innerText = '$' + totalCost.toFixed(2) + '/mo';
-            document.getElementById('summary-hourly').innerText = '$' + (totalCost / 720).toFixed(4) + '/h';
+            document.getElementById('summary-total').innerText = '$' + totalCost.toFixed(2);
+            document.getElementById('summary-hourly').innerText = '$' + (totalCost / 720).toFixed(2) ;
             document.getElementById('submit-vps').disabled = false;
             document.getElementById('loader').style.display = 'none';
         })
         .catch(error => {
             console.log('Error:', error);
-            document.getElementById('summary-total').innerText = '$0.00/mo';
-            document.getElementById('summary-hourly').innerText = '$0.0000/h';
+            document.getElementById('summary-total').innerText = '$0.00';
+            document.getElementById('summary-hourly').innerText = '$0.00';
             document.getElementById('loader').style.display = 'none';
         });
 
@@ -117,9 +143,6 @@
             alert('Please select a plan.');
             return;
         }
-
-
-
 
         fetch('/api/vps/create', {
             method: 'POST',
@@ -179,11 +202,17 @@
     fetchCurrentBalance();
     render_summary_block();
 
-
+    // Update duration and trigger change event
     document.getElementById('duration-input').addEventListener('input', function() {
         vpsConfiguration.duration = parseInt(this.value);
         document.getElementById('config_updated').value = 'true';
         document.getElementById('config_updated').dispatchEvent(new Event('change'));
     });
-</script>
 
+    // Update auto-renew and trigger change event
+    document.getElementById('auto-renew').addEventListener('change', function() {
+        vpsConfiguration.auto_renew = this.checked;
+        document.getElementById('config_updated').value = 'true';
+        document.getElementById('config_updated').dispatchEvent(new Event('change'));
+    });
+</script>
