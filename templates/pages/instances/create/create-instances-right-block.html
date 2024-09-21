@@ -154,12 +154,20 @@
         })
         .then(response => {
             if (response.ok) {
-                location.href='/instances/'
+                location.href = '/instances/';
             } else {
-                alert('Failed to create VPS.\n'+response.data.error);
+                return response.json().then(errorData => {
+                    // Handle the error data
+                    console.log('Error:', errorData);
+                    alert('Failed to create VPS.\n' + errorData.error);
+                });
             }
         })
-        .catch(error => console.log('Error:', error));
+        .catch(error => {
+            console.log('Network or server error:', error);
+            alert('A network or server error occurred.');
+        });
+
     });
 
     // Monitor changes to the hidden input field
