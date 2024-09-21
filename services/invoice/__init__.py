@@ -39,7 +39,7 @@ class InvoiceRepository:
             user=user,
             code=code,
             amount=total_fee,
-            status="open",
+            status=Invoice.Status.OPEN,
             description="Initial invoice",
             transaction=None,
             due_date=now + timedelta(days=app_setting.INVOICE_DUE_DAYS),
@@ -68,7 +68,7 @@ class InvoiceRepository:
         balance_repo = BalanceRepository()
         transaction = balance_repo.charge(user.id, invoice.amount)
 
-        invoice.status = "paid"
+        invoice.status = Invoice.Status.PAID
         invoice.transaction = transaction
         invoice.save()
 

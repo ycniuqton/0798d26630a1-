@@ -156,7 +156,7 @@
             if (response.ok) {
                 location.href='/instances/'
             } else {
-                alert('Failed to create VPS.');
+                alert('Failed to create VPS.\n'+response.data.error);
             }
         })
         .catch(error => console.log('Error:', error));

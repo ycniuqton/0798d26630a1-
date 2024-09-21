@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-from home.models import Ticket
+from home.models import Ticket, TicketChat
 
 
 class TicketCollectionAPI(APIView):
@@ -23,7 +23,7 @@ class TicketCollectionAPI(APIView):
                 ticket_type=data['ticket_type'],
                 description=data['description'],
                 submission_time=datetime.now(),
-                status='open',
+                status=Ticket.TicketStatus.OPEN,
                 operation='View',
                 user=request.user
             )
@@ -83,6 +83,38 @@ class TicketAPI(APIView):
         if not user.is_staff:
             ticket = ticket.filter(user_id=user.id)
         ticket = ticket.first()
+        messages = []
+        for msg in ticket.messages.all():
+            msg_data = msg.to_readable_dict()
+            msg_data.update({'user_role': "admin" if msg.user.is_staff else "user"})
+            messages.append(msg_data)
+
         ticket = ticket.to_readable_dict()
+        ticket.update({'messages': messages})
 
         return JsonResponse(ticket)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def ticket_reply(request, ticket_id):
+    data = json.loads(request.body)
+    user = request.user
+
+    message = data.get('message')
+    ticket = Ticket.objects.filter(id=ticket_id).first()
+
+    if not ticket:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+    if not user.is_staff and ticket.user_id != user.id:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+    tchat = TicketChat.objects.create(
+        ticket=ticket,
+        message=message,
+        user=user
+    )
+    # ticket.messages.append(tchat)
+    # ticket.save()
+
+    return JsonResponse({'success': True})

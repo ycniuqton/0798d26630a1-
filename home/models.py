@@ -61,6 +61,7 @@ class User(AbstractUser, BaseModel):
     balance_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_topup = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    open_ticket = models.PositiveIntegerField(default=0)
 
 
 class VpsStatus:
@@ -164,6 +165,12 @@ class Transaction(BaseModel):
 
 
 class Invoice(BaseModel):
+    class Status(models.TextChoices):
+        OPEN = 'open', 'Open'
+        PAID = 'paid', 'Paid'
+        CANCELED = 'canceled', 'Canceled'
+        EXPIRED = 'expired', 'Expired'
+
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     amount = models.FloatField()
     status = models.CharField(max_length=200)
@@ -213,6 +220,10 @@ class InvoiceLine(BaseModel):
 
 
 class Ticket(BaseModel):
+    class TicketStatus(models.TextChoices):
+        OPEN = 'open', 'Open'
+        CLOSED = 'closed', 'Closed'
+
     subject = models.CharField(max_length=200)
     ticket_type = models.CharField(max_length=200)
     description = models.TextField()

@@ -1,7 +1,7 @@
 from django.db.models import Sum
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from .models import Vps, User, Balance, Transaction
+from .models import Vps, User, Balance, Transaction, Ticket
 
 
 @receiver(post_save, sender=Vps)
@@ -34,4 +34,11 @@ def update_account_statistic_on_save(sender, instance, **kwargs):
     total_topup = Transaction.objects.filter(user=user, type='topup').aggregate(Sum('amount'))['amount__sum']
     if total_topup:
         user.total_topup = total_topup
+    user.save()
+
+
+@receiver(post_save, sender=Ticket)
+def update_ticket_len_on_save(sender, instance, **kwargs):
+    user = instance.user
+    user.open_ticket = Ticket.objects.filter(user=user, status=Ticket.TicketStatus.OPEN).count()
     user.save()

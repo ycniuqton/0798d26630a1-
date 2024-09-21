@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from django.db.models import Q
 from django.utils import timezone
 
 from adapters.kafka_adapter import make_kafka_publisher
@@ -31,7 +32,7 @@ class CheckVPSExpired(BaseJob):
 
     def run(self):
         # filter not suspended vps
-        list_vps = Vps.objects.filter(end_time__lt=get_now()).all()
+        list_vps = Vps.objects.filter(end_time__lt=get_now()).filter(~Q(_deleted=True)).all()
 
         for vps in list_vps:
             is_expire_triggered = vps.is_expire_triggered()

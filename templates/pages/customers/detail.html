@@ -74,7 +74,12 @@
         </li>
         <li class="nav-item">
             <a class="nav-link" id="ticket-tab" data-toggle="tab" href="#ticket" role="tab" aria-controls="ticket" aria-selected="false">
+                {% if customer.vps_len > 0 %}
+                <label> Ticket ({{customer.open_ticket}})</label>
+                {% else %}
                 <label> Ticket</label>
+                {% endif %}
+
             </a>
         </li>
 

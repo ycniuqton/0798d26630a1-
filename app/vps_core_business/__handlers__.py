@@ -441,6 +441,9 @@ class InvoiceExpired(BaseHandler):
         if not invoice.is_expired():
             return False
 
+        invoice.status = Invoice.Status.EXPIRED
+        invoice.save()
+
         # send suspend
         publisher = make_kafka_publisher(KafkaConfig)
 
