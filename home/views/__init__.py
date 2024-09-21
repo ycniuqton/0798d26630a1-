@@ -134,41 +134,6 @@ def block_storage(request):
 
 def snapshot(request):
     snapshots_data = [
-        {
-            "snapshot_name": "Snapshot 1",
-            "type": "Full",
-            "size": "50 GB",
-            "location": "New York, USA",
-            "datetime": "2024-07-10 14:30"
-        },
-        {
-            "snapshot_name": "Snapshot 2",
-            "type": "Incremental",
-            "size": "25 GB",
-            "location": "London, UK",
-            "datetime": "2024-07-11 09:20"
-        },
-        {
-            "snapshot_name": "Snapshot 3",
-            "type": "Full",
-            "size": "75 GB",
-            "location": "Tokyo, Japan",
-            "datetime": "2024-07-12 17:45"
-        },
-        {
-            "snapshot_name": "Snapshot 4",
-            "type": "Incremental",
-            "size": "20 GB",
-            "location": "Sydney, Australia",
-            "datetime": "2024-07-13 12:15"
-        },
-        {
-            "snapshot_name": "Snapshot 5",
-            "type": "Full",
-            "size": "100 GB",
-            "location": "Berlin, Germany",
-            "datetime": "2024-07-14 08:30"
-        }
     ]
     context = {
         'segment': 'snapshot',

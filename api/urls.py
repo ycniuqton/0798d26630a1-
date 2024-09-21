@@ -1,5 +1,6 @@
 from django.urls import path
 
+from .snapshot import VpsSnapshotAPI, restore_vsp
 from .support import TicketCollectionAPI, TicketAPI, ticket_reply
 from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token, AccountCollectionAPI
 from .invoices import InvoiceAPI
@@ -54,4 +55,7 @@ urlpatterns = [
     path('tokens/<str:token_id>/', delete_token, name='delete-token'),
 
     path('invoices/', InvoiceAPI.as_view(), name='api-invoices'),
+
+    path('snapshots/<str:vps_id>/', VpsSnapshotAPI.as_view(), name='vps-snapshots'),
+    path('snapshots/<str:vps_id>/restore/', restore_vsp, name='vps-snapshots'),
 ]

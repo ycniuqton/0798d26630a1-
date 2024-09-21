@@ -84,18 +84,19 @@ class CachedResource(RedisService):
         self.retry_count = retry_count
         super().__init__(host, port, db, password, redis_uri, ex, px)
 
-    def get(self):
+    def get(self, sub_key=''):
         """
         Get the value from Redis. If it doesn't exist, fetch from an API.
 
         :param retry_count: The number of times to retry the API call.
         :return: The value retrieved from cache or API.
         """
-        value = super().get(self.key_name)
+        key_name = f"{self.key_name}:{sub_key}"
+        value = super().get(key_name)
         if value is None:
-            value = self._fetch_from_api(retry_count=self.retry_count)
+            value = self._fetch_from_api(retry_count=self.retry_count, sub_key=sub_key)
             if value is not None:
-                self.set(self.key_name, value)
+                self.set(key_name, value)
         return value
 
     def set(self, key_name, value, ex=None, px=None):
@@ -108,13 +109,14 @@ class CachedResource(RedisService):
         """
         super().set(key_name, value, ex, px)
 
-    def delete(self):
+    def delete(self, sub_key=''):
         """
         Delete the key from Redis.
         """
-        super().delete(self.key_name)
+        key_name = f"{self.key_name}:{sub_key}"
+        super().delete(key_name)
 
-    def _fetch_from_api(self, retry_count):
+    def _fetch_from_api(self, retry_count, sub_key=''):
         """
         Fetch the value from an API. This method is meant to be overridden.
 
@@ -129,14 +131,13 @@ class CachedResource(RedisService):
                     return response
             except Exception as e:
                 print(f"Error fetching data from API: {e}")
-                retry_count -= 1
+            retry_count -= 1
         return None
 
-    def _make_api_call(self):
-        """
-        Placeholder for the actual API call. This should be overridden in a subclass.
-        """
-        data = requests.get(self.data_url, headers=self.auth_header)
+    def _make_api_call(self, url=None):
+        if not url:
+            url = self.data_url
+        data = requests.get(url, headers=self.auth_header)
         if data.status_code == 200:
             return data.json()
         return None

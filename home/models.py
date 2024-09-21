@@ -79,6 +79,7 @@ class VpsStatus:
     STOPPING = "stopping"
     STARTING = "starting"
     ERROR = "error"
+    RESTORING = "restoring"
 
 
 class Vps(BaseModel):
@@ -104,6 +105,8 @@ class Vps(BaseModel):
     meta_data = JSONField(null=True, blank=True)
     cycle = models.CharField(max_length=200, null=True, blank=True)
     auto_renew = models.BooleanField(default=True)
+    log_count = models.IntegerField(default=0)
+    backup_count = models.IntegerField(default=0)
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 

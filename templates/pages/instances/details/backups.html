@@ -1,0 +1,195 @@
+
+{% block extrastyle %}
+<style>
+    .search-bar {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .search-bar input {
+        flex: 1;
+        margin-right: 10px;
+    }
+    .search-bar select, .search-bar button {
+        margin-right: 10px;
+    }
+    .table thead th {
+        background-color: #f8f9fa;
+        cursor: pointer;
+    }
+    .no-logs {
+        text-align: center;
+        padding: 50px 0;
+    }
+    .no-logs img {
+        max-width: 150px;
+        margin-bottom: 20px;
+    }
+        .width-auto{
+            width: auto;
+        }
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<div class="container mt-0">
+    <div class="search-bar">
+
+        <select class="form-control width-auto mr-1" id="action-filter-select" style="display:none">
+            <option value="">All Actions</option>
+            <option value="Create">Create</option>
+            <option value="Delete">Delete</option>
+            <option value="Suspend">Suspend</option>
+            <option value="Upgrade">Upgrade</option>
+            <!-- Add more options here if needed -->
+        </select>
+        <select class="form-control width-auto mr-1" id="status-filter-select_2" style="display:none">
+            <option value="">All Statuses</option>
+            <option value="Success">Success</option>
+            <option value="Failure">Failure</option>
+            <!-- Add more options here if needed -->
+        </select>
+        <input  type="text" class="form-control width-auto " id="search-input" placeholder="Search" aria-label="Search"
+               style="height: 43px; display:none">
+        <button class="btn btn-outline-secondary m-0" style="height: 43px; display:none" id="search-button"><i
+                class="fas fa-search"></i></button>
+    </div>
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th scope="col" data-sort="instance_name">Date</th>
+            <th scope="col" data-sort="action">Name</th>
+            <th scope="col" data-sort="status">Size</th>
+            <th scope="col">Restore</th>
+        </tr>
+        </thead>
+        <tbody id="general-tbody_2">
+        <!-- Logs will be loaded here via AJAX -->
+        </tbody>
+    </table>
+    <nav>
+        <ul class="pagination" id="pagination_2">
+            <!-- Pagination will be loaded here via AJAX -->
+        </ul>
+    </nav>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentPage = 1;
+        let currentSort = '-datetime';
+        let currentActionFilter = '';
+        let currentStatusFilter = '';
+        let currentFilter_2 = {'vps_id': '{{ instance.id }}'};
+        let currentSearch_2 = '';
+
+        window.load_table_2 = function(page = 1, sort = currentSort, filter = currentFilter_2, search = currentSearch_2) {
+
+            document.getElementById('loader').style.display = 'block';
+
+            console.log("triggered");
+            filter_str = Object.keys(filter).map(key => key + "=" + filter[key]).join('&');
+            fetch(`/api/snapshots/{{ instance.id }}/?page=${page}&page_size=10&sort_by=${sort}&${filter_str}&search=${search}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('general-tbody_2');
+                    tbody.innerHTML = '';
+                    data.data.forEach(log => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+
+                            <td>${log.date}</td>
+                            <td>${log.name}</td>
+                            <td>${log.size}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" data-abs-path="${log.abs_path}" data-vps-id="{{ instance.id }}">Restore</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+
+                    const pagination = document.getElementById('pagination_2');
+                    pagination.innerHTML = '';
+                    for (let i = 1; i <= data.total_pages; i++) {
+                        const pageItem = document.createElement('li');
+                        pageItem.className = 'page-item' + (i === data.current_page ? ' active' : '');
+                        pageItem.innerHTML = `<a class="page-link" onclick="load_table_2(${i})">${i}</a>`;
+                        pagination.appendChild(pageItem);
+                    }
+
+                    // Add event listener to restore buttons
+                    document.querySelectorAll('button[data-abs-path]').forEach(button => {
+                        button.addEventListener('click', () => {
+                            const absPath = button.getAttribute('data-abs-path');
+                            const vpsId = button.getAttribute('data-vps-id');
+                            restoreSnapshot(vpsId, absPath);
+                        });
+                    });
+
+                    document.getElementById('loader').style.display = 'none';
+                })
+                .catch(error => console.log('Error:', error));
+        }
+
+        function restoreSnapshot(vpsId, absPath) {
+            fetch(`/api/snapshots/${vpsId}/restore/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',  // Ensure CSRF token is included if necessary
+                },
+                body: JSON.stringify({ 'abs_path': absPath })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error('Failed to restore snapshot');
+                }
+            })
+            .then(data => {
+                alert('Snapshot restored successfully!');
+                // Optionally reload table or update UI as needed
+                load_table_2(currentPage, currentSort, currentFilter_2, currentSearch_2);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error restoring snapshot: ' + error.message);
+            });
+        }
+
+        document.getElementById('search-button').addEventListener('click', () => {
+            currentSearch_2 = document.getElementById('search-input').value.toLowerCase();
+            load_table_2(currentPage, currentSort, currentFilter_2, currentSearch_2);
+        });
+
+        document.getElementById('search-input').addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                currentSearch_2 = document.getElementById('search-input').value.toLowerCase();
+                load_table_2(currentPage, currentSort, currentFilter_2, currentSearch_2);
+            }
+        });
+
+        document.getElementById('action-filter-select').addEventListener('change', (event) => {
+            currentFilter_2["action"] = event.target.value.toLowerCase();
+            load_table_2(currentPage, currentSort, currentFilter_2, currentSearch_2);
+        });
+
+        document.getElementById('status-filter-select_2').addEventListener('change', (event) => {
+            currentFilter_2["status"] = event.target.value.toLowerCase();
+            load_table_2(currentPage, currentSort, currentFilter_2, currentSearch_2);
+        });
+
+        document.querySelectorAll('th[data-sort]').forEach(th => {
+            th.addEventListener('click', () => {
+                const sortField = th.getAttribute('data-sort');
+                currentSort = currentSort === sortField ? `-${sortField}` : sortField;
+                load_table_2(currentPage, currentSort, currentFilter_2, currentSearch_2);
+            });
+        });
+
+        load_table_2();
+    });
+</script>
+
+{% endblock content %}

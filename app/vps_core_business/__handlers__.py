@@ -13,6 +13,7 @@ from home.models import Vps, VpsStatus, User, TriggeredOnceEvent, Invoice
 from adapters.kafka_adapter._exceptions import SkippableException
 from services.app_setting import AppSettingRepository
 from services.invoice import InvoiceRepository, get_billing_cycle, get_now
+from services.virtualizor_manager import VirtualizorManager
 from services.vps_log import VPSLogger
 from core import settings
 
@@ -574,3 +575,34 @@ class ChargeInvoice(BaseHandler):
                     "vps_id": line.vps_id
                 }
                 publisher.publish('suspend_vps', payload)
+
+
+class RestoreVPS(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            vps_id = fields.String(required=True)
+            abs_path = fields.String(required=True)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        close_old_connections()
+        vps = Vps.objects.filter(id=payload['vps_id']).first()
+        if not vps:
+            raise DBInsertFailed("Missing Order")
+        abs_path = payload.get('abs_path')
+
+        virtualizor_manager = VirtualizorManager()
+        try:
+            virtualizor_manager.restore_vps(vps.linked_id, abs_path)
+        except:
+            raise SkippableException("Failed to restart VPS")
