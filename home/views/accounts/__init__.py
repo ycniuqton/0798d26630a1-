@@ -92,7 +92,7 @@ class UserRegistrationView(CreateView):
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
-        if self.form_class(request.POST).is_valid():  # Validate form before proceeding
+        if response.status_code == 302:
             user = get_user_model().objects.get(username=request.POST['username'])
             ar = AccountRepository()
             ar.create_account(user.id)
