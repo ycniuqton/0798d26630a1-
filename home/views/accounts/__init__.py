@@ -1,11 +1,7 @@
-from admin_datta.views import UserLoginView, UserRegistrationView
-from django.contrib.auth import get_user_model
-from django.contrib.auth.forms import UserCreationForm
+from admin_datta.views import UserLoginView
 from django.shortcuts import render, redirect
 from rest_framework.authtoken.models import Token
 from datetime import datetime, timedelta
-from django import forms
-from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView
 from services.account import AccountRepository
 
@@ -34,6 +30,16 @@ def logout_view(request):
     return response
 
 
+from django import forms
+from django.contrib.auth.forms import UserCreationForm
+from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
+from django.contrib.auth import get_user_model
+from django.urls import reverse_lazy
+from django.views.generic.edit import CreateView
+
+
+# Custom Registration Form
 class RegistrationForm(UserCreationForm):
     password1 = forms.CharField(
         label=_("Password"),
@@ -59,15 +65,35 @@ class RegistrationForm(UserCreationForm):
             })
         }
 
+    # Overriding clean method to validate username and email
+    def clean(self):
+        cleaned_data = super().clean()
+        username = cleaned_data.get("username")
+        email = cleaned_data.get("email")
 
+        User = get_user_model()
+
+        # Check if username already exists
+        if User.objects.filter(username=username).exists():
+            self.add_error('username', ValidationError(_("This username is already taken.")))
+
+        # Check if email already exists
+        if User.objects.filter(email=email).exists():
+            self.add_error('email', ValidationError(_("This email is already registered.")))
+
+        return cleaned_data
+
+
+# User Registration View
 class UserRegistrationView(CreateView):
     template_name = 'accounts/auth-signup.html'
     form_class = RegistrationForm
-    success_url = '/accounts/login/'
+    success_url = reverse_lazy('login')  # Using reverse_lazy for cleaner URL handling
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
-        user = get_user_model().objects.get(username=request.POST['username'])
-        ar = AccountRepository()
-        ar.create_account(user.id)
+        if self.form_class(request.POST).is_valid():  # Validate form before proceeding
+            user = get_user_model().objects.get(username=request.POST['username'])
+            ar = AccountRepository()
+            ar.create_account(user.id)
         return response

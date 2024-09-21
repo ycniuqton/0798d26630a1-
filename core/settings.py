@@ -242,6 +242,13 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'core.exception_handlers.custom_exception_handler',
 }
 
+AUTHENTICATION_BACKENDS = [
+    'core.authentication_backends.EmailOrUsernameModelBackend',  # Add the path to your custom backend
+    'django.contrib.auth.backends.ModelBackend',  # Django's default authentication backend
+]
+
+
+
 from datetime import timedelta
 
 SIMPLE_JWT = {
