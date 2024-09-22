@@ -262,7 +262,7 @@
     </table>`;
 
 
-            document.getElementById('qr-code-img').src = "https://apiqr.web2m.com/api/generate/{{BANK_NAME}}/{{BANK_ACCOUNT}}/{{BANK_USERNAME}}?amount="+vnd_amount+"&memo={{request.user.username}}";
+            document.getElementById('qr-code-img').src = "https://apiqr.web2m.com/api/generate/{{BANK_NAME}}/{{BANK_ACCOUNT}}/{{BANK_USERNAME}}?amount="+vnd_amount+"&memo=U {{request.user.username}}";
             document.getElementById('qr-code').style.display = 'block';
         } else {
             alert('Please select a payment method.');
