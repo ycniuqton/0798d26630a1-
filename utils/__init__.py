@@ -1,4 +1,5 @@
 from urllib.parse import urlparse, parse_qs
+from .random_thing import *
 
 country_mapping = {
     "US": "United States",
@@ -276,4 +277,3 @@ def extract_url_params(url):
     query_params = parse_qs(parsed_url.query)
 
     return query_params
-

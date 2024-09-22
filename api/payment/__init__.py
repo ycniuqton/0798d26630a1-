@@ -194,7 +194,7 @@ def generate_qr_code(request):
     amount = request.GET.get('amount', 0)
     amount = float(amount)
     vnd_amount = amount * APPConfig.VND_USD_EXCHANGE_RATE
-    memo = f'UP {user.username}'
+    memo = f'UP {user.customer_code}'
     url = f'https://apiqr.web2m.com/api/generate/{APPConfig.BANK_NAME}/{APPConfig.BANK_ACCOUNT}/{APPConfig.BANK_USERNAME}?amount={vnd_amount}&memo={memo}'
     response = requests.get(url)
     if response.status_code != 200:

@@ -8,6 +8,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 
+from utils import generate_customer_code
+
 
 def gen_uuid():
     return str(uuid.uuid4())
@@ -62,6 +64,7 @@ class User(AbstractUser, BaseModel):
     total_topup = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     open_ticket = models.PositiveIntegerField(default=0)
+    customer_code = models.CharField(max_length=200, null=True, blank=True, default=generate_customer_code)
 
 
 class VpsStatus:
