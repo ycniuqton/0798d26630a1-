@@ -157,14 +157,14 @@ def bank_webhook(request):
         payment_id = data.get('id')
         gateway = data.get('gateway')
         content = data.get('content')
-        username = content.split('UP ')[-1]
+        customer_code = content.split('UP ')[-1][:8]
         payment_type = data.get('transferType')
 
         if payment_type != 'IN':
             continue
 
         # parse user
-        user = User.objects.filter(username=username).first()
+        user = User.objects.filter(customer_code=customer_code).first()
         if not user:
             user = User.objects.filter(username='system').first()
 
