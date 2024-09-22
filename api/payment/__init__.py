@@ -157,7 +157,7 @@ def bank_webhook(request):
         payment_id = data.get('id')
         gateway = data.get('gateway')
         content = data.get('content')
-        customer_code = content.split('UP ')[-1][:8]
+        customer_code = content.split('UP ')[-1][:8].upper()
         payment_type = data.get('transferType')
 
         if payment_type != 'IN':
