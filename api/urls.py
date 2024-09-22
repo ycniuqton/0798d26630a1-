@@ -12,8 +12,8 @@ from .vps.rebuild import rebuild_vps
 from .vps_log import get_vps_logs
 from .balances import topup, reclaim
 from .vps.calculator import vps_calculator
-from .payment import get_payment_url, get_qr_code, paypal_success_callback, paypal_cancel_callback, paypal_webhook, \
-    bank_webhook
+from .payment import get_payment_url, paypal_success_callback, paypal_cancel_callback, paypal_webhook, \
+    bank_webhook, generate_qr_code
 
 urlpatterns = [
     path('register/', RegisterAPI.as_view(), name='register'),
@@ -40,7 +40,7 @@ urlpatterns = [
     path('account/balance/reclaim/', reclaim, name='user-balance-reclaim'),
 
     path('payment/get_payment_url/', get_payment_url, name='get_payment_url'),
-    path('payment/get_qr_code/', get_qr_code, name='get_qr_code'),
+    path('payment/get_qr_code/', generate_qr_code, name='get_qr_code'),
     path('payment/paypal/success/', paypal_success_callback, name='paypal_success_callback'),
     path('payment/paypal/cancel/', paypal_cancel_callback, name='paypal_cancel_callback'),
     path('payment/paypal/webhook/', paypal_webhook, name='paypal_webhook'),

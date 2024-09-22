@@ -1,10 +1,11 @@
-from django.http import JsonResponse
+import requests
+from django.http import JsonResponse, HttpResponse
 from django.http import HttpResponseRedirect
 import json
 
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.decorators import permission_classes, api_view
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from adapters.paypal import PayPalClient
 from config import PaypalConfig, APPConfig
@@ -60,21 +61,6 @@ def get_payment_url(request):
 
 # Mock exchange rate
 EXCHANGE_RATE = 23000  # 1 USD = 23,000 VND
-
-
-def get_qr_code(request):
-    amount = float(request.GET.get('amount'))
-    amount_vnd = amount * EXCHANGE_RATE
-
-    # Mock response with bank details and QR code
-    bank_info = {
-        'qr_code': 'https://example.com/qr-code-image.png',  # Replace with actual QR code generator URL
-        'bank_name': 'VN Bank',
-        'account_number': '123456789',
-        'amount_vnd': amount_vnd
-    }
-
-    return JsonResponse(bank_info)
 
 
 def paypal_success_callback(request):
@@ -171,7 +157,7 @@ def bank_webhook(request):
         payment_id = data.get('id')
         gateway = data.get('gateway')
         content = data.get('content')
-        username = content.split(' ')[1]
+        username = content.split('UP ')[-1]
         payment_type = data.get('transferType')
 
         if payment_type != 'IN':
@@ -199,3 +185,19 @@ def bank_webhook(request):
             BalanceRepository().topup(user.id, amount)
 
     return JsonResponse({'message': 'Success'}, status=200)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def generate_qr_code(request):
+    user = request.user
+    amount = request.GET.get('amount', 0)
+    amount = float(amount)
+    vnd_amount = amount * APPConfig.VND_USD_EXCHANGE_RATE
+    memo = f'UP {user.username}'
+    url = f'https://apiqr.web2m.com/api/generate/{APPConfig.BANK_NAME}/{APPConfig.BANK_ACCOUNT}/{APPConfig.BANK_USERNAME}?amount={vnd_amount}&memo={memo}'
+    response = requests.get(url)
+    if response.status_code != 200:
+        return JsonResponse({'error': 'QR code generation failed'}, status=500)
+
+    return HttpResponse(response.content, content_type=response.headers['Content-Type'], status=response.status_code)

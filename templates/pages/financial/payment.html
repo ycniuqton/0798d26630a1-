@@ -256,13 +256,13 @@
         </tr>
         <tr>
             <td style="padding: 10px; font-weight: bold;">Message:</td>
-            <td style="padding: 10px;">{{request.user.username}}</td>
+            <td style="padding: 10px;">UP {{request.user.username}}</td>
         </tr>
 
     </table>`;
 
 
-            document.getElementById('qr-code-img').src = "https://apiqr.web2m.com/api/generate/{{BANK_NAME}}/{{BANK_ACCOUNT}}/{{BANK_USERNAME}}?amount="+vnd_amount+"&memo=U {{request.user.username}}";
+            document.getElementById('qr-code-img').src = "/api/payment/get_qr_code/?amount=" + amount;
             document.getElementById('qr-code').style.display = 'block';
         } else {
             alert('Please select a payment method.');
