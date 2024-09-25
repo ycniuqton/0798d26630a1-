@@ -66,6 +66,9 @@ class User(AbstractUser, BaseModel):
     open_ticket = models.PositiveIntegerField(default=0)
     customer_code = models.CharField(max_length=200, null=True, blank=True, default=generate_customer_code)
 
+    class Meta:
+        db_table = 'user'
+
 
 class VpsStatus:
     CREATING = "creating"
@@ -128,6 +131,9 @@ class Vps(BaseModel):
     def is_expired(self):
         return self.end_time < datetime.now(timezone.utc)
 
+    class Meta:
+        db_table = 'vps'
+
 
 class VPSLog(BaseModel):
     action = models.CharField(max_length=200)
@@ -148,6 +154,9 @@ class VPSLog(BaseModel):
             self.performed_by = self.user.username
         super().save(*args, **kwargs)
 
+    class Meta:
+        db_table = 'vps_log'
+
 
 class Balance(BaseModel):
     amount = models.FloatField()
@@ -155,6 +164,9 @@ class Balance(BaseModel):
 
     def __str__(self):
         return f'{self.amount}'
+
+    class Meta:
+        db_table = 'balance'
 
 
 class Transaction(BaseModel):
@@ -168,6 +180,9 @@ class Transaction(BaseModel):
 
     def __str__(self):
         return f'{self.amount} ({self.status})'
+
+    class Meta:
+        db_table = 'transaction'
 
 
 class Invoice(BaseModel):
@@ -211,6 +226,9 @@ class Invoice(BaseModel):
             return True
         return False
 
+    class Meta:
+        db_table = 'invoice'
+
 
 class InvoiceLine(BaseModel):
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='lines')
@@ -223,6 +241,9 @@ class InvoiceLine(BaseModel):
 
     def __str__(self):
         return f'{self.amount} ({self.status})'
+
+    class Meta:
+        db_table = 'invoice_line'
 
 
 class Ticket(BaseModel):
@@ -241,6 +262,9 @@ class Ticket(BaseModel):
     def __str__(self):
         return self.subject
 
+    class Meta:
+        db_table = 'ticket'
+
 
 class TicketChat(BaseModel):
     message = models.TextField()
@@ -249,6 +273,9 @@ class TicketChat(BaseModel):
 
     def __str__(self):
         return self.message
+
+    class Meta:
+        db_table = 'ticket_chat'
 
 
 class UserToken(BaseModel):
@@ -261,6 +288,9 @@ class UserToken(BaseModel):
 
     def __str__(self):
         return self.token
+
+    class Meta:
+        db_table = 'user_token'
 
 
 class PaypalTransaction(BaseModel):
@@ -279,6 +309,9 @@ class PaypalTransaction(BaseModel):
 
     def __str__(self):
         return f'{self.amount} ({self.status})'
+
+    class Meta:
+        db_table = 'paypal_transaction'
 
 
 class BankTransaction(BaseModel):
@@ -305,6 +338,9 @@ class BankTransaction(BaseModel):
     def __str__(self):
         return f'{self.amount} ({self.status})'
 
+    class Meta:
+        db_table = 'bank_transaction'
+
 
 class TriggeredOnceEvent(BaseModel):
     class EventName(models.TextChoices):
@@ -323,7 +359,13 @@ class TriggeredOnceEvent(BaseModel):
     def __str__(self):
         return self.event_name
 
+    class Meta:
+        db_table = 'triggered_once_event'
+
 
 class AppSetting(BaseModel):
     invoice_due_days = models.IntegerField(default=3)
     sufficient_balance_suspend_days = models.IntegerField(default=0)
+
+    class Meta:
+        db_table = 'app_setting'
