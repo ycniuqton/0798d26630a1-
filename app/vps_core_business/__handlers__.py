@@ -220,8 +220,6 @@ class SuspendVPS(BaseHandler):
         vps = Vps.objects.filter(id=payload['vps_id']).first()
         if not vps:
             raise DBInsertFailed("Missing Order")
-        if vps.status in [VpsStatus.SUSPENDED, VpsStatus.SUSPENDING]:
-            return False
 
         base_url = settings.ADMIN_CONFIG.URL
         api_key = settings.ADMIN_CONFIG.API_KEY
