@@ -37,7 +37,7 @@ def suspend_vps(request):
         #     continue
         vps.status = VpsStatus.SUSPENDING
         vps.save()
-        VPSLogger().log(user, vps, 'stop', VpsStatus.SUSPENDING)
+        VPSLogger().log(user, vps, 'suspend', VpsStatus.SUSPENDING)
         payload = {
             "vps_id": vps.id
         }
