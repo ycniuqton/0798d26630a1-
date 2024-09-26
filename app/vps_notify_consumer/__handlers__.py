@@ -212,6 +212,40 @@ class VPSDeleted(BaseHandler):
             raise SkippableException("Failed to start VPS")
 
 
+class VPSChangedPassword(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            identifier = fields.String(required=False)
+            data = fields.Dict(required=False)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        identifier = payload.get('identifier')
+        data = payload.get('data')
+        vps = Vps.objects.filter(linked_id=identifier).first()
+        if not vps:
+            raise DBInsertFailed("Missing Order")
+        password = payload.get('password')
+        if not password:
+            raise SkippableException("Missing password")
+
+        try:
+            vps.password = password
+            vps.save()
+        except:
+            raise SkippableException("Failed to start VPS")
+
+
 class VPSStoppedError(BaseHandler):
     def __init__(self) -> None:
         super().__init__()

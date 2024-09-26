@@ -5,6 +5,7 @@ from .support import TicketCollectionAPI, TicketAPI, ticket_reply
 from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token, AccountCollectionAPI
 from .invoices import InvoiceAPI
 from .views import RegisterAPI, LoginAPI, LogoutAPI
+from .vps.change_pass import change_pass_vps
 from .vps.create import create_vps
 from .vps import VPSAPI, start_vps, stop_vps, restart_vps, suspend_vps, unsuspend_vps, give_vps, change_vps_plan
 from .vps.delete import delete_vps
@@ -27,6 +28,7 @@ urlpatterns = [
     path('vps/rebuild/', rebuild_vps, name='rebuild-vps'),
     path('vps/suspend/', suspend_vps, name='suspend-vps'),
     path('vps/unsuspend/', unsuspend_vps, name='unsuspend-vps'),
+    path('vps/change_pass/', change_pass_vps, name='change-pass-vps'),
     path('vps/give/', give_vps, name='give-vps'),
     path('vps/<str:vps_id>/change_plan', change_vps_plan, name='change_vps_plan'),
 

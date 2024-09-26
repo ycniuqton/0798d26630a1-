@@ -604,3 +604,42 @@ class RestoreVPS(BaseHandler):
             virtualizor_manager.restore_vps(vps.linked_id, abs_path)
         except:
             raise SkippableException("Failed to restart VPS")
+
+
+class ChangePassVPS(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            vps_id = fields.String(required=True)
+            password = fields.String(required=True)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        close_old_connections()
+        vps = Vps.objects.filter(id=payload['vps_id']).first()
+        if not vps:
+            raise DBInsertFailed("Missing Order")
+        password = payload.get('password')
+
+        base_url = settings.ADMIN_CONFIG.URL
+        api_key = settings.ADMIN_CONFIG.API_KEY
+
+        service = VPSService(base_url, api_key)
+
+        try:
+            response = service.change_pass({
+                'vps_id': vps.id,
+                'linked_id': vps.linked_id,
+                'password': password
+            })
+        except:
+            raise SkippableException("Failed to change pass VPS")

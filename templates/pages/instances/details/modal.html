@@ -22,6 +22,10 @@
                     <p>Enter the email of the user to give this instance to:</p>
                     <input type="email" id="userEmail" class="form-control" placeholder="user@example.com">
                 </div>
+                <div id="newPasswordInput" class="d-none">
+                    <p>Enter a new password for this instance:</p>
+                    <input type="" id="newPassword" class="form-control" placeholder="New Password">
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -38,12 +42,12 @@
         let confirmationMessage = `Are you sure you want to ${action} this instance?`;
         document.getElementById('confirmationModalLabel').textContent = `${action.charAt(0).toUpperCase() + action.slice(1)} Confirmation`;
         document.getElementById('confirmationMessage').textContent = confirmationMessage;
-<!--        document.getElementById('instanceName').textContent = instanceData.server_name;-->
 
         // Hide all specific action elements
         document.getElementById('vncLink').classList.add('d-none');
         document.getElementById('snapshotDropdown').classList.add('d-none');
         document.getElementById('giveUserInput').classList.add('d-none');
+        document.getElementById('newPasswordInput').classList.add('d-none');
         document.getElementById('confirmAction').classList.remove('d-none');
         document.getElementById('openVncAction').classList.add('d-none');
         document.getElementById('restoreAction').classList.add('d-none');
@@ -81,6 +85,9 @@
             document.getElementById('giveUserInput').classList.remove('d-none');
             document.getElementById('confirmAction').textContent = 'Give';
 
+        } else if (action === 'change_pass') {
+            document.getElementById('newPasswordInput').classList.remove('d-none');
+            document.getElementById('confirmAction').textContent = 'Change Password';
         }
 
         // Show modal
@@ -93,6 +100,8 @@
             let body = { vps_ids: [instance_id] };
             if (action === 'give') {
                 body.user_email = document.getElementById('userEmail').value;
+            } else if (action === 'change_pass') {
+                body.password = document.getElementById('newPassword').value;
             }
 
             // Make API call

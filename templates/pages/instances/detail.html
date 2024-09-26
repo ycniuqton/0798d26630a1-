@@ -71,6 +71,8 @@
 <!--                class="fas fa-undo"></i><span>Restore</span></button>-->
         <button class="action-button" data-color="#007bff" onclick="performAction('give')"><i
                 class="fas fa-user-plus"></i><span>Give to Other User</span></button>
+        <button class="action-button" data-color="#80FFA7" onclick="performAction('change_pass')"><i
+                class="fas fa-user-plus"></i><span>Change pass</span></button>
         {% if request.user.is_staff %}
         <button class="action-button" data-color="#000000" onclick="performAction('suspend')"><i
                 class="fas fa-lock"></i><span>Suspend</span></button>

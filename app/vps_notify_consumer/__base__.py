@@ -28,6 +28,9 @@ class VirtualizorEvent:
     VPS_DELETED_FAILED = 'vps_deleted_failed'
     VPS_STOPPED = 'vps_stopped'
     VPS_STOPPED_FAILED = 'vps_stopped_failed'
+    VPS_PASSWORD_CHANGED_FAILED = 'vps_password_changed_failed'
+    VPS_PASSWORD_CHANGED = 'vps_password_changed'
+
 
 
 handlers = {
@@ -47,6 +50,7 @@ handlers = {
     VirtualizorEvent.VPS_REBUILT_FAILED: VPSRebuiltError(),
     VirtualizorEvent.VPS_DELETED: VPSDeleted(),
     # VirtualizorEvent.VPS_DELETED_FAILED: VPSDeletedError(),
+    VirtualizorEvent.VPS_PASSWORD_CHANGED: VPSChangedPassword(),
 }
 
 

@@ -140,6 +140,19 @@ class VPSService:
             # Raise an HTTP error for non-200 status codes
             response.raise_for_status()
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+    def change_pass(self, payload):
+        linked_id = payload.get('linked_id')
+        url = f"{self.base_url}/system/vpss/{linked_id}/change_pass"
+        response = requests.post(url, headers=self.headers, json=payload)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            return response.json()
+        else:
+            # Raise an HTTP error for non-200 status codes
+            response.raise_for_status()
+
 
 class CtvVPSService(VPSService):
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
@@ -236,6 +249,22 @@ class CtvVPSService(VPSService):
         raw_data['linked_id'] = vps_id
         raw_data.pop('vps_id', None)
         response = requests.post(url, headers=self.headers, json=payload.get('raw_data'))
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            return response.json()
+        else:
+            # Raise an HTTP error for non-200 status codes
+            response.raise_for_status()
+
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+    def change_pass(self, payload):
+
+        url = f"{self.base_url}/api/vps/change_pass/"
+        response = requests.post(url, headers=self.headers, json={
+            'linked_ids': payload.get('linked_ids'),
+            'password': payload.get('password')
+        })
 
         # Check if the request was successful
         if response.status_code == 200:
