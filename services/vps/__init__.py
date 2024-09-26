@@ -262,7 +262,7 @@ class CtvVPSService(VPSService):
 
         url = f"{self.base_url}/api/vps/change_pass/"
         response = requests.post(url, headers=self.headers, json={
-            'linked_ids': payload.get('linked_ids'),
+            'linked_ids': [payload.get('linked_id')],
             'password': payload.get('password')
         })
 
