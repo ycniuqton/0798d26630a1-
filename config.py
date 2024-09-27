@@ -57,11 +57,13 @@ class PGDBConfig:
 class APPConfig:
     _data = config_data.get('APP_CONFIG', {})
     APP_ROLE = _data.get('APP_ROLE', 'ctv')
+    APP_NAME = _data.get('APP_NAME', 'World Server')
     BANK_NAME = _data.get('BANK_NAME')
     BANK_ACCOUNT = _data.get('BANK_ACCOUNT')
     BANK_USERNAME = _data.get('BANK_USERNAME')
     WEBHOOK_TOKEN = _data.get('WEBHOOK_TOKEN')
     VND_USD_EXCHANGE_RATE = _data.get('VND_USD_EXCHANGE_RATE', 26000)
+
 
 
 class KafkaNotifierConfig:

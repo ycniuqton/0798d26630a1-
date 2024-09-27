@@ -9,5 +9,6 @@ def my_constants(request):
     """
     return {
         'APP_ROLE': APPConfig.APP_ROLE,
-        "VND_USD_EXCHANGE_RATE": APPConfig.VND_USD_EXCHANGE_RATE
+        "VND_USD_EXCHANGE_RATE": APPConfig.VND_USD_EXCHANGE_RATE,
+        "APP_NAME": APPConfig.APP_NAME
     }
