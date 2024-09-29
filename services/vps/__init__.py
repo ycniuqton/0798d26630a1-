@@ -1,6 +1,7 @@
 from tenacity import retry, stop_after_attempt, wait_fixed
 import requests
 
+from adapters.redis_service.resources.full_data_server_group import CachedServerGroupConfig
 from home.models import Vps, VpsStatus
 
 
@@ -15,7 +16,12 @@ class VPSService:
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def create(self, payload):
+        group_configs = CachedServerGroupConfig().get()
         url = f"{self.base_url}/system/vpss/create"
+        is_locked = CachedServerGroupConfig().get_locked(payload.get('server_group'))
+        if is_locked:
+            payload['serid'] = is_locked
+            del payload['server_group']
         response = requests.post(url, headers=self.headers, json=payload)
 
         # Check if the request was successful

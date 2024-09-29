@@ -83,13 +83,14 @@ def create_vps(request):
 
     publisher = make_kafka_publisher(KafkaConfig)
 
-    publisher.publish('gen_invoice', {
-        'user_id': user.id,
-        'items': [vps.id],
-        'cycle': cycle,
-        'from_time': from_time,
-        'to_time': to_time
-    })
+    if not user.is_staff:
+        publisher.publish('gen_invoice', {
+            'user_id': user.id,
+            'items': [vps.id],
+            'cycle': cycle,
+            'from_time': from_time,
+            'to_time': to_time
+        })
 
     payload = {
         "hostname": hostname,

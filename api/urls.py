@@ -1,5 +1,6 @@
 from django.urls import path
 
+from .admin import get_group_configs, lock_group, SuspendConfig
 from .snapshot import VpsSnapshotAPI, restore_vsp
 from .support import TicketCollectionAPI, TicketAPI, ticket_reply
 from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token, AccountCollectionAPI
@@ -60,4 +61,8 @@ urlpatterns = [
 
     path('snapshots/<str:vps_id>/', VpsSnapshotAPI.as_view(), name='vps-snapshots'),
     path('snapshots/<str:vps_id>/restore/', restore_vsp, name='vps-snapshots'),
+
+    path('admin/group_config/', get_group_configs, name='group-config'),
+    path('admin/group_config/lock', lock_group, name='lock_group'),
+    path('admin/suspend_config/', SuspendConfig.as_view(), name='suspend-config'),
 ]

@@ -170,6 +170,7 @@
 <!--                </li>-->
 <!--                {% endif %}-->
 
+                {% if user.is_staff %}
                 <li
                         class="nav-item pcoded-hasmenu  ">
                     <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i
@@ -179,8 +180,13 @@
                             <span class="pcoded-mtext">Financial</span></a></li>
                         <li class=""><a href="{% url 'ctv-settings' %}" class="">
                             <span class="pcoded-mtext">Settings</span></a></li>
+                        {% if  APP_ROLE != 'admin' %}
+                        <li class=""><a href="{% url 'admin_invoices' %}" class="">
+                            <span class="pcoded-mtext">Open Invoice</span></a></li>
+                        {% endif %}
                     </ul>
                 </li>
+                {% endif %}
             </ul>
         </div>
     </div>

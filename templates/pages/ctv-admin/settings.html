@@ -5,135 +5,479 @@
 
 {% block extrastyle %}
 <style>
-.iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
-.parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+    .iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+    .parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
 </style>
 {% endblock extrastyle %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Profile</h2>
-    <div class="alert alert-warning">
-        💡 Please fill in the correct account information to facilitate the synchronization of resources and platform information.
-    </div>
-    <form id="profile-form">
-        <div class="form-group">
-            <label for="emailAddress">Email Address</label>
-            <input type="email" class="form-control" id="emailAddress" readonly>
-<!--            <button type="button" class="btn btn-primary mt-2" onclick="enableEmailEdit()">Change</button>-->
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="firstName">First name</label>
-                <input type="text" class="form-control" id="firstName">
-            </div>
-            <div class="form-group col-md-6">
-                <label for="lastName">Last name</label>
-                <input type="text" class="form-control" id="lastName">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="address">Address</label>
-            <input type="text" class="form-control" id="address">
-        </div>
-        <div class="form-row">
-            <div class="form-group col-md-4">
-                <label for="city">City</label>
-                <input type="text" class="form-control" id="city">
-            </div>
-            <div class="form-group col-md-4">
-                <label for="countryRegion">Country/Region</label>
-                <input type="text" class="form-control" id="countryRegion">
-            </div>
-            <div class="form-group col-md-4">
-                <label for="zipCode">Zip code</label>
-                <input type="text" class="form-control" id="zipCode">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="companyName">Company name</label>
-            <input type="text" class="form-control" id="companyName" placeholder="Company name">
-        </div>
-        <div class="form-row">
+    <div class="row" hidden>
+        <!-- Left Column: Big (8 columns) -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">VPS Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <!-- Select Plan -->
+                        <div class="form-group">
+                            <label for="select-plan">Select Plan</label>
+                            <select class="form-control" id="select-plan">
+                                <option>plan 4/8/50</option>
+                            </select>
+                        </div>
 
-            <div class="form-group col-md-6">
-                <label for="phoneNumber">&nbsp;Phone number</label>
-                <input type="text" class="form-control" id="phoneNumber">
+                        <!-- Backup Plan -->
+                        <div class="form-group">
+                            <label for="backup-plan">Backup Plan</label>
+                            <select class="form-control" id="backup-plan">
+                                <option>Same as VPS Plan</option>
+                            </select>
+                        </div>
+
+                        <!-- Hostname -->
+                        <div class="form-group">
+                            <label for="hostname">Hostname</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="hostname" value="test">
+                                <div class="input-group-append">
+                                    <button class="btn btn-link" type="button"><i class="fas fa-edit"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Username -->
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" class="form-control" id="username" placeholder="">
+                        </div>
+
+                        <!-- VPS Root Password -->
+                        <div class="form-group">
+                            <label for="vps-password">VPS Root Password</label>
+                            <div class="input-group">
+                                <input type="password" class="form-control" id="vps-password">
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="password-strength">Strength Indicator</span>
+                                    <button class="btn btn-primary" type="button"><i class="fas fa-search"></i></button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- IP Address -->
+                        <div class="form-group">
+                            <label for="ip-address">IP Address</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="ip-address" value="103.195.238.234">
+                                <div class="input-group-append">
+                                    <button class="btn btn-danger" type="button"><i class="fas fa-times"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-        <div class="form-check">
-            <input type="checkbox" class="form-check-input" id="subscribeEmail">
-            <label class="form-check-label" for="subscribeEmail">Subscribe to marketing email</label>
+
+        <!-- Right Column: Small (4 columns) -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Additional Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <!-- Disk Space -->
+                        <div class="form-group">
+                            <label for="disk-space">Disk Space</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="disk-space" value="50.000">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">GB</span>
+                                </div>
+                            </div>
+                            <a href="#">d83WXc55EOiQi2lU</a>
+                        </div>
+
+                        <!-- Guaranteed RAM -->
+                        <div class="form-group">
+                            <label for="ram">Guaranteed RAM</label>
+                            <input type="number" class="form-control" id="ram" value="8196">
+                        </div>
+
+                        <!-- Storage -->
+                        <div class="form-group">
+                            <label for="storage">Storage</label>
+                            <select class="form-control" id="storage">
+                                <option>kvm1 (3246.89GB Free)</option>
+                            </select>
+                        </div>
+
+                        <!-- Free Disk Space -->
+                        <div class="form-group">
+                            <label for="free-space">Free Disk Space</label>
+                            <input type="text" class="form-control" id="free-space" value="252707 MB Free" disabled>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-        <button class="btn btn-primary mt-3" type="button" onclick="saveProfile()">Save changes</button>
-    </form>
+    </div>
+
+    <!-- Third Block: New Form Elements (8 columns wide) -->
+    <div class="row" hidden>
+        <div class="col-md-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Other Settings</h5>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <!-- Date Time Picker -->
+                        <div class="form-group">
+                            <label for="date-time">Select Date and Time</label>
+                            <input type="datetime-local" class="form-control" id="date-time">
+                        </div>
+
+                        <!-- Item Picker -->
+                        <div class="form-group">
+                            <label for="item-picker">Item Picker</label>
+                            <div class="row">
+                                <!-- Available Items -->
+                                <div class="col-6">
+                                    <label>Available Items</label>
+                                    <ul class="list-group">
+                                        <li class="list-group-item">Item 1</li>
+                                        <li class="list-group-item">Item 2</li>
+                                        <li class="list-group-item">Item 3</li>
+                                    </ul>
+                                </div>
+                                <!-- Selected Items -->
+                                <div class="col-6">
+                                    <label>Selected Items</label>
+                                    <ul class="list-group">
+                                        <li class="list-group-item">Item A</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Styled Radio Buttons -->
+                        <div class="form-group">
+                            <label>Select Option</label>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input">
+                                <label class="custom-control-label" for="customRadio1">Option 1</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input">
+                                <label class="custom-control-label" for="customRadio2">Option 2</label>
+                            </div>
+                        </div>
+
+                        <!-- Styled Checkboxes -->
+                        <div class="form-group">
+                            <label>Select Features</label>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheck1">
+                                <label class="custom-control-label" for="customCheck1">Feature 1</label>
+                            </div>
+                            <div class="custom-control custom-checkbox">
+                                <input type="checkbox" class="custom-control-input" id="customCheck2">
+                                <label class="custom-control-label" for="customCheck2">Feature 2</label>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary btn-block">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Server Group Configuration</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Server Group List (Left Column) -->
+                            <div class="col-5 mt-3">
+                                <label>Server Groups</label>
+                                <ul class="list-group" id="server-group-list">
+                                    <!-- Server groups will be populated here dynamically -->
+                                </ul>
+                            </div>
+
+                            <!-- Server List (Right Column) -->
+                            <div class="col-5 mt-3">
+                                <label>Servers in Group</label>
+                                <ul class="list-group" id="server-list">
+                                    <!-- Servers will be populated here dynamically -->
+                                </ul>
+                            </div>
+                            <!-- Lock/Unlock Button -->
+                            <div class="col-2 " id="lock-container" style="display: none;">
+                                <button id="lock-button" class="btn btn-danger" onclick="lockGroup()">Lock Group
+                                </button>
+                                <button id="unlock-button" class="btn btn-success" style="display: none;"
+                                        onclick="unlockGroup()">Unlock Group
+                                </button>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let data = {}; // Will hold the server group data from the API
+        let selectedGroup = null;
+        let selectedServer = null;
+
+        // Function to fetch data from the API
+        async function fetchData() {
+            try {
+                const response = await fetch('/api/admin/group_config/'); // Replace with actual API endpoint
+                data = await response.json();
+                renderServerGroups();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Function to render server groups and servers
+        function renderServerGroups() {
+            const serverGroupList = document.getElementById('server-group-list');
+            serverGroupList.innerHTML = ''; // Clear existing groups
+
+            for (const groupId in data) {
+                const group = data[groupId];
+                const groupItem = document.createElement('li');
+                groupItem.classList.add('list-group-item');
+                groupItem.setAttribute('data-group-id', groupId);
+
+                // Add lock icon if the group is locked
+                if (group.is_locked) {
+                    groupItem.innerHTML = `<i class="fas fa-lock"></i> ${group.sg_name}`;
+                } else {
+                    groupItem.textContent = group.sg_name;
+                }
+
+                groupItem.addEventListener('click', () => selectGroup(groupId, groupItem));
+                serverGroupList.appendChild(groupItem);
+            }
+        }
+
+        // Function to handle group selection
+function selectGroup(groupId, groupElement) {
+    selectedGroup = groupId;
+    const group = data[groupId];
+    const serverList = document.getElementById('server-list');
+    serverList.innerHTML = ''; // Clear existing servers
+
+    // Highlight selected group
+    document.querySelectorAll('#server-group-list .list-group-item').forEach(item => item.classList.remove('active'));
+    groupElement.classList.add('active');
+
+    // Populate the server list for the selected group
+    for (const serverId in group.servers) {
+        const server = group.servers[serverId];
+        const serverItem = document.createElement('li');
+        serverItem.classList.add('list-group-item');
+        serverItem.setAttribute('data-server-id', serverId);
+
+        // Add lock icon if this server is locked
+        if (server.is_locked) {
+            serverItem.innerHTML = `<i class="fas fa-lock"></i> ${server.name}`;
+        } else {
+            serverItem.textContent = server.name;
+        }
+
+        serverItem.addEventListener('click', () => selectServer(serverId, serverItem));
+        serverList.appendChild(serverItem);
+    }
+
+    // Always show the unlock button if the group is locked
+    if (group.is_locked) {
+        document.getElementById('lock-button').style.display = 'none';
+        document.getElementById('unlock-button').style.display = 'block';
+    } else {
+        document.getElementById('lock-button').style.display = 'none'; // Hide lock button initially
+        document.getElementById('unlock-button').style.display = 'none'; // Hide unlock button for unlocked groups
+    }
+
+    document.getElementById('lock-container').style.display = 'block'; // Show lock/unlock container
+}
+
+
+       // Function to handle server selection
+function selectServer(serverId, serverElement) {
+    selectedServer = serverId;
+
+    // Highlight selected server
+    document.querySelectorAll('#server-list .list-group-item').forEach(item => item.classList.remove('active'));
+    serverElement.classList.add('active');
+
+    // Show lock button only if the group is not locked
+    if (!data[selectedGroup].is_locked) {
+        document.getElementById('lock-button').style.display = 'block';
+    }
+
+    document.getElementById('unlock-button').style.display = 'none'; // Hide unlock button if group is not locked
+}
+
+        // Function to lock the group to the selected server
+        async function lockGroup() {
+            try {
+                await updateLockStatus(selectedGroup, selectedServer, true); // Lock the group
+                data[selectedGroup].is_locked = true;
+                data[selectedGroup].servers[selectedServer].is_locked = true;
+                renderServerGroups(); // Re-render the groups to update the lock icons
+                selectGroup(selectedGroup, document.querySelector(`[data-group-id="${selectedGroup}"]`)); // Re-render the server list for the locked group
+            } catch (error) {
+                console.error('Error locking the group:', error);
+            }
+        }
+
+        // Function to unlock the group
+        async function unlockGroup() {
+            try {
+                await updateLockStatus(selectedGroup, null, false); // Unlock the group
+                data[selectedGroup].is_locked = false;
+                for (const serverId in data[selectedGroup].servers) {
+                    data[selectedGroup].servers[serverId].is_locked = false;
+                }
+                renderServerGroups(); // Re-render the groups to update the lock icons
+                selectGroup(selectedGroup, document.querySelector(`[data-group-id="${selectedGroup}"]`)); // Re-render the server list for the unlocked group
+            } catch (error) {
+                console.error('Error unlocking the group:', error);
+            }
+        }
+
+        // Function to update the lock status via the API
+        async function updateLockStatus(groupId, serverId, isLocked) {
+            const payload = {
+                group_id: groupId,
+                server_id: serverId,
+                is_locked: isLocked
+            };
+            const response = await fetch(`/api/admin/group_config/lock`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+            });
+            if (!response.ok) {
+                throw new Error('Failed to update lock status');
+            }
+        }
+
+        // Load server groups from API when the page loads
+        fetchData( )
+    </script>
+
+    <style>
+        .list-group-item.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .list-group-item i {
+            margin-right: 8px;
+        }
+    </style>
+
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Suspend Config</h5>
+        </div>
+        <div class="card-body">
+            <form id="suspend-config-form">
+                <div class="form-group">
+                    <label for="invoice-due-days">Invoice Due Days</label>
+                    <input type="number" class="form-control" id="invoice-due-days" min="0" placeholder="Enter invoice due days" required>
+                </div>
+                <div class="form-group">
+                    <label for="suspend-days">Sufficient Balance Suspend Days</label>
+                    <input type="number" class="form-control" id="suspend-days" min="0" placeholder="Enter sufficient balance suspend days" required>
+                </div>
+                <button type="button" class="btn btn-primary" id="update-button">Update</button>
+                <button type="button" class="btn btn-secondary" id="clear-button">Clear</button>
+            </form>
+        </div>
+    </div>
+
+
 </div>
-<style>
-    .form-check-label {
-        margin-left: 20px;
-    }
-    .btn-primary {
-        width: 100%;
-    }
-</style>
+
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    fetchUserProfile();
-});
 
-function fetchUserProfile() {
-    fetch('/api/account/profile/')
-    .then(response => response.json())
-    .then(data => {
-        document.getElementById('emailAddress').value = data.email;
-        document.getElementById('firstName').value = data.first_name;
-        document.getElementById('lastName').value = data.last_name;
-        document.getElementById('address').value = data.address;
-        document.getElementById('city').value = data.city;
-        document.getElementById('countryRegion').value = data.country_region;
-        document.getElementById('zipCode').value = data.zip_code;
-        document.getElementById('companyName').value = data.company_name;
-        document.getElementById('phoneNumber').value = data.phone_number;
-        document.getElementById('subscribeEmail').checked = data.subscribe_email;
-    })
-    .catch(error => console.log('Error fetching profile:', error));
+// Function to load suspend config from API
+async function loadSuspendConfig() {
+    try {
+        const response = await fetch('/api/admin/suspend_config/'); // GET request to the updated API endpoint
+        const data = await response.json();
+        document.getElementById('invoice-due-days').value = data.invoice_due_days || 0;
+        document.getElementById('suspend-days').value = data.sufficient_balance_suspend_days || 0;
+    } catch (error) {
+        console.error('Error loading suspend config:', error);
+    }
 }
 
-function enableEmailEdit() {
-    document.getElementById('emailAddress').removeAttribute('readonly');
-}
+// Function to update suspend config via API
+async function updateSuspendConfig() {
+    const invoiceDueDays = document.getElementById('invoice-due-days').value;
+    const suspendDays = document.getElementById('suspend-days').value;
 
-function saveProfile() {
-    var profileData = {
-        email: document.getElementById('emailAddress').value,
-        first_name: document.getElementById('firstName').value,
-        last_name: document.getElementById('lastName').value,
-        address: document.getElementById('address').value,
-        city: document.getElementById('city').value,
-        country_region: document.getElementById('countryRegion').value,
-        zip_code: document.getElementById('zipCode').value,
-        company_name: document.getElementById('companyName').value,
-        phone_number: document.getElementById('phoneNumber').value,
-        subscribe_email: document.getElementById('subscribeEmail').checked
+    const payload = {
+        invoice_due_days: Number(invoiceDueDays),
+        sufficient_balance_suspend_days: Number(suspendDays)
     };
 
-    fetch('/api/account/profile/', {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token }}'
-        },
-        body: JSON.stringify(profileData)
-    })
-    .then(response => {
-        if (response.ok) {
-            alert('Profile updated successfully!');
-        } else {
-            alert('Failed to update profile.');
+    try {
+        const response = await fetch('/api/admin/suspend_config/', { // POST request to the updated API endpoint
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update suspend config');
         }
-    })
-    .catch(error => console.log('Error saving profile:', error));
+
+        alert('Suspend config updated successfully');
+    } catch (error) {
+        console.error('Error updating suspend config:', error);
+        alert('Failed to update suspend config');
+    }
 }
-</script>
+
+// Function to clear form inputs and reload data
+function clearSuspendConfig() {
+    loadSuspendConfig(); // Reload data to clear unsaved changes
+}
+
+// Event listeners
+document.getElementById('update-button').addEventListener('click', updateSuspendConfig);
+document.getElementById('clear-button').addEventListener('click', clearSuspendConfig);
+
+loadSuspendConfig(); // Load suspend config when the page loads
+    </script>
+
+
 {% endblock content %}

@@ -26,3 +26,9 @@ class AppSettingRepository:
     def SUFFICIENT_BALANCE_SUSPEND_DAYS(self, value):
         self._SUFFICIENT_BALANCE_SUSPEND_DAYS = value
         AppSetting.objects.update(sufficient_balance_suspend_days=value)
+
+    def to_dict(self):
+        return {
+            'invoice_due_days': self.INVOICE_DUE_DAYS,
+            'sufficient_balance_suspend_days': self.SUFFICIENT_BALANCE_SUSPEND_DAYS
+        }

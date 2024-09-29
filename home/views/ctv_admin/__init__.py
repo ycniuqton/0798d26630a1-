@@ -45,3 +45,7 @@ def ctv_settings(request):
         'balance': balance.amount
     }
     return render(request, "pages/ctv-admin/settings.html", context)
+
+
+def admin_invoices(request):
+    return render(request, "pages/ctv-admin/invoices.html", context={})

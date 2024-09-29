@@ -47,3 +47,21 @@ class InvoiceAPI(APIView):
             'has_next': total > page * page_size,
             'has_previous': page > 1,
         })
+
+    def post(self, request):
+        user = request.user
+        if not user.is_staff:
+            return JsonResponse({'error': 'Permission denied'}, status=403)
+
+        data = json.loads(request.body)
+        due_date = data.get('due_date')
+        invoice_id = data.get('id')
+
+        invoice = Invoice.objects.get(id=invoice_id)
+        if not invoice:
+            return JsonResponse({'error': 'Invoice not found'}, status=404)
+
+        invoice.due_date = due_date
+        invoice.save()
+
+        return JsonResponse({'message': 'Invoice updated successfully'}, status=200)
