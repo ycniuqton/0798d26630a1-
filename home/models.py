@@ -238,6 +238,7 @@ class InvoiceLine(BaseModel):
     vps = models.ForeignKey(Vps, on_delete=models.CASCADE)
     start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(default=timezone.now)
+    cycle = models.CharField(max_length=200, null=True, blank=True)
 
     def __str__(self):
         return f'{self.amount} ({self.status})'

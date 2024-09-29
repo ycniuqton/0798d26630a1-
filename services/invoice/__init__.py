@@ -56,6 +56,7 @@ class InvoiceRepository:
                 description=f"VPS {item.plan_name}",
                 start_time=from_time,
                 end_time=to_time,
+                cycle=cycle,
             )
 
         return invoice

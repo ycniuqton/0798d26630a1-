@@ -397,18 +397,18 @@ class ExpiredVPS(BaseHandler):
         if not vps.is_expired():
             return False
 
-        if vps.auto_renew:
-            # check existed invoice
-            invoice_line = InvoiceLine.objects.filter(vps_id=vps.id, invoice__status='open').first()
-            if invoice_line:
-                return False
+        cycle, from_time, to_time = get_billing_cycle(get_now())
 
+        if vps.auto_renew:
             # send suspend
             publisher = make_kafka_publisher(KafkaConfig)
 
             publisher.publish('gen_invoice', {
                 'user_id': vps.user_id,
-                'items': [vps.id]
+                'items': [vps.id],
+                'cycle': cycle,
+                'from_time': from_time,
+                'to_time': to_time
             })
 
         VPSLogger().log(vps.user, vps, 'expire', 'expired', f'VPS has expired')
@@ -542,7 +542,14 @@ class GenerateInvoice(BaseHandler):
         if not user:
             raise DBInsertFailed("Missing User")
 
-        list_vps = Vps.objects.filter(id__in=payload['items']).all()
+        exited_invoice_line = Invoice.objects.filter(user=user, vps_id__in=payload['items'],
+                                                     cycle=cycle).all()
+        existed_vps_ids = [line.vps_id for line in exited_invoice_line]
+        generating_vps_ids = [vps_id for vps_id in payload['items'] if vps_id not in existed_vps_ids]
+
+        list_vps = Vps.objects.filter(id__in=generating_vps_ids).all()
+        if not list_vps:
+            return
 
         invoice_repo = InvoiceRepository()
         invoice = invoice_repo.create(user.id, items=list_vps, cycle=cycle, from_time=from_time,
