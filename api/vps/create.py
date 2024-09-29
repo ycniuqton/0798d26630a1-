@@ -1,5 +1,6 @@
 import time
 import json
+import uuid
 from datetime import datetime, timedelta
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
@@ -27,6 +28,8 @@ def create_vps(request):
     username = data.get('login', {}).get('username', f'default-{time.time()}')
     sg_id = data.get('location', {}).get('id', 0)
     identifier = data.get('identifier', '')
+    if not identifier:
+        identifier = uuid.uuid4().hex
 
     plid = data.get('plan', {}).get('id', 0)
     image_version = data.get('image', {}).get('version', 'None')
