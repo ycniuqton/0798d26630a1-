@@ -77,6 +77,9 @@ def create_vps(request):
         auto_renew=auto_renew,
     )
     vps.plan = plan
+    if user.is_staff:
+        vps.end_time = to_time
+
     vps.save()
 
     VPSLogger().log(user, vps, 'create', 'creating')
