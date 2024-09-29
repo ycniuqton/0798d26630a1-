@@ -542,7 +542,7 @@ class GenerateInvoice(BaseHandler):
         if not user:
             raise DBInsertFailed("Missing User")
 
-        exited_invoice_line = InvoiceLine.objects.filter(user=user, vps_id__in=payload['items'],
+        exited_invoice_line = InvoiceLine.objects.filter(vps_id__in=payload['items'],
                                                          cycle=cycle).all()
         existed_vps_ids = [line.vps_id for line in exited_invoice_line]
         generating_vps_ids = [vps_id for vps_id in payload['items'] if vps_id not in existed_vps_ids]
