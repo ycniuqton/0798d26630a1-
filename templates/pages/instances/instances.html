@@ -216,7 +216,9 @@ function copyErrorMessage(element) {
                         data.data.forEach(item => {
                             if (item.status == 'error') {
                                 operation_button = `<a href="/instance/${item.id}" class="btn btn-sm btn-outline-primary" >Manage</a>`;
-                                operation_button += `<a href="#" class="btn btn-sm btn-outline-danger" data-error-message="${htmlEncode(item.error_message)}" onclick="copyErrorMessage(this); event.preventDefault();">Copy Error</a>`;
+                                {% if request.user.is_staff %}
+                                    operation_button += `<a href="#" class="btn btn-sm btn-outline-danger" data-error-message="${htmlEncode(item.error_message)}" onclick="copyErrorMessage(this); event.preventDefault();">Copy Error</a>`;
+                                {% endif %}
 
 
                             }
