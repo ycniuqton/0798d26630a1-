@@ -55,7 +55,7 @@ class SuspendConfig(APIView):
 
     def get(self, request):
         user = request.user
-        if not user.is_staff or APPConfig.APP_ROLE != 'admin':
+        if not user.is_staff:
             return JsonResponse({'error': 'Permission denied'}, status=403)
 
         app_setting = AppSettingRepository().to_dict()
@@ -64,7 +64,7 @@ class SuspendConfig(APIView):
 
     def post(self, request):
         user = request.user
-        if not user.is_staff or APPConfig.APP_ROLE != 'admin':
+        if not user.is_staff:
             return JsonResponse({'error': 'Permission denied'}, status=403)
 
         data = request.data
