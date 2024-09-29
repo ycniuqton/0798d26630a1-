@@ -200,6 +200,7 @@
         </div>
     </div>
 
+    {% if APP_ROLE == 'admin' %}
     <div class="mt-4">
         <div class="row">
             <div class="col-md-12">
@@ -398,6 +399,8 @@ function selectServer(serverId, serverElement) {
             margin-right: 8px;
         }
     </style>
+
+    {% endif %}
 
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
