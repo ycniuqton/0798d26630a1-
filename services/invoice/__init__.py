@@ -61,6 +61,8 @@ class InvoiceRepository:
         return invoice
 
     def charge(self, invoice):
+        if invoice.status != Invoice.Status.OPEN:
+            return True
         user = invoice.user
         if user.balance.amount < invoice.amount:
             return False

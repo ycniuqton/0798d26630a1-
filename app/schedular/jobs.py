@@ -31,6 +31,7 @@ class CheckVPSExpired(BaseJob):
     """
 
     def run(self):
+        print("Checking VPS expired")
         # filter not suspended vps
         list_vps = Vps.objects.filter(end_time__lt=get_now()).filter(~Q(_deleted=True)).all()
 
@@ -52,6 +53,7 @@ class CheckInvoiceExpired(BaseJob):
     """
 
     def run(self):
+        print("Checking Invoice expired")
         # filter not suspended vps
         list_invoice = Invoice.objects.filter(due_date__lt=get_now(), status='open').all()
 
@@ -73,6 +75,7 @@ class CheckSuspendVPS(BaseJob):
     """
 
     def run(self):
+        print("Checking Suspend VPS")
         list_invoice = Invoice.objects.filter(status='open').all()
         app_setting = AppSettingRepository()
         publisher = make_kafka_publisher(KafkaConfig)

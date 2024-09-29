@@ -9,7 +9,7 @@ from typing import Dict, Any
 from tenacity import RetryError
 
 from config import KafkaConfig
-from home.models import Vps, VpsStatus, User, TriggeredOnceEvent, Invoice
+from home.models import Vps, VpsStatus, User, TriggeredOnceEvent, Invoice, InvoiceLine
 from adapters.kafka_adapter._exceptions import SkippableException
 from services.app_setting import AppSettingRepository
 from services.invoice import InvoiceRepository, get_billing_cycle, get_now
@@ -397,6 +397,11 @@ class ExpiredVPS(BaseHandler):
             return False
 
         if vps.auto_renew:
+            # check existed invoice
+            invoice_line = InvoiceLine.objects.filter(vps_id=vps.id, invoice__status='open').first()
+            if invoice_line:
+                return False
+
             # send suspend
             publisher = make_kafka_publisher(KafkaConfig)
 
