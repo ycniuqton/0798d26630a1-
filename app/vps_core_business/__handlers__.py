@@ -8,7 +8,8 @@ from marshmallow import Schema, fields, INCLUDE
 from typing import Dict, Any
 from tenacity import RetryError
 
-from config import KafkaConfig
+from config import KafkaConfig, APPConfig
+from do_some_django import app_setting
 from home.models import Vps, VpsStatus, User, TriggeredOnceEvent, Invoice, InvoiceLine
 from adapters.kafka_adapter._exceptions import SkippableException
 from services.app_setting import AppSettingRepository
@@ -459,6 +460,51 @@ class InvoiceExpired(BaseHandler):
         trigger_event = TriggeredOnceEvent()
         trigger_event.invoice_id = invoice.id
         trigger_event.event_name = TriggeredOnceEvent.EventName.INVOICE_EXPIRED
+        trigger_event.user = invoice.user
+        trigger_event.save()
+
+
+class CheckSuspendVps(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            invoice_id = fields.String(required=True)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        close_old_connections()
+        invoice = Invoice.objects.filter(id=payload['invoice_id']).first()
+        if not invoice:
+            raise DBInsertFailed("Missing Order")
+
+        if invoice.is_suspend_triggered():
+            return
+
+        if app_setting.SUFFICIENT_BALANCE_SUSPEND_DAYS == 0:
+            suspend_threshold = timedelta(minutes=APPConfig.MINIMUM_SUSPEND_THRESHOLD)
+        else:
+            suspend_threshold = timedelta(days=app_setting.SUFFICIENT_BALANCE_SUSPEND_DAYS)
+        if invoice._created + suspend_threshold > get_now():
+            return
+
+        publisher = make_kafka_publisher(KafkaConfig)
+        for line in invoice.lines.all():
+            publisher.publish('suspend_vps', {
+                'vps_id': line.vps_id,
+            })
+
+        trigger_event = TriggeredOnceEvent()
+        trigger_event.invoice_id = invoice.id
+        trigger_event.event_name = TriggeredOnceEvent.EventName.INVOICE_SUSPENDED
         trigger_event.user = invoice.user
         trigger_event.save()
 

@@ -63,7 +63,7 @@ class APPConfig:
     BANK_USERNAME = _data.get('BANK_USERNAME')
     WEBHOOK_TOKEN = _data.get('WEBHOOK_TOKEN')
     VND_USD_EXCHANGE_RATE = _data.get('VND_USD_EXCHANGE_RATE', 26000)
-
+    MINIMUM_SUSPEND_THRESHOLD = _data.get('MINIMUM_SUSPEND_THRESHOLD', 2)
 
 
 class KafkaNotifierConfig:
@@ -89,4 +89,3 @@ class PaypalConfig:
     MODE = _data.get("MODE")
     RETURN_URL = _data.get("RETURN_URL")
     CANCEL_URL = _data.get("CANCEL_URL")
-

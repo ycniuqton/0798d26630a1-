@@ -81,18 +81,7 @@ class CheckSuspendVPS(BaseJob):
         publisher = make_kafka_publisher(KafkaConfig)
 
         for invoice in list_invoice:
-            if invoice.is_suspend_triggered():
-                continue
-            if invoice._created + timedelta(days=app_setting.SUFFICIENT_BALANCE_SUSPEND_DAYS) > get_now():
-                continue
+            publisher.publish('check_suspend_vps', {
+                'invoice_id': invoice.id,
+            })
 
-            for line in invoice.lines.all():
-                publisher.publish('suspend_vps', {
-                    'vps_id': line.vps_id,
-                })
-
-            trigger_event = TriggeredOnceEvent()
-            trigger_event.invoice_id = invoice.id
-            trigger_event.event_name = TriggeredOnceEvent.EventName.INVOICE_SUSPENDED
-            trigger_event.user = invoice.user
-            trigger_event.save()
