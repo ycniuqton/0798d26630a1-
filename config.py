@@ -89,3 +89,27 @@ class PaypalConfig:
     MODE = _data.get("MODE")
     RETURN_URL = _data.get("RETURN_URL")
     CANCEL_URL = _data.get("CANCEL_URL")
+
+
+class MailSenderConfig:
+    _data = config_data.get("MAIL_SENDER", {})
+
+    MAIL_SERVER = _data.get("MAIL_SERVER")
+    MAIL_PORT = _data.get("MAIL_PORT")
+    MAIL_USERNAME = _data.get("MAIL_USERNAME")
+    MAIL_PASSWORD = _data.get("MAIL_PASSWORD")
+
+
+class NotificationGatewayConfig:
+    _data = config_data.get("NOTIFICATION_GATEWAY", {})
+
+    KAFKA_SERVER = _data.get("KAFKA_SERVER")
+    TOPIC = _data.get("TOPIC")
+    CONSUMER_GROUP = _data.get("CONSUMER_GROUP")
+    ENABLE_KAFKA_SSL = _data.get('ENABLE_KAFKA_SSL')
+    KAFKA_SECURITY_PROTOCOL = _data.get('KAFKA_SECURITY_PROTOCOL')
+    KAFKA_SASL_MECHANISM = _data.get('KAFKA_SASL_MECHANISM')
+    KAFKA_SASL_PLAIN_USERNAME = _data.get('KAFKA_SASL_PLAIN_USERNAME')
+    KAFKA_SASL_PLAIN_PASSWORD = _data.get('KAFKA_SASL_PLAIN_PASSWORD')
+    KAFKA_SSL_CHECK_HOSTNAME = _data.get('KAFKA_SSL_CHECK_HOSTNAME')
+    KAFKA_SSL_CA_FILE = _data.get('KAFKA_SSL_CA_FILE')

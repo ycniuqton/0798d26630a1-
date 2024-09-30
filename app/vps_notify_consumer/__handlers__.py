@@ -6,6 +6,7 @@ from tenacity import RetryError
 
 from home.models import Vps, VpsStatus, User
 from adapters.kafka_adapter._exceptions import SkippableException
+from services.mail_service import VPSMailService
 from services.vps_log import VPSLogger
 from core import settings
 
@@ -50,6 +51,8 @@ class VPSCreated(BaseHandler):
         vps.linked_id = data.get('vpsid')
         vps.status = VpsStatus.ON
         vps.save()
+
+        VPSMailService().send_vps_created_email(vps.user, vps)
 
 
 class VPSCreatedError(BaseHandler):

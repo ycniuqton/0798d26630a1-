@@ -4,6 +4,7 @@ from rest_framework.authtoken.models import Token
 from datetime import datetime, timedelta
 from django.views.generic import CreateView
 from services.account import AccountRepository
+from services.mail_service import VPSMailService
 
 
 class CustomUserLoginView(UserLoginView):
@@ -96,4 +97,5 @@ class UserRegistrationView(CreateView):
             user = get_user_model().objects.get(username=request.POST['username'])
             ar = AccountRepository()
             ar.create_account(user.id)
+            VPSMailService().send_register_email(user)
         return response

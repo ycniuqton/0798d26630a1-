@@ -44,6 +44,12 @@ def run_notify_consumer():
     vps_notify_consumer()
 
 
+@cli.command()
+def run_notification_gateway():
+    from app.notification_gateway import run as notification_gateway
+    notification_gateway()
+
+
 if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     logger.info("Starting the app")
