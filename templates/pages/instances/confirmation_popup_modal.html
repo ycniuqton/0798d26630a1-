@@ -14,6 +14,10 @@
                     <p>Enter the email of the user to give these instances to:</p>
                     <input type="email" id="userEmail" class="form-control" placeholder="user@example.com">
                 </div>
+                <div id="deleteConfirmationInput" class="d-none">
+                    <p>Please type "Delete" to confirm deletion:</p>
+                    <input type="text" id="deleteConfirmation" class="form-control" placeholder="Delete">
+                </div>
                 <div id="selectedInstancesList"></div>
             </div>
             <div class="modal-footer">
@@ -61,12 +65,28 @@
 
         // Handle "Give to Other User" action
         var giveUserInput = document.getElementById('giveUserInput');
+        var deleteConfirmationInput = document.getElementById('deleteConfirmationInput');
         if (action.toLowerCase() === 'give') {
             giveUserInput.classList.remove('d-none');
+            deleteConfirmationInput.classList.add('d-none');
             document.getElementById('confirmAction').textContent = 'Give';
+            document.getElementById('confirmAction').disabled = false;
+
+        } else if (action.toLowerCase() === 'delete') {
+            giveUserInput.classList.add('d-none');
+            deleteConfirmationInput.classList.remove('d-none');
+            document.getElementById('confirmAction').textContent = 'Delete';
+            document.getElementById('confirmAction').disabled = true;
+
+            document.getElementById('deleteConfirmation').addEventListener('input', function() {
+                const inputVal = document.getElementById('deleteConfirmation').value;
+                document.getElementById('confirmAction').disabled = inputVal !== 'Delete';
+            });
         } else {
             giveUserInput.classList.add('d-none');
+            deleteConfirmationInput.classList.add('d-none');
             document.getElementById('confirmAction').textContent = 'Confirm';
+            document.getElementById('confirmAction').disabled = false;
         }
 
         // Show modal

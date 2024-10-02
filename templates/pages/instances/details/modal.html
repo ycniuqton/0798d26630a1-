@@ -1,5 +1,6 @@
 <!-- Modal -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -9,7 +10,8 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p id="confirmationMessage">Are you sure you want to perform this action on <strong id="instanceName">123</strong>?</p>
+                <p id="confirmationMessage">Are you sure you want to perform this action on <strong id="instanceName">123</strong>?
+                </p>
                 <div id="vncLink" class="d-none">
                     <p>Click the link below to open VNC:</p>
                     <a href="#" id="vncLinkHref" target="_blank">Open VNC</a>
@@ -24,7 +26,11 @@
                 </div>
                 <div id="newPasswordInput" class="d-none">
                     <p>Enter a new password for this instance:</p>
-                    <input type="" id="newPassword" class="form-control" placeholder="New Password">
+                    <input type="password" id="newPassword" class="form-control" placeholder="New Password">
+                </div>
+                <div id="deleteConfirmationInput" class="d-none">
+                    <p>Please type "Delete" to confirm deletion:</p>
+                    <input type="text" id="deleteConfirmation" class="form-control" placeholder="Delete">
                 </div>
             </div>
             <div class="modal-footer">
@@ -48,6 +54,7 @@
         document.getElementById('snapshotDropdown').classList.add('d-none');
         document.getElementById('giveUserInput').classList.add('d-none');
         document.getElementById('newPasswordInput').classList.add('d-none');
+        document.getElementById('deleteConfirmationInput').classList.add('d-none');
         document.getElementById('confirmAction').classList.remove('d-none');
         document.getElementById('openVncAction').classList.add('d-none');
         document.getElementById('restoreAction').classList.add('d-none');
@@ -88,6 +95,16 @@
         } else if (action === 'change_pass') {
             document.getElementById('newPasswordInput').classList.remove('d-none');
             document.getElementById('confirmAction').textContent = 'Change Password';
+
+        } else if (action === 'delete') {
+            document.getElementById('deleteConfirmationInput').classList.remove('d-none');
+            document.getElementById('confirmAction').textContent = 'Delete';
+            document.getElementById('confirmAction').disabled = true;
+
+            document.getElementById('deleteConfirmation').addEventListener('input', function() {
+                const inputVal = document.getElementById('deleteConfirmation').value;
+                document.getElementById('confirmAction').disabled = inputVal !== 'Delete';
+            });
         }
 
         // Show modal
@@ -116,7 +133,13 @@
             .then(response => {
                 if (response.ok) {
                     alert(`Instance ${action}ed successfully!`);
+
+                    if (action === 'delete') {
+                        location.href = '/instances/';
+                        }
+                    else{
                     location.reload();
+                    }
                 } else {
                     alert(`Failed to ${action} instance.`);
                 }
