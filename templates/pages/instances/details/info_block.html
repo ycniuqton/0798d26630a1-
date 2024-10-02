@@ -67,7 +67,7 @@ h2 {
             </div>
             <div class="item">
                 <div class="title">DISK</div>
-                <div class="value">{{stats.used_disk}}GB <span>of {{instance.disk}}GB</span></div>
+                <div class="value">{{ stats.used_disk|floatformat:2 }}GB<span> of {{instance.disk}}GB</span></div>
                 <div class="icon">
                     <i class="icon feather icon-inbox"></i>
                 </div>

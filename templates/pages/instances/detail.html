@@ -42,7 +42,7 @@
 </script>
 
 <div class="container detail-container">
-    <h2 style="display:flex;align-items: center;">Server-01 <span class="badge badge-success status-badge">
+    <h2 style="display:flex;align-items: center;">{{instance.hostname| upper }}<span class="badge badge-success status-badge">
         {% if stats.status == 0 %}
         Off
         {% elif stats.status == 1 %}
