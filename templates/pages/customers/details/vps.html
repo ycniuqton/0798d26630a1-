@@ -30,7 +30,7 @@
 <!--                class="fas fa-database"></i><span>Backup</span></button>-->
         <button class="action-button" data-color="#007bff" onclick="handleAction('give')"><i
                 class="fas fa-user-plus"></i><span>Give to Other User</span></button>
-        {% if request.user.is_staff %}
+        {% if request.user.is_staff and APP_ROLE == 'admin' %}
         <button class="action-button" data-color="#000000" onclick="handleAction('suspend')"><i
                 class="fas fa-lock"></i><span>Suspend</span></button>
         <button class="action-button" data-color="#0ec8dd" onclick="handleAction('unsuspend')"><i

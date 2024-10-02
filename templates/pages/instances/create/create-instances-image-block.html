@@ -110,9 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 version: imageVersion
             };
 
-            // Trigger configuration update
-            document.getElementById('config_updated').value = 'true';
-            document.getElementById('config_updated').dispatchEvent(new Event('change'));
+
 
             // update user
             if ( imageName == 'windows') {
@@ -120,6 +118,11 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 document.getElementById('login').value = 'root';
             }
+            vpsConfiguration.login.username = document.getElementById('login').value;
+
+            // Trigger configuration update
+            document.getElementById('config_updated').value = 'true';
+            document.getElementById('config_updated').dispatchEvent(new Event('change'));
         });
     });
 

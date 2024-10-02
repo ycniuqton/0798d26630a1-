@@ -6,7 +6,7 @@
     </div>
     <div class="form-group">
         <label for="login">Login</label>
-        <input type="text" class="form-control" id="login" value="root">
+        <input type="text" class="form-control" id="login">
     </div>
     <div class="form-group">
         <label for="password">Password</label>
@@ -66,7 +66,6 @@
             vpsConfiguration.login.hostname = hostnameInput.value;
             vpsConfiguration.login.username = loginInput.value;
             vpsConfiguration.login.password = passwordInput.value;
-
             configUpdated.value = 'true';
             configUpdated.dispatchEvent(new Event('change'));
         }
