@@ -19,6 +19,7 @@ class UpdateVpsStat(BaseJob):
     """
 
     def run(self):
+        print("Updating VPS stats")
         cvr = CachedVpsStatRepository()
         cvr.reload()
         print("Vps stats updated!")

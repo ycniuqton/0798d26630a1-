@@ -16,12 +16,12 @@ def main():
     scheduler = BlockingScheduler()
 
     # Instantiate the job
-    # update_vps_stat = UpdateVpsStat()
+    update_vps_stat = UpdateVpsStat()
     check_vps_expired = CheckVPSExpired()
     check_invoice_expired = CheckInvoiceExpired()
     check_vps_suspend = CheckSuspendVPS()
 
-    # scheduler.add_job(update_vps_stat.run, 'cron', hour='*', minute='*')
+    scheduler.add_job(update_vps_stat.run, 'cron', hour='*', minute='*')
     scheduler.add_job(check_vps_expired.run, 'cron', hour='*', minute='*')
     scheduler.add_job(check_invoice_expired.run, 'cron', hour='*', minute='*')
     scheduler.add_job(check_vps_suspend.run, 'cron', hour='*', minute='*')

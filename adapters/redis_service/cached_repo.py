@@ -28,8 +28,8 @@ class CachedVpsStatRepository(CachedRepository):
     suffix = "repository"
 
     def reload(self, vps_ids=[]):
-        base_url = settings.ADMIN_CONFIG.URL
-        api_key = settings.ADMIN_CONFIG.API_KEY
+        base_url = settings.VIRTUALIZOR_CONFIG.MANAGER_URL
+        api_key = settings.VIRTUALIZOR_CONFIG.API_KEY
 
         vps_service = VPSService(base_url, api_key)
         stats = vps_service.get_stat(vps_ids)
