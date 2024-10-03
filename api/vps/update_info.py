@@ -17,29 +17,23 @@ from services.balance import BalanceRepository
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def change_pass_vps(request):
+def update_info(request, vps_id):
     data = json.loads(request.body)
     user = request.user
-    vps_ids = data.get('vps_ids', [])
-    vps_linked_ids = data.get('linked_ids', [])
-    password = data.get('password')
-    restart = data.get('restart', False)
+    updatable_fields = ['auto_renew']
+    new_data = {}
+    for field in updatable_fields:
+        if field in data:
+            new_data[field] = data[field]
 
-    if vps_ids:
-        list_vps = Vps.objects.filter(id__in=vps_ids)
-    else:
-        list_vps = Vps.objects.filter(linked_id__in=vps_linked_ids)
-    if not user.is_staff:
-        list_vps.filter(user_id=user.id)
-    list_vps = list(list_vps)
+    vps = Vps.objects.get(id=vps_id)
+    if not vps:
+        return JsonResponse('Invalid Request', safe=False)
+    if not user.is_staff and vps.user_id != user.id:
+        return JsonResponse('Permission denied', safe=False)
 
-    publisher = make_kafka_publisher(KafkaConfig)
-    for vps in list_vps:
-        payload = {
-            "vps_id": vps.id,
-            "password": password,
-            "restart": restart,
-        }
-        publisher.publish('change_pass_vps', payload)
+    for field, value in new_data.items():
+        setattr(vps, field, value)
 
+    vps.save()
     return JsonResponse('', safe=False)

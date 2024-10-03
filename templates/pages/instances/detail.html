@@ -61,16 +61,20 @@
                 class="fas fa-stop"></i><span>Stop</span></button>
         <button class="action-button" data-color="#ffc107" onclick="performAction('restart')"><i
                 class="fas fa-redo"></i><span>Restart</span></button>
+        {% if request.user.is_staff and APP_ROLE == 'admin' %}
         <button class="action-button" data-color="rgb(143 7 255)" onclick="performAction('delete')"><i
                 class="fas fa-trash"></i><span>Delete</span></button>
+        {% endif %}
         <button class="action-button" data-color="#17a2b8" onclick="performAction('vnc')"><i
                 class="fas fa-desktop"></i><span>VNC</span></button>
 <!--        <button class="action-button" data-color="#6c757d" onclick="performAction('backup')"><i-->
 <!--                class="fas fa-database"></i><span>Backup</span></button>-->
 <!--        <button class="action-button" data-color="#6c757d" onclick="performAction('restore')"><i-->
 <!--                class="fas fa-undo"></i><span>Restore</span></button>-->
+        {% if request.user.is_staff %}
         <button class="action-button" data-color="#007bff" onclick="performAction('give')"><i
                 class="fas fa-user-plus"></i><span>Give to Other User</span></button>
+        {% endif %}
         <button class="action-button" data-color="#80FFA7" onclick="performAction('change_pass')"><i
                 class="fas fa-user-plus"></i><span>Change pass</span></button>
         {% if request.user.is_staff and APP_ROLE == 'admin' %}

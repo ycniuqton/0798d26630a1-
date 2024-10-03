@@ -1,89 +1,88 @@
 <style>
 
-.utilization-container {
+    .utilization-container {
 
-    margin: 0 auto;
-    text-align: center;
-}
+        margin: 0 auto;
+        text-align: center;
+    }
 
-h2 {
-    font-size: 24px;
-    color: #333;
-    margin-bottom: 20px;
-}
+    h2 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 20px;
+    }
 
-.utilization-box {
-    display: flex;
-    justify-content: space-around;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-}
+    .utilization-box {
+        display: flex;
+        justify-content: space-around;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
 
-.item {
-    text-align: center;
-}
+    .item {
+        text-align: center;
+    }
 
-.item .title {
-    font-size: 14px;
-    color: #888;
-    margin-bottom: 10px;
-}
+    .item .title {
+        font-size: 14px;
+        color: #888;
+        margin-bottom: 10px;
+    }
 
-.item .value {
-    font-size: 20px;
-    color: #007bff;
-    margin-bottom: 10px;
-}
+    .item .value {
+        font-size: 20px;
+        color: #007bff;
+        margin-bottom: 10px;
+    }
 
-.item .value span {
-    font-size: 14px;
-    color: #888;
-}
+    .item .value span {
+        font-size: 14px;
+        color: #888;
+    }
 
-.icon img {
-    width: 40px;
-    height: auto;
-    opacity: 0.3;
-}
+    .icon img {
+        width: 40px;
+        height: auto;
+        opacity: 0.3;
+    }
 
 </style>
 <div class="utilization-container">
-        <div class="utilization-box">
-            <div class="item">
-                <div class="title">CPU</div>
-                <div class="value">{{stats.used_cpu}}% <span>of {{instance.cpu}} CPU</span></div>
-                <div class="icon">
-                    <i class="icon feather icon-cpu"></i>
-                </div>
+    <div class="utilization-box">
+        <div class="item">
+            <div class="title">CPU</div>
+            <div class="value">{{stats.used_cpu}}% <span>of {{instance.cpu}} CPU</span></div>
+            <div class="icon">
+                <i class="icon feather icon-cpu"></i>
             </div>
-            <div class="item">
-                <div class="title">RAM</div>
-                <div class="value">{{stats.used_ram}}MB <span>of {{instance.ram}}MB</span></div>
-                <div class="icon">
-                    <i class="icon feather icon-film"></i>
-                </div>
+        </div>
+        <div class="item">
+            <div class="title">RAM</div>
+            <div class="value">{{stats.used_ram}}MB <span>of {{instance.ram}}MB</span></div>
+            <div class="icon">
+                <i class="icon feather icon-film"></i>
             </div>
-            <div class="item">
-                <div class="title">DISK</div>
-                <div class="value">{{ stats.used_disk|floatformat:2 }}GB<span> of {{instance.disk}}GB</span></div>
-                <div class="icon">
-                    <i class="icon feather icon-inbox"></i>
-                </div>
+        </div>
+        <div class="item">
+            <div class="title">DISK</div>
+            <div class="value">{{ stats.used_disk|floatformat:2 }}GB<span> of {{instance.disk}}GB</span></div>
+            <div class="icon">
+                <i class="icon feather icon-inbox"></i>
             </div>
-            <div class="item">
-                <div class="title">TRAFFIC</div>
-                <div class="value">{{stats.used_bandwidth}}GB <span>of {{instance.network_speed}}GB</span></div>
-                <div class="icon">
-                    <i class="icon feather icon-bar-chart-2"></i>
-                </div>
+        </div>
+        <div class="item">
+            <div class="title">TRAFFIC</div>
+            <div class="value">{{stats.used_bandwidth}}GB <span>of {{instance.network_speed}}GB</span></div>
+            <div class="icon">
+                <i class="icon feather icon-bar-chart-2"></i>
             </div>
         </div>
     </div>
+</div>
 
 <div class="card card-custom mt-2">
-
 
 
     <div class="card-header">
@@ -126,10 +125,12 @@ h2 {
                     </select>
 
                     <!-- Password input, hidden initially -->
-                    <input type="password" id="os-password" class="form-control d-none mt-2 mb-2" placeholder="Enter password">
+                    <input type="password" id="os-password" class="form-control d-none mt-2 mb-2"
+                           placeholder="Enter password">
 
                     <button id="update-os-btn" class="btn btn-primary d-none" onclick="updateOs()">Update</button>
-                    <button id="cancel-os-btn" class="btn btn-secondary d-none" onclick="cancelOsChange()">Cancel</button>
+                    <button id="cancel-os-btn" class="btn btn-secondary d-none" onclick="cancelOsChange()">Cancel
+                    </button>
                 </td>
             </tr>
             <tr>
@@ -144,6 +145,47 @@ h2 {
                 <th>End Date</th>
                 <td>{{ instance.end_time }}</td>
             </tr>
+            <tr>
+                <th>Renewable</th>
+                <td>
+                    <div class="form-check">
+                        {% if instance.auto_renew %}
+                            <input class="form-check-input" type="checkbox" id="autoRenewCheckbox" checked>
+                        {% else %}
+                            <input class="form-check-input" type="checkbox" id="autoRenewCheckbox">
+                        {% endif %}
+                        <label class="form-check-label" for="autoRenewCheckbox">Auto Renew</label>
+                    </div>
+                </td>
+            </tr>
+
+            <script>
+                document.getElementById('autoRenewCheckbox').addEventListener('change', function() {
+                    var isChecked = this.checked;
+                    var vpsId = "{{ instance.id }}"; // Assuming 'instance.id' holds the VPS ID
+
+                    fetch(`/api/vps/${vpsId}/update_info/`, {
+                        method: 'POST', // Use 'PUT' or 'PATCH' if applicable
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}' // Ensure CSRF protection if needed
+                        },
+                        body: JSON.stringify({ 'auto_renew': isChecked })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            console.log('Auto Renew updated successfully');
+                        } else {
+                            console.error('Failed to update Auto Renew');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                });
+            </script>
+
         </table>
     </div>
 </div>

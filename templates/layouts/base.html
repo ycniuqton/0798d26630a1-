@@ -11,82 +11,104 @@
     {% block extrastyle %}{% endblock extrastyle %}
     {% block extrahead %}{% endblock extrahead %}
     <script>
-            function generateUUID() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-        var r = Math.random() * 16 | 0,
-            v = c == 'x' ? r : (r & 0x3 | 0x8);
-        return v.toString(16);
-    });
+        function generateUUID() {
+return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0,
+        v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+});
 }
 
     </script>
 
     <style>
-    .action-block {
-        display: flex;
-        justify-content: space-around;
-        padding: 20px;
-        background: #f5f5f5;
-        border-radius: 10px;
-        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-        margin: 20px 0;
-    }
-    .action-button {
-        margin: 0 5px;
-        padding: 10px 20px;
-        font-size: 14px;
-        border: none;
-        border-radius: 5px;
-        text-align: center;
-        background-color: #ffffff;
-        color: var(--main-color, #007bff);
-        transition: background-color 0.3s, color 0.3s;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    .action-button i {
-        font-size: 20px;
-        margin-right: 8px;
-    }
-    .action-button span {
-        font-size: 14px;
-        font-weight: bold;
-    }
-
-    .loader-line {
-            display: none; /* Hidden by default */
-            height: 4px;
-            width: 100%;
-            background-color: #3498db; /* Blue color for the loader */
-            position: fixed;
-            top: 0;
-            left: 0;
-            animation: loading 2s linear infinite; /* Loading animation */
+        .action-block {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            margin: 20px 0;
         }
-            .sidebar-selected {
-      background: #474df3;
-    }
-    ul.pcoded-submenu li:hover {
-        background: #474df3;
-    }
-    ul.pcoded-submenu li a {
-        text-decoration: none;
-    }
-
-    /* Animation keyframes for the loader */
-        @keyframes loading {
-            0% {
-                transform: translateX(-100%);
-            }
-            50% {
-                transform: translateX(0%);
-            }
-            100% {
-                transform: translateX(100%);
-            }
+        .action-button {
+            margin: 0 5px;
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            background-color: #ffffff;
+            color: var(--main-color, #007bff);
+            transition: background-color 0.3s, color 0.3s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
+        .action-button i {
+            font-size: 20px;
+            margin-right: 8px;
+        }
+        .action-button span {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .loader-line {
+                display: none; /* Hidden by default */
+                height: 4px;
+                width: 100%;
+                background-color: #3498db; /* Blue color for the loader */
+                position: fixed;
+                top: 0;
+                left: 0;
+                animation: loading 2s linear infinite; /* Loading animation */
+            }
+                .sidebar-selected {
+          background: #474df3;
+        }
+        ul.pcoded-submenu li:hover {
+            background: #474df3;
+        }
+        ul.pcoded-submenu li a {
+            text-decoration: none;
+        }
+
+        /* Animation keyframes for the loader */
+            @keyframes loading {
+                0% {
+                    transform: translateX(-100%);
+                }
+                50% {
+                    transform: translateX(0%);
+                }
+                100% {
+                    transform: translateX(100%);
+                }
+            }
+
+                .small-text{
+            font-size: small;
+        }
+        .green-text{
+            color: green;
+        }
+        .medium-text{
+            font-size: medium;
+        }
+        .red-text{
+            color: red;
+        }
+
+        .pointable {
+         cursor: pointer;}
+
+        .prevent-select {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
 
     </style>
 </head>
@@ -132,45 +154,45 @@
 
 
 <script>
-  function adjustColorBrightness(color, amount) {
-        let usePound = false;
-        if (color[0] === "#") {
-            color = color.slice(1);
-            usePound = true;
-        }
-        const num = parseInt(color, 16);
-        let r = (num >> 16) + amount;
-        let g = ((num >> 8) & 0x00FF) + amount;
-        let b = (num & 0x0000FF) + amount;
-        r = r < 255 ? (r < 0 ? 0 : r) : 255;
-        g = g < 255 ? (g < 0 ? 0 : g) : 255;
-        b = b < 255 ? (b < 0 ? 0 : b) : 255;
-        return (usePound ? "#" : "") + (r << 16 | g << 8 | b).toString(16).padStart(6, '0');
-    }
+    function adjustColorBrightness(color, amount) {
+          let usePound = false;
+          if (color[0] === "#") {
+              color = color.slice(1);
+              usePound = true;
+          }
+          const num = parseInt(color, 16);
+          let r = (num >> 16) + amount;
+          let g = ((num >> 8) & 0x00FF) + amount;
+          let b = (num & 0x0000FF) + amount;
+          r = r < 255 ? (r < 0 ? 0 : r) : 255;
+          g = g < 255 ? (g < 0 ? 0 : g) : 255;
+          b = b < 255 ? (b < 0 ? 0 : b) : 255;
+          return (usePound ? "#" : "") + (r << 16 | g << 8 | b).toString(16).padStart(6, '0');
+      }
 
-    document.querySelectorAll('.action-button').forEach(button => {
-        const mainColor = button.getAttribute('data-color');
-        const hoverColor = adjustColorBrightness(mainColor, -50);
-        button.style.setProperty('--main-color', mainColor);
+      document.querySelectorAll('.action-button').forEach(button => {
+          const mainColor = button.getAttribute('data-color');
+          const hoverColor = adjustColorBrightness(mainColor, -50);
+          button.style.setProperty('--main-color', mainColor);
 
-        button.addEventListener('mouseover', () => {
-            button.style.backgroundColor = mainColor;
-            button.style.color = '#ffffff';
-        });
+          button.addEventListener('mouseover', () => {
+              button.style.backgroundColor = mainColor;
+              button.style.color = '#ffffff';
+          });
 
-        button.addEventListener('mouseout', () => {
-            button.style.backgroundColor = '#ffffff';
-            button.style.color = mainColor;
-        });
+          button.addEventListener('mouseout', () => {
+              button.style.backgroundColor = '#ffffff';
+              button.style.color = mainColor;
+          });
 
-        button.addEventListener('mousedown', () => {
-            button.style.transform = 'translateY(-2px)';
-        });
+          button.addEventListener('mousedown', () => {
+              button.style.transform = 'translateY(-2px)';
+          });
 
-        button.addEventListener('mouseup', () => {
-            button.style.transform = 'translateY(0)';
-        });
-    });
+          button.addEventListener('mouseup', () => {
+              button.style.transform = 'translateY(0)';
+          });
+      });
 
 </script>
 </body>

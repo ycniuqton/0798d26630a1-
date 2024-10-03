@@ -672,6 +672,7 @@ class ChangePassVPS(BaseHandler):
         class MySchema(Schema):
             vps_id = fields.String(required=True)
             password = fields.String(required=True)
+            restart = fields.Boolean(required=False, default=False)
 
             class Meta:
                 unknown = INCLUDE
@@ -687,7 +688,7 @@ class ChangePassVPS(BaseHandler):
         if not vps:
             raise DBInsertFailed("Missing Order")
         password = payload.get('password')
-
+        restart = payload.get('restart')
         base_url = settings.ADMIN_CONFIG.URL
         api_key = settings.ADMIN_CONFIG.API_KEY
 
@@ -699,5 +700,7 @@ class ChangePassVPS(BaseHandler):
                 'linked_id': vps.linked_id,
                 'password': password
             })
+            if restart:
+                response = service.restart(vps.linked_id)
         except:
             raise SkippableException("Failed to change pass VPS")

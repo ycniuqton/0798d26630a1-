@@ -29,6 +29,7 @@ class VpsSnapshotAPI(APIView):
 
         vps_backup = CachedVpsBackup()
         vps_backup_data = vps_backup.get(str(vps.linked_id))
+        vps_backup_data = vps_backup_data or []
 
         # update backup count
         if vps.backup_count != len(vps_backup_data):

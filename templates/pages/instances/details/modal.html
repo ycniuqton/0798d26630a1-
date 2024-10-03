@@ -1,4 +1,17 @@
 <!-- Modal -->
+<style>
+    .restart-box{
+        border: 1px solid;
+    border-radius: 6px;
+    padding-left: 30px;
+    width: 240px;
+    height: 40px;
+    padding-top: 7px;
+    background: #f75b5b;
+    color: #ffffff;
+    }
+</style>
+
 <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel"
      aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -12,27 +25,55 @@
             <div class="modal-body">
                 <p id="confirmationMessage">Are you sure you want to perform this action on <strong id="instanceName">123</strong>?
                 </p>
+
+                <!-- VNC Link Section -->
                 <div id="vncLink" class="d-none">
                     <p>Click the link below to open VNC:</p>
                     <a href="#" id="vncLinkHref" target="_blank">Open VNC</a>
                 </div>
+
+                <!-- Snapshot Dropdown Section -->
                 <div id="snapshotDropdown" class="d-none">
                     <p>Select a snapshot to restore:</p>
                     <select id="snapshotSelect" class="form-control"></select>
                 </div>
+
+                <!-- User Input for Giving Instance -->
                 <div id="giveUserInput" class="d-none">
                     <p>Enter the email of the user to give this instance to:</p>
                     <input type="email" id="userEmail" class="form-control" placeholder="user@example.com">
                 </div>
+
+                <!-- New Password Input Section -->
+
+
                 <div id="newPasswordInput" class="d-none">
                     <p>Enter a new password for this instance:</p>
-                    <input type="password" id="newPassword" class="form-control" placeholder="New Password">
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="newPassword">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button"
+                                    onclick="togglePasswordVisibility2()">
+                                <i class="fas fa-eye" id="toggle-password-icon-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-check mt-3 restart-box">
+                        <input class="form-check-input" type="checkbox" value="" id="restartVpsCheckbox">
+                        <label class="form-check-label pointable prevent-select " for="restartVpsCheckbox">
+                            Restart VPS immediately
+                        </label>
+                    </div>
                 </div>
+
+                <!-- Delete Confirmation Section -->
                 <div id="deleteConfirmationInput" class="d-none">
                     <p>Please type "Delete" to confirm deletion:</p>
                     <input type="text" id="deleteConfirmation" class="form-control" placeholder="Delete">
                 </div>
+
             </div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
                 <button type="button" class="btn btn-primary" id="confirmAction">Confirm</button>
@@ -42,6 +83,22 @@
         </div>
     </div>
 </div>
+
+<script>
+                        function togglePasswordVisibility2() {
+        const passwordField = document.getElementById('newPassword');
+        const toggleIcon = document.getElementById('toggle-password-icon-2');
+        if (passwordField.type === 'password') {
+            passwordField.type = 'text';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        } else {
+            passwordField.type = 'password';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        }
+    }
+                    </script>
 
 <script>
     function performAction(action) {
@@ -119,6 +176,7 @@
                 body.user_email = document.getElementById('userEmail').value;
             } else if (action === 'change_pass') {
                 body.password = document.getElementById('newPassword').value;
+                body.restart = document.getElementById('restartVpsCheckbox').checked;
             }
 
             // Make API call

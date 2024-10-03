@@ -98,6 +98,30 @@
         max-width: 200px;
         height: auto;
     }
+
+    .suggestion-box {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .suggestion-amount {
+        padding: 10px 20px;
+        background-color: #e7ffea;
+        border: 1px solid #28a745;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.2em;
+        transition: background-color 0.3s ease-in-out;
+        min-width: 100px;
+        text-align: center;
+    }
+
+    .suggestion-amount:hover {
+        background-color: #007bff;
+        color: white;
+    }
 </style>
 {% endblock extrastyle %}
 
@@ -119,9 +143,7 @@
                     <!-- Bank Transfer Card -->
                     <div id="bank-card" class="card payment-method">
                         <div class="icon">
-                            <img src="/static/assets/images/custom/BIDV_Logo.png" style="
-    width: 140px;
-">
+                            <img src="/static/assets/images/custom/BIDV_Logo.png" style="width: 140px;">
                         </div>
                         <h4>Bank Transfer</h4>
                     </div>
@@ -134,14 +156,31 @@
                     </div>
                 </div>
 
-                <!-- Receiver Information -->
-
+                <!-- Suggested Top-up Amounts -->
+                {% if APP_ROLE == 'ctv' %}
+                <div class="suggestion-box">
+                    <div class="suggestion-amount" data-amount="5">$5</div>
+                    <div class="suggestion-amount" data-amount="10">$10</div>
+                    <div class="suggestion-amount" data-amount="20">$20</div>
+                    <div class="suggestion-amount" data-amount="50">$50</div>
+                    <div class="suggestion-amount" data-amount="100">$100</div>
+                    <div class="suggestion-amount" data-amount="500">$500</div>
+                    <div class="suggestion-amount" data-amount="1000">$1000</div>
+                </div>
+                {% else %}
+                <div class="suggestion-box">
+                    <div class="suggestion-amount" data-amount="500">$500</div>
+                    <div class="suggestion-amount" data-amount="1000">$1000</div>
+                    <div class="suggestion-amount" data-amount="2000">$2000</div>
+                    <div class="suggestion-amount" data-amount="5000">$5000</div>
+                    <div class="suggestion-amount" data-amount="10000">$10000</div>
+                </div>
+                {% endif %}
 
                 <!-- Deposit Amount Input -->
                 <div class="deposit-amount">
                     <label for="deposit-amount">Enter Deposit Amount (in USD):</label>
-                    <input type="number" id="deposit-amount" class="form-control" placeholder="0.00" min="1"
-                           step="0.01">
+                    <input type="number" id="deposit-amount" class="form-control" placeholder="0.00" min="1" step="0.01">
                 </div>
 
                 <!-- QR Code for Bank Transfer -->
@@ -154,7 +193,6 @@
                     <h4>Receiver Information</h4>
                     <p id="receiver-details"></p>
                 </div>
-
 
                 <!-- Deposit Button -->
                 <div class="mt-4">
@@ -199,8 +237,6 @@
         deactivateAllCards();
         document.getElementById('bank-card').classList.add('active');
         selectedMethod = 'bank';
-
-
     });
 
     document.getElementById('crypto-card').addEventListener('click', function() {
@@ -210,12 +246,23 @@
         selectedMethod = 'crypto';
     });
 
+    document.querySelectorAll('.suggestion-amount').forEach(function(el) {
+        el.addEventListener('click', function() {
+            var amount = this.getAttribute('data-amount');
+            document.getElementById('deposit-amount').value = amount;
+        });
+    });
+
     document.getElementById('deposit-btn').addEventListener('click', function() {
         var amount = document.getElementById('deposit-amount').value;
         if (!amount || amount <= 0) {
             alert('Please enter a valid deposit amount.');
             return;
         }
+        document.getElementById('loader').style.display = 'block';
+        setTimeout(() => {
+            document.getElementById('loader').style.display = 'none';
+        }, 3000);
 
         if (selectedMethod === 'paypal' || selectedMethod === 'crypto') {
             var paymentType = selectedMethod === 'paypal' ? 'paypal' : 'crypto';
@@ -233,37 +280,35 @@
                     alert('An error occurred while processing your payment.');
                 });
         } else if (selectedMethod === 'bank') {
-        var vnd_amount = parseInt( parseFloat(amount) * {{VND_USD_EXCHANGE_RATE}});
+            var vnd_amount = parseInt(parseFloat(amount) * {{VND_USD_EXCHANGE_RATE}});
             receiver_info = document.getElementById('receiver-info');
-        receiver_info.style.display = 'block';
-        receiver_info.innerHTML = `
-    <table style="border-collapse: collapse; width: 100%;">
-        <tr>
-            <td style="padding: 10px; font-weight: bold;">Bank:</td>
-            <td style="padding: 10px;">{{BANK_NAME}}</td>
-        </tr>
-        <tr>
-            <td style="padding: 10px; font-weight: bold;">Account:</td>
-            <td style="padding: 10px;">{{BANK_ACCOUNT}}</td>
-        </tr>
-        <tr>
-            <td style="padding: 10px; font-weight: bold;">Name:</td>
-            <td style="padding: 10px;">{{BANK_USERNAME}}</td>
-        </tr>
-        <tr>
-            <td style="padding: 10px; font-weight: bold;">Amount:</td>
-            <td style="padding: 10px;">${vnd_amount} VND</td>
-        </tr>
-        <tr>
-            <td style="padding: 10px; font-weight: bold;">Message:</td>
-            <td style="padding: 10px;">UP {{request.user.customer_code}}</td>
-        </tr>
-
-    </table>`;
-
-
+            receiver_info.style.display = 'block';
+            receiver_info.innerHTML = `
+                <table style="border-collapse: collapse; width: 100%;">
+                    <tr>
+                        <td style="padding: 10px; font-weight: bold;">Bank:</td>
+                        <td style="padding: 10px;">{{BANK_NAME}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; font-weight: bold;">Account:</td>
+                        <td style="padding: 10px;">{{BANK_ACCOUNT}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; font-weight: bold;">Name:</td>
+                        <td style="padding: 10px;">{{BANK_USERNAME}}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; font-weight: bold;">Amount:</td>
+                        <td style="padding: 10px;">${vnd_amount} VND</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 10px; font-weight: bold;">Message:</td>
+                        <td style="padding: 10px;">UP {{request.user.customer_code}}</td>
+                    </tr>
+                </table>`;
             document.getElementById('qr-code-img').src = "/api/payment/get_qr_code/?amount=" + amount;
             document.getElementById('qr-code').style.display = 'block';
+
         } else {
             alert('Please select a payment method.');
         }
