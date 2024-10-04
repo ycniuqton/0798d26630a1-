@@ -111,26 +111,26 @@
                 <th>Image</th>
                 <td>
                     <span id="os-text">{{ instance.os_version }}</span>
-                    <i class="fas fa-edit" id="change-os-icon" style="cursor: pointer;" onclick="showOsDropdown()"></i>
+                    <i class="fas fa-edit" id="change-os-icon" style="cursor: pointer;" onclick="performAction('reinstall')"></i>
 
                     <!-- OS Dropdown populated dynamically -->
-                    <select id="os-dropdown" class="form-control d-none">
-                        {% for image in images %}
-                        <optgroup label="{{ image.name }}">
-                            {% for version in image.versions %}
-                            <option value="{{ version }}">{{ version }}</option>
-                            {% endfor %}
-                        </optgroup>
-                        {% endfor %}
-                    </select>
+<!--                    <select id="os-dropdown" class="form-control d-none">-->
+<!--                        {% for image in images %}-->
+<!--                        <optgroup label="{{ image.name }}">-->
+<!--                            {% for version in image.versions %}-->
+<!--                            <option value="{{ version }}">{{ version }}</option>-->
+<!--                            {% endfor %}-->
+<!--                        </optgroup>-->
+<!--                        {% endfor %}-->
+<!--                    </select>-->
 
-                    <!-- Password input, hidden initially -->
-                    <input type="password" id="os-password" class="form-control d-none mt-2 mb-2"
-                           placeholder="Enter password">
+<!--                    &lt;!&ndash; Password input, hidden initially &ndash;&gt;-->
+<!--                    <input type="password" id="os-password" class="form-control d-none mt-2 mb-2"-->
+<!--                           placeholder="Enter password">-->
 
-                    <button id="update-os-btn" class="btn btn-primary d-none" onclick="updateOs()">Update</button>
-                    <button id="cancel-os-btn" class="btn btn-secondary d-none" onclick="cancelOsChange()">Cancel
-                    </button>
+<!--                    <button id="update-os-btn" class="btn btn-primary d-none" onclick="updateOs()">Update</button>-->
+<!--                    <button id="cancel-os-btn" class="btn btn-secondary d-none" onclick="cancelOsChange()">Cancel-->
+<!--                    </button>-->
                 </td>
             </tr>
             <tr>

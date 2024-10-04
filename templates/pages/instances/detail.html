@@ -77,6 +77,10 @@
         {% endif %}
         <button class="action-button" data-color="#80FFA7" onclick="performAction('change_pass')"><i
                 class="fas fa-user-plus"></i><span>Change pass</span></button>
+
+        <button class="action-button" data-color="#80DFF7" onclick="performAction('reinstall')"><i
+                class="fas fa-user-plus"></i><span>ReInstall</span></button>
+
         {% if request.user.is_staff and APP_ROLE == 'admin' %}
         <button class="action-button" data-color="#000000" onclick="performAction('suspend')"><i
                 class="fas fa-lock"></i><span>Suspend</span></button>

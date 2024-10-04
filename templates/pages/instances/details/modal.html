@@ -45,8 +45,6 @@
                 </div>
 
                 <!-- New Password Input Section -->
-
-
                 <div id="newPasswordInput" class="d-none">
                     <p>Enter a new password for this instance:</p>
                     <div class="input-group">
@@ -60,7 +58,7 @@
                     </div>
                     <div class="form-check mt-3 restart-box">
                         <input class="form-check-input" type="checkbox" value="" id="restartVpsCheckbox">
-                        <label class="form-check-label pointable prevent-select " for="restartVpsCheckbox">
+                        <label class="form-check-label pointable prevent-select" for="restartVpsCheckbox">
                             Restart VPS immediately
                         </label>
                     </div>
@@ -72,6 +70,45 @@
                     <input type="text" id="deleteConfirmation" class="form-control" placeholder="Delete">
                 </div>
 
+                <!-- Reinstall OS Section -->
+                <div id="reinstallOsSection" class="d-none">
+                    <p>Select an OS version to reinstall:</p>
+                    <!-- OS Dropdown populated dynamically -->
+                    <select id="os-dropdown" class="form-control">
+                        {% for image in images %}
+                        <optgroup label="{{ image.name }}">
+                            {% for version in image.versions %}
+                            <option value="{{ version }}">{{ version }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endfor %}
+                    </select>
+
+                    <p class="mt-4">Enter new password for new OS:</p>
+                    <input type="text" id="os-password" class="form-control mt-2 mb-2"
+                           placeholder="Enter password">
+
+                    <!-- Warning message to inform the user about data loss -->
+                    <p class="mt-2 text-danger mb-5">
+                        Warning: Reinstalling the OS will completely erase all data. Please ensure you have backed up
+                        your data before proceeding.
+                    </p>
+
+                    <!-- Password input for OS reinstallation -->
+
+
+                    <hr class="mt-10">
+                    <p class="text-warning">
+                        To continue, please type <strong>"YES"</strong> below to confirm that you understand all data
+                        will be lost.
+                    </p>
+
+                    <!-- Confirmation input to force user to type "YES" -->
+                    <input type="text" id="confirmation-input" class="form-control mt-2 mb-2"
+                           placeholder="Type YES to confirm">
+
+
+                </div>
             </div>
 
             <div class="modal-footer">
@@ -84,21 +121,22 @@
     </div>
 </div>
 
+
 <script>
-                        function togglePasswordVisibility2() {
-        const passwordField = document.getElementById('newPassword');
-        const toggleIcon = document.getElementById('toggle-password-icon-2');
-        if (passwordField.type === 'password') {
-            passwordField.type = 'text';
-            toggleIcon.classList.remove('fa-eye-slash');
-            toggleIcon.classList.add('fa-eye');
-        } else {
-            passwordField.type = 'password';
-            toggleIcon.classList.remove('fa-eye');
-            toggleIcon.classList.add('fa-eye-slash');
-        }
-    }
-                    </script>
+    function togglePasswordVisibility2() {
+const passwordField = document.getElementById('newPassword');
+const toggleIcon = document.getElementById('toggle-password-icon-2');
+if (passwordField.type === 'password') {
+passwordField.type = 'text';
+toggleIcon.classList.remove('fa-eye-slash');
+toggleIcon.classList.add('fa-eye');
+} else {
+passwordField.type = 'password';
+toggleIcon.classList.remove('fa-eye');
+toggleIcon.classList.add('fa-eye-slash');
+}
+}
+</script>
 
 <script>
     function performAction(action) {
@@ -152,6 +190,9 @@
         } else if (action === 'change_pass') {
             document.getElementById('newPasswordInput').classList.remove('d-none');
             document.getElementById('confirmAction').textContent = 'Change Password';
+        } else if (action === 'reinstall') {
+            document.getElementById('reinstallOsSection').classList.remove('d-none');
+            document.getElementById('confirmAction').textContent = 'Reinstall';
 
         } else if (action === 'delete') {
             document.getElementById('deleteConfirmationInput').classList.remove('d-none');
@@ -177,32 +218,45 @@
             } else if (action === 'change_pass') {
                 body.password = document.getElementById('newPassword').value;
                 body.restart = document.getElementById('restartVpsCheckbox').checked;
+            } else if (action === 'reinstall') {
+                body.os_version = document.getElementById('os-dropdown').value;
+                body.password = document.getElementById('os-password').value;
             }
 
-            // Make API call
-            fetch(`/api/vps/${action}/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify(body)
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert(`Instance ${action}ed successfully!`);
+            if (action === 'reinstall') {
+                if (document.getElementById('confirmation-input').value !== 'YES') {
+                    alert('Please type "YES" to confirm.');
 
-                    if (action === 'delete') {
-                        location.href = '/instances/';
-                        }
-                    else{
-                    location.reload();
-                    }
-                } else {
-                    alert(`Failed to ${action} instance.`);
+                    return;
                 }
-            })
-            .catch(error => console.log('Error:', error));
+                updateOs()
+            }
+            else{
+                fetch(`/api/vps/${action}/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify(body)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert(`Instance ${action}ed successfully!`);
+
+                        if (action === 'delete') {
+                            location.href = '/instances/';
+                            }
+                        else{
+                        location.reload();
+                        }
+                    } else {
+                        alert(`Failed to ${action} instance.`);
+                    }
+                })
+                .catch(error => console.log('Error:', error));
+
+            }
         };
 
         // Handle VNC action
