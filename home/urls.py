@@ -4,7 +4,7 @@ from django.contrib.auth import views as auth_views
 from home import views
 from .views import set_introducer, \
     current_introducer, faqs_view
-from home.views.instances import instances, create_instances, instance_detail, vps_history
+from home.views.instances import instances, create_instances, instance_detail, vps_history, archived_instances
 from home.views.statics import FlagAPI, OSIconAPI
 from home.views.accounts import *
 from home.views.financial import invoices_view, financial_view, payment_view, billing_view, resource_record, \
@@ -18,6 +18,7 @@ urlpatterns = [
     # path('home/', views.home, name='home'),
 
     path('instances/', instances, name='instances'),
+    path('archived_instances/', archived_instances, name='archived_instances'),
     path('instances/create/', create_instances, name='create_instances'),
     path('instance/<str:instance_id>/', instance_detail, name='instance_detail'),
     path('instances/history/', vps_history, name='vps_history'),

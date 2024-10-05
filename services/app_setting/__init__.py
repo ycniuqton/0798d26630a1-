@@ -8,6 +8,7 @@ class AppSettingRepository:
             setting = AppSetting.objects.create()
         self._INVOICE_DUE_DAYS = setting.invoice_due_days
         self._SUFFICIENT_BALANCE_SUSPEND_DAYS = setting.sufficient_balance_suspend_days
+        self._VPS_AUTO_ARCHIVE = setting.vps_auto_archive
 
     @property
     def INVOICE_DUE_DAYS(self):
@@ -17,10 +18,19 @@ class AppSettingRepository:
     def SUFFICIENT_BALANCE_SUSPEND_DAYS(self):
         return self._SUFFICIENT_BALANCE_SUSPEND_DAYS
 
+    @property
+    def VPS_AUTO_ARCHIVE(self):
+        return self._VPS_AUTO_ARCHIVE
+
     @INVOICE_DUE_DAYS.setter
     def INVOICE_DUE_DAYS(self, value):
         self._INVOICE_DUE_DAYS = value
         AppSetting.objects.update(invoice_due_days=value)
+
+    @VPS_AUTO_ARCHIVE.setter
+    def VPS_AUTO_ARCHIVE(self, value):
+        self._VPS_AUTO_ARCHIVE = value
+        AppSetting.objects.update(vps_auto_archive=value)
 
     @SUFFICIENT_BALANCE_SUSPEND_DAYS.setter
     def SUFFICIENT_BALANCE_SUSPEND_DAYS(self, value):
@@ -30,5 +40,6 @@ class AppSettingRepository:
     def to_dict(self):
         return {
             'invoice_due_days': self.INVOICE_DUE_DAYS,
-            'sufficient_balance_suspend_days': self.SUFFICIENT_BALANCE_SUSPEND_DAYS
+            'sufficient_balance_suspend_days': self.SUFFICIENT_BALANCE_SUSPEND_DAYS,
+            'vps_auto_archive': self.VPS_AUTO_ARCHIVE
         }

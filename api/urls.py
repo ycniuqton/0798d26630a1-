@@ -1,11 +1,12 @@
 from django.urls import path
 
-from .admin import get_group_configs, lock_group, SuspendConfig
+from .admin import get_group_configs, lock_group, SuspendConfig, VpsConfig
 from .snapshot import VpsSnapshotAPI, restore_vsp
 from .support import TicketCollectionAPI, TicketAPI, ticket_reply
 from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token, AccountCollectionAPI
 from .invoices import InvoiceCollectionAPI, InvoiceAPI
 from .views import RegisterAPI, LoginAPI, LogoutAPI
+from .vps.archived_vps import archived_vps
 from .vps.change_pass import change_pass_vps
 from .vps.create import create_vps
 from .vps import VPSAPI, start_vps, stop_vps, restart_vps, suspend_vps, unsuspend_vps, give_vps, change_vps_plan, \
@@ -24,6 +25,7 @@ urlpatterns = [
     path('login/', LoginAPI.as_view(), name='login'),
     path('logout/', LogoutAPI.as_view(), name='logout'),
     path('vps/create', create_vps, name='create-vps'),
+    path('vps/get_archived_vps', archived_vps, name='archived_vps'),
     path('vps/start/', start_vps, name='start-vps'),
     path('vps/stop/', stop_vps, name='stop-vps'),
     path('vps/restart/', restart_vps, name='restart-vps'),
@@ -69,4 +71,5 @@ urlpatterns = [
     path('admin/group_config/', get_group_configs, name='group-config'),
     path('admin/group_config/lock', lock_group, name='lock_group'),
     path('admin/suspend_config/', SuspendConfig.as_view(), name='suspend-config'),
+    path('admin/vps_config/', VpsConfig.as_view(), name='vps-config'),
 ]

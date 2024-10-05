@@ -86,3 +86,18 @@ class CheckSuspendVPS(BaseJob):
                 'invoice_id': invoice.id,
             })
 
+
+class ArchiveVPS(BaseJob):
+    """
+    Example of a job that inherits from BaseJob.
+    This job prints a message when run.
+    """
+
+    def run(self):
+        print("Archiving VPS")
+        pivot = get_now() - timedelta(hours=AppSettingRepository().VPS_AUTO_ARCHIVE)
+        list_vps = Vps.objects.filter(status=VpsStatus.ERROR, _created_lt=pivot).all()
+
+        for vps in list_vps:
+            vps._deleted = True
+            vps.save()

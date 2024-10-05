@@ -373,6 +373,7 @@ class TriggeredOnceEvent(BaseModel):
 class AppSetting(BaseModel):
     invoice_due_days = models.IntegerField(default=3)
     sufficient_balance_suspend_days = models.IntegerField(default=0)
+    vps_auto_archive = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'app_setting'

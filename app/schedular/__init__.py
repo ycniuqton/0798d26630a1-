@@ -8,7 +8,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 django.setup()
 
 from apscheduler.schedulers.blocking import BlockingScheduler
-from app.schedular.jobs import UpdateVpsStat, CheckVPSExpired, CheckInvoiceExpired, CheckSuspendVPS
+from app.schedular.jobs import UpdateVpsStat, CheckVPSExpired, CheckInvoiceExpired, CheckSuspendVPS, ArchiveVPS
 
 
 def main():
@@ -20,11 +20,13 @@ def main():
     check_vps_expired = CheckVPSExpired()
     check_invoice_expired = CheckInvoiceExpired()
     check_vps_suspend = CheckSuspendVPS()
+    archive_vps = ArchiveVPS()
 
     scheduler.add_job(update_vps_stat.run, 'cron', hour='*', minute='*')
     scheduler.add_job(check_vps_expired.run, 'cron', hour='*', minute='*')
     scheduler.add_job(check_invoice_expired.run, 'cron', hour='*', minute='*')
     scheduler.add_job(check_vps_suspend.run, 'cron', hour='*', minute='*')
+    scheduler.add_job(archive_vps.run, 'cron', hour='*', minute='*')
 
     # Start the scheduler
     print("Starting scheduler...")

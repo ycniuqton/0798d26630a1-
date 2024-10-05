@@ -75,3 +75,28 @@ class SuspendConfig(APIView):
         app_setting.SUFFICIENT_BALANCE_SUSPEND_DAYS = sufficient_balance_suspend_days
 
         return JsonResponse({'message': 'Update success'})
+
+
+class VpsConfig(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if not user.is_staff:
+            return JsonResponse({'error': 'Permission denied'}, status=403)
+
+        app_setting = AppSettingRepository().to_dict()
+
+        return JsonResponse(app_setting)
+
+    def post(self, request):
+        user = request.user
+        if not user.is_staff:
+            return JsonResponse({'error': 'Permission denied'}, status=403)
+
+        data = request.data
+        vps_auto_archive = data.get('vps_auto_archive')
+        app_setting = AppSettingRepository()
+        app_setting.VPS_AUTO_ARCHIVE = vps_auto_archive
+
+        return JsonResponse({'message': 'Update success'})
