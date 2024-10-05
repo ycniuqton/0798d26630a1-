@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 
+from config import APPConfig
 from utils import generate_customer_code
 
 
@@ -135,7 +136,8 @@ class Vps(BaseModel):
 
     @property
     def is_refundable(self):
-        return self.end_time > self._created + timezone.timedelta(days=1) > datetime.now(timezone.utc)
+        return self.end_time > self._created + timezone.timedelta(
+            hours=APPConfig.VPS_REFUND_HOURS) > datetime.now(timezone.utc)
 
     class Meta:
         db_table = 'vps'
@@ -374,6 +376,26 @@ class AppSetting(BaseModel):
     invoice_due_days = models.IntegerField(default=3)
     sufficient_balance_suspend_days = models.IntegerField(default=0)
     vps_auto_archive = models.IntegerField(default=0)
+    vps_refund_hours = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'app_setting'
+
+
+class RefundRequest(BaseModel):
+    class RefundRequestStatus:
+        PENDING = 'pending'
+        APPROVED = 'approved'
+        REJECTED = 'rejected'
+
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    amount = models.FloatField()
+    status = models.CharField(max_length=200, default=RefundRequestStatus.PENDING)
+    description = models.TextField()
+    vps = models.ForeignKey(Vps, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.amount} ({self.status})'
+
+    class Meta:
+        db_table = 'refund_request'

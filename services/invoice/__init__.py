@@ -11,6 +11,10 @@ class InvoiceRepository:
     def __init__(self):
         pass
 
+    def gen_code(self, user_id):
+        now = get_now()
+        return f"{user_id[-4:]}-{now.month}-{now.year}-{now.microsecond}"
+
     def create(self, user_id, items=[], cycle=None, from_time=None, to_time=None):
         user = User.objects.get(id=user_id)
 
@@ -28,7 +32,7 @@ class InvoiceRepository:
 
         total_fee = sum([i.price for i in items])
         now = get_now()
-        code = f"{user.id[-4:]}-{now.month}-{now.year}-{now.microsecond}"
+        code = self.gen_code(user)
 
         if not cycle:
             cycle, from_time, to_time = get_billing_cycle(now)
@@ -53,6 +57,38 @@ class InvoiceRepository:
                 invoice=invoice,
                 vps=item,
                 amount=item.price,
+                description=f"VPS {item.plan_name}",
+                start_time=from_time,
+                end_time=to_time,
+                cycle=cycle,
+            )
+
+        return invoice
+
+    def refund(self, user, invoice_lines):
+        amount = 0 - sum([i.amount for i in invoice_lines])
+        code = self.gen_code(user)
+        now = get_now()
+        cycle, from_time, to_time = get_billing_cycle(now)
+
+        invoice = Invoice.objects.create(
+            user=user,
+            code=code,
+            amount=amount,
+            status=Invoice.Status.OPEN,
+            description="Initial invoice",
+            transaction=None,
+            due_date=now + timedelta(days=1),
+            cycle=cycle,
+            start_time=from_time,
+            end_time=to_time,
+        )
+
+        for item in invoice_lines:
+            invoice_line = InvoiceLine.objects.create(
+                invoice=invoice,
+                vps=item.vps,
+                amount=0-item.amount,
                 description=f"VPS {item.plan_name}",
                 start_time=from_time,
                 end_time=to_time,

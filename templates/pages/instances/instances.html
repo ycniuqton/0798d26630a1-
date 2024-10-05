@@ -180,6 +180,37 @@ function copyErrorMessage(element) {
         console.error('Could not copy text: ', err);
     });
 }
+
+
+</script>
+
+<script>
+    function call_refund(vps_id) {
+    const url = `/api/vps/${vps_id}/refund/`;
+
+    // Perform a GET request using fetch
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            // Add any additional headers, e.g., authorization token if needed
+            // 'Authorization': 'Bearer your-token'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            alert('There was a problem with the fetch operation. Please try again later.');
+        }
+        return response.json(); // Parse the JSON from the response
+    })
+    .then(data => {
+        alert("Refund request has been sent successfully");
+    })
+    .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+    });
+}
+
 </script>
 
 <script>
@@ -219,8 +250,8 @@ function copyErrorMessage(element) {
                         data.data.forEach(item => {
                             console.log(item.is_refundable);
                             refund_button = ''
-                            if(item.is_refundable && false){
-                                refund_button = `<a href="/api/vps/${item.id}/refund/" class="btn btn-sm btn-outline-warning" >Refund</a>`;
+                            if(item.is_refundable){
+                                refund_button = `<a onclick="call_refund('${item.id}')" class="btn btn-sm btn-outline-warning" >Refund</a>`;
                             }
 
                             if (item.status == 'error') {

@@ -190,6 +190,8 @@
                         {% if  APP_ROLE != 'admin' %}
                         <li class=""><a href="{% url 'admin_invoices' %}" class="">
                             <span class="pcoded-mtext">Open Invoice</span></a></li>
+                        <li class=""><a href="{% url 'refund_requests' %}" class="">
+                            <span class="pcoded-mtext">Refund Request</span></a></li>
                         {% endif %}
                     </ul>
                 </li>

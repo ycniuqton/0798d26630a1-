@@ -9,7 +9,7 @@ from home.views.statics import FlagAPI, OSIconAPI
 from home.views.accounts import *
 from home.views.financial import invoices_view, financial_view, payment_view, billing_view, resource_record, \
     transaction_history, invoice_view
-from home.views.ctv_admin import ctv_financial, ctv_settings, admin_invoices
+from home.views.ctv_admin import ctv_financial, ctv_settings, admin_invoices, refund_requests
 from .views.customers import list_customer, customer_detail
 
 urlpatterns = [
@@ -71,6 +71,7 @@ urlpatterns = [
     path('admin/financial/', ctv_financial, name='ctv-financial'),
     path('admin/settings/', ctv_settings, name='ctv-settings'),
     path('admin/invoices/', admin_invoices, name='admin_invoices'),
+    path('admin/refund_requests/', refund_requests, name='refund_requests'),
 
     path('customer/', list_customer, name='list_customer'),
     path('customer/<str:customer_id>/', customer_detail, name='customer_detail'),

@@ -15,7 +15,7 @@ from services.vps_log import VPSLogger
 from services.balance import BalanceRepository
 
 
-@api_view(['POST'])
+@api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def refund_vps(request, vps_id):
     user = request.user
