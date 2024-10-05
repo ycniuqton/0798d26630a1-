@@ -101,6 +101,39 @@ class StartVPS(BaseHandler):
             raise SkippableException("Failed to start VPS")
 
 
+class RefundVPS(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            vps_id = fields.String(required=True)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        close_old_connections()
+        vps = Vps.objects.filter(id=payload['vps_id']).first()
+        if not vps:
+            raise DBInsertFailed("Missing Order")
+
+        base_url = settings.ADMIN_CONFIG.URL
+        api_key = settings.ADMIN_CONFIG.API_KEY
+
+        service = VPSService(base_url, api_key)
+
+        try:
+            response = service.start(vps.linked_id)
+        except:
+            raise SkippableException("Failed to start VPS")
+
+
 class StopVPS(BaseHandler):
     def __init__(self) -> None:
         super().__init__()

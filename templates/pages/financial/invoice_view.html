@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice {{ invoice.id }}</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        .invoice-container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #004E89;
+            color: white;
+            padding: 20px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .header img {
+            max-width: 100px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .invoice-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .invoice-info div {
+            font-size: 14px;
+        }
+        .invoice-details {
+            margin-top: 40px;
+        }
+        .invoice-details table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .invoice-details th, .invoice-details td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .invoice-details th {
+            background-color: #004E89;
+            color: white;
+        }
+        .totals {
+            text-align: right;
+            margin-top: 20px;
+        }
+        .totals table {
+            margin-left: 60%;
+            width: 40%;
+            margin-top: 20px;
+        }
+        .totals th, .totals td {
+            padding: 10px;
+            text-align: right;
+        }
+        .totals tr th {
+            font-weight: bold;
+            border-top: 2px solid #004E89;
+        }
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="invoice-container">
+    <!-- Header -->
+    <div class="header">
+        <div style="display: flex; justify-content: space-between;">
+            <div>
+                <img src="https://your-logo-url.com/logo.png" alt="Company Logo">
+            </div>
+            <div>
+                {% if invoice.status == 'paid' %}
+                    <h1 style="color: #92ff92">{{invoice.status | upper}} - INVOICE</h1>
+                {% else %}
+                    <h1>{{invoice.status | upper}} - INVOICE</h1>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Info -->
+    <div class="invoice-info">
+        <div>
+            <p><strong>Invoice to:</strong></p>
+            <p>{{ user.email }}</p>
+            <p>Location: {{ invoice.code }}</p>
+        </div>
+        <div>
+            <p><strong>Invoice: #{{ invoice.id }}</strong></p>
+            <p><strong>Date Created: {{ invoice.created }}</strong></p>
+            <p><strong>Due Date: {{ invoice.due_date }}</strong></p>
+<!--            {% if invoice.status == 'paid' %}-->
+<!--                <p><strong style="color: green; font-size: 25px">{{invoice.status | upper}}</strong></p>-->
+<!--            {% else %}-->
+<!--                <p><strong>{{invoice.status | upper}}</strong></p>-->
+<!--            {% endif %}-->
+        </div>
+    </div>
+
+    <!-- Invoice Details -->
+    <div class="invoice-details">
+        <table>
+            <thead>
+                <tr>
+                    <th>Qty</th>
+                    <th>Item Name</th>
+                    <th>Type</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Price</th>
+                    <th>Discount</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for line in invoice.lines %}
+                <tr>
+                    <td>1</td>
+                    <td>{{ line.vps }}</td> <!-- Item Name -->
+                    <td>{{ line.description }}</td> <!-- Type -->
+                    <td>{{ line.start_time }}</td> <!-- Start Date -->
+                    <td>{{ line.end_time }}</td> <!-- End Date -->
+                    <td>{{ line.amount }}</td> <!-- Price -->
+                    <td>0</td> <!-- Discount -->
+                    <td>{{ line.amount }}</td> <!-- Total (Price - Discount) -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="    padding-top: 50px;"></div>
+    <hr>
+
+    <!-- Totals -->
+    <div class="totals">
+        <table>
+            <tr>
+                <th>Sub Total:</th>
+                <td>${{ invoice.amount }}</td>
+            </tr>
+            <tr>
+                <th>Discount:</th>
+                <td>$0.00</td>
+            </tr>
+            <tr>
+                <th>Tax (0%):</th>
+                <td>$0.00</td>
+            </tr>
+            <tr>
+                <th>Total:</th>
+                <td><strong>${{ invoice.amount }}</strong></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>Terms & Conditions: Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        <p>Your Address Here, +022 343 855 4545, www.yourwebsite.com</p>
+    </div>
+</div>
+
+</body>
+</html>

@@ -10,7 +10,7 @@ from django.http import JsonResponse, HttpResponse
 from services.balance import BalanceRepository
 
 
-class InvoiceAPI(APIView):
+class InvoiceCollectionAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
@@ -65,3 +65,23 @@ class InvoiceAPI(APIView):
         invoice.save()
 
         return JsonResponse({'message': 'Invoice updated successfully'}, status=200)
+
+
+class InvoiceAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, invoice_id):
+        user = request.user
+        invoice = Invoice.objects.filter(id=invoice_id)
+        if not user.is_staff:
+            invoice = invoice.filter(user_id=user.id)
+        invoice = invoice.first()
+
+        if not invoice:
+            return JsonResponse({'error': 'Invoice not found'}, status=404)
+
+        invoice_lines = invoice.lines.all()
+        data = invoice.to_readable_dict()
+        data['lines'] = [il.to_readable_dict() for il in invoice_lines]
+
+        return JsonResponse(data)

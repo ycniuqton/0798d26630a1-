@@ -47,7 +47,8 @@ class BaseModel(models.Model):
                 return value.strftime("%d/%m/%Y")
             return str(value)
 
-        return {field.name: convert_build_in_types(getattr(self, field.name)) for field in self._meta.fields}
+        converting_fields = list(self._meta._property_names) + list([field.name for field in self._meta.fields])
+        return {field: convert_build_in_types(getattr(self, field)) for field in converting_fields}
 
 
 class User(AbstractUser, BaseModel):
@@ -86,6 +87,7 @@ class VpsStatus:
     STARTING = "starting"
     ERROR = "error"
     RESTORING = "restoring"
+    REFUND_REQUESTED = "refund_requested"
 
 
 class Vps(BaseModel):
@@ -130,6 +132,10 @@ class Vps(BaseModel):
 
     def is_expired(self):
         return self.end_time < datetime.now(timezone.utc)
+
+    @property
+    def is_refundable(self):
+        return self.end_time > self._created + timezone.timedelta(days=1) > datetime.now(timezone.utc)
 
     class Meta:
         db_table = 'vps'

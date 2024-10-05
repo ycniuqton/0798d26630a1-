@@ -4,7 +4,7 @@ from .admin import get_group_configs, lock_group, SuspendConfig
 from .snapshot import VpsSnapshotAPI, restore_vsp
 from .support import TicketCollectionAPI, TicketAPI, ticket_reply
 from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token, AccountCollectionAPI
-from .invoices import InvoiceAPI
+from .invoices import InvoiceCollectionAPI, InvoiceAPI
 from .views import RegisterAPI, LoginAPI, LogoutAPI
 from .vps.change_pass import change_pass_vps
 from .vps.create import create_vps
@@ -12,6 +12,7 @@ from .vps import VPSAPI, start_vps, stop_vps, restart_vps, suspend_vps, unsuspen
     update_info
 from .vps.delete import delete_vps
 from .vps.rebuild import rebuild_vps
+from .vps.refund import refund_vps
 from .vps_log import get_vps_logs
 from .balances import topup, reclaim
 from .vps.calculator import vps_calculator
@@ -33,6 +34,7 @@ urlpatterns = [
     path('vps/change_pass/', change_pass_vps, name='change-pass-vps'),
     path('vps/give/', give_vps, name='give-vps'),
     path('vps/<str:vps_id>/change_plan', change_vps_plan, name='change_vps_plan'),
+    path('vps/<str:vps_id>/refund/', refund_vps, name='refund_vps'),
     path('vps/<str:vps_id>/update_info/', update_info, name='update_info'),
 
     path('vps/calculator', vps_calculator, name='vps_calculator'),
@@ -51,15 +53,15 @@ urlpatterns = [
     path('payment/paypal/webhook/', paypal_webhook, name='paypal_webhook'),
     path('payment/bank/webhook/', bank_webhook, name='bank_webhook'),
 
-    path('invoice/', InvoiceAPI.as_view(), name='invoice'),
+    path('invoice/', InvoiceCollectionAPI.as_view(), name='invoice'),
+    path('invoices/', InvoiceCollectionAPI.as_view(), name='api-invoices'),
+    path('invoices/<str:invoice_id>', InvoiceAPI.as_view(), name='api-invoice'),
     path('tickets/', TicketCollectionAPI.as_view(), name='tickets_view'),
     path('tickets/<str:ticket_id>/', TicketAPI.as_view(), name='ticket_view'),
     path('tickets/<str:ticket_id>/reply/', ticket_reply, name='ticket_reply'),
 
     path('tokens/', UserTokenAPI.as_view(), name='user-tokens'),
     path('tokens/<str:token_id>/', delete_token, name='delete-token'),
-
-    path('invoices/', InvoiceAPI.as_view(), name='api-invoices'),
 
     path('snapshots/<str:vps_id>/', VpsSnapshotAPI.as_view(), name='vps-snapshots'),
     path('snapshots/<str:vps_id>/restore/', restore_vsp, name='vps-snapshots'),

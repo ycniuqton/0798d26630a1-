@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let currentStatusFilter = '';
         let currentFilter = {};
         let currentSearch = '';
-        let api_url = '/api/invoice/';
+        let api_url = '/api/invoices/';
 
         window.load_table = function(page = 1, sort = '-_created', filter = {}, search = '') {
 
@@ -189,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <td>${item.status}</td>
                                 <td>${item.amount}</td>
                                 <td>
-                                    <a href="/invoice/${item.id}" class="btn btn-sm btn-outline-primary">View</a>
+                                    <a href="/invoices/${item.id}" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer">View</a>
                                 </td>
                             `;
                             tbody.appendChild(row);

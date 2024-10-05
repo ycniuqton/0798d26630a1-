@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta, timezone
+
+from django.http import Http404
 from django.shortcuts import render, get_object_or_404
 from rest_framework.decorators import permission_classes, api_view
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from config import APPConfig
 from home.models import Vps, Invoice
@@ -131,6 +133,7 @@ def financial_view(request):
 def invoices_view(request):
     return render(request, 'pages/financial/invoices.html', {'segment': 'invoices'})
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def transaction_history(request):
@@ -153,3 +156,23 @@ def transaction_history(request):
     }
 
     return render(request, 'pages/financial/balance_record.html', context)
+
+
+# @api_view(['GET'])
+@permission_classes([AllowAny])
+def invoice_view(request, invoice_id):
+    invoice = Invoice.objects.filter(id=invoice_id).first()
+    user = invoice.user
+    if not invoice:
+        Http404("Item does not exist")
+
+    invoice_lines = invoice.lines.all()
+    data = invoice.to_readable_dict()
+    data['lines'] = [line.to_readable_dict() for line in invoice_lines]
+    data['created'] = data['_created']
+    context = {
+        'invoice': data,
+        'user': user.to_readable_dict()
+    }
+
+    return render(request, 'pages/financial/invoice_view.html', context)
