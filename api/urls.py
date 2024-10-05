@@ -1,6 +1,7 @@
 from django.urls import path
 
-from .admin import get_group_configs, lock_group, SuspendConfig, VpsConfig
+from .admin import get_group_configs, lock_group, SuspendConfig, VpsConfig, RefundRequestAPI, approve_refund_request, \
+    reject_refund_request
 from .snapshot import VpsSnapshotAPI, restore_vsp
 from .support import TicketCollectionAPI, TicketAPI, ticket_reply
 from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token, AccountCollectionAPI
@@ -72,4 +73,7 @@ urlpatterns = [
     path('admin/group_config/lock', lock_group, name='lock_group'),
     path('admin/suspend_config/', SuspendConfig.as_view(), name='suspend-config'),
     path('admin/vps_config/', VpsConfig.as_view(), name='vps-config'),
+    path('admin/refund_requests/', RefundRequestAPI.as_view(), name='refund-requests-api'),
+    path('admin/refund_requests/<str:request_id>/approve/', approve_refund_request, name='approve-refund-request'),
+    path('admin/refund_requests/<str:request_id>/reject/', reject_refund_request, name='reject-refund-request'),
 ]

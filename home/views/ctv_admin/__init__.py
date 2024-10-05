@@ -49,3 +49,8 @@ def ctv_settings(request):
 
 def admin_invoices(request):
     return render(request, "pages/ctv-admin/invoices.html", context={})
+
+
+def refund_requests(request):
+    return render(request, "pages/ctv-admin/refund_requests.html", context={})
+

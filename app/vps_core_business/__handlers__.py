@@ -15,6 +15,7 @@ from adapters.kafka_adapter._exceptions import SkippableException
 from services.app_setting import AppSettingRepository
 from services.invoice import InvoiceRepository, get_billing_cycle, get_now
 from services.virtualizor_manager import VirtualizorManager
+from services.vps.refund import RefundService
 from services.vps_log import VPSLogger
 from core import settings
 
@@ -123,15 +124,16 @@ class RefundVPS(BaseHandler):
         if not vps:
             raise DBInsertFailed("Missing Order")
 
-        base_url = settings.ADMIN_CONFIG.URL
-        api_key = settings.ADMIN_CONFIG.API_KEY
+        invoice_line = InvoiceLine.objects.filter(vps_id=vps.id).latest('_created')
+        if not invoice_line:
+            raise DBInsertFailed("Missing Invoice")
 
-        service = VPSService(base_url, api_key)
+        invoice = invoice_line.invoice
+        if not invoice or invoice.status != Invoice.Status.PAID:
+            raise DBInsertFailed("Invalid Invoice")
 
-        try:
-            response = service.start(vps.linked_id)
-        except:
-            raise SkippableException("Failed to start VPS")
+        rs = RefundService()
+        rs.create(invoice_line)
 
 
 class StopVPS(BaseHandler):
@@ -592,6 +594,44 @@ class GenerateInvoice(BaseHandler):
             vps.cycle = cycle
             vps.end_time = to_time
             vps.save()
+
+        publisher = make_kafka_publisher(KafkaConfig)
+        publisher.publish('charge_invoice', payload={
+            'invoice_id': invoice.id
+        })
+
+
+class GenerateRefundInvoice(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            user_id = fields.String(required=True)
+            items = fields.List(fields.String, required=True)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        close_old_connections()
+        user = User.objects.filter(id=payload['user_id']).first()
+
+        invoice_lines = []
+        for vps_id in payload['items']:
+            invoice_line = InvoiceLine.objects.filter(vps_id=vps_id, invoice__status=Invoice.Status.PAID).latest(
+                '_created')
+            if not invoice_line:
+                continue
+            invoice_lines.append(invoice_line)
+
+        invoice_repo = InvoiceRepository()
+        invoice = invoice_repo.refund(user, invoice_lines)
 
         publisher = make_kafka_publisher(KafkaConfig)
         publisher.publish('charge_invoice', payload={
