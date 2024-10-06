@@ -399,3 +399,58 @@ class RefundRequest(BaseModel):
 
     class Meta:
         db_table = 'refund_request'
+
+
+class TopUpReport(BaseModel):
+    amount = models.FloatField(default=0)
+    date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'{self.amount} ({self.date})'
+
+    class Meta:
+        db_table = 'topup_report'
+
+
+class InvoicePaidReport(BaseModel):
+    amount = models.FloatField(default=0)
+    date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'{self.amount} ({self.date})'
+
+    class Meta:
+        db_table = 'invoice_paid_report'
+
+
+class OrderReport(BaseModel):
+    amount = models.FloatField(default=0)
+    date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'{self.amount} ({self.date})'
+
+    class Meta:
+        db_table = 'order_report'
+
+
+class UnpaidOrderReport(BaseModel):
+    amount = models.FloatField(default=0)
+    date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'{self.amount} ({self.date})'
+
+    class Meta:
+        db_table = 'unpaid_order_report'
+
+
+class RefundReport(BaseModel):
+    amount = models.FloatField(default=0)
+    date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'{self.amount} ({self.date})'
+
+    class Meta:
+        db_table = 'refund_report'

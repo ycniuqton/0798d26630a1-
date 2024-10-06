@@ -7,6 +7,7 @@ from adapters.kafka_adapter import make_kafka_publisher
 from config import KafkaConfig
 from services.app_setting import AppSettingRepository
 from services.invoice import get_now
+from services.report import TopUpCounter, RefundCounter, InvoicePaidCounter, OrderCounter
 from .__base__ import BaseJob
 from adapters.redis_service import CachedVpsStatRepository
 from home.models import Vps, VpsStatus, Invoice, TriggeredOnceEvent
@@ -96,8 +97,23 @@ class ArchiveVPS(BaseJob):
     def run(self):
         print("Archiving VPS")
         pivot = get_now() - timedelta(hours=AppSettingRepository().VPS_AUTO_ARCHIVE)
-        list_vps = Vps.objects.filter(status=VpsStatus.ERROR, _created_lt=pivot).all()
+        list_vps = Vps.objects.filter(status=VpsStatus.ERROR, _created__lt=pivot).all()
 
         for vps in list_vps:
             vps._deleted = True
             vps.save()
+
+
+class CollectReport(BaseJob):
+    """
+    Example of a job that inherits from BaseJob.
+    This job prints a message when run.
+    """
+
+    def run(self):
+        print("Collecting report")
+
+        TopUpCounter().update(get_now())
+        InvoicePaidCounter().update(get_now())
+        OrderCounter().update(get_now())
+        RefundCounter().update(get_now())

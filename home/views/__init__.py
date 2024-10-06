@@ -1,6 +1,9 @@
+import math
+
 from admin_datta.views import UserLoginView, UserRegistrationView
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.db.models import Q
 from django.shortcuts import render, redirect
 import requests
 from django.http import JsonResponse
@@ -14,20 +17,127 @@ from django.shortcuts import render, get_object_or_404
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 
-from home.models import Vps
+from adapters.redis_service import CachedPlan
+from config import APPConfig
+from home.models import Vps, Ticket
 
 from django.http import JsonResponse, HttpResponse
 from django.conf import settings
 from django.views import View
 import os
 
+from services.invoice import get_now
+from services.report import TopUpCounter, InvoicePaidCounter, OrderCounter, UnpaidOrderCounter
+from utils import number
+
+
+def calculate_diff(current, previous):
+    if previous == current == 0:
+        return 0
+    if previous == 0:
+        return 100
+    return math.floor(100 * (1 + (current - previous) / previous))
+
+
+def get_top_up_day_data(counter, now):
+    current_value = counter.get(now)
+    previous_value = counter.get(now - timedelta(days=1))
+    diff = calculate_diff(current_value, previous_value)
+    return {'current': number(current_value), 'diff': diff}
+
+
+def get_top_up_range_data(counter, now, days):
+    current_value = counter.total_in_range(now - timedelta(days=days), now)
+    previous_value = counter.total_in_range(now - timedelta(days=2 * days), now - timedelta(days=days))
+    diff = calculate_diff(current_value, previous_value)
+    return {'current': number(current_value), 'diff': diff}
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def index(request):
+    user = request.user
+    data = {}
+    if user.is_staff and APPConfig.APP_ROLE == 'admin':
+        top_up_counter = TopUpCounter()
+        invoice_paid_counter = InvoicePaidCounter()
+        order_counter = OrderCounter()
+        unpaid_order_counter = UnpaidOrderCounter()
+
+        now = get_now()
+
+        data = {
+            'deposits': {
+                'day': get_top_up_day_data(top_up_counter, now),
+                'month': get_top_up_range_data(top_up_counter, now, 30),  # 30 days for month
+                'year': get_top_up_range_data(top_up_counter, now, 365),  # 365 days for year
+                'total': number(top_up_counter.total())
+            },
+            'revenue': {
+                'day': get_top_up_day_data(invoice_paid_counter, now),
+                'month': get_top_up_range_data(invoice_paid_counter, now, 30),  # 30 days for month
+                'year': get_top_up_range_data(invoice_paid_counter, now, 365),  # 365 days for year
+                'total': number(invoice_paid_counter.total())
+            },
+            'orders': {
+                'day': get_top_up_day_data(order_counter, now),
+                'month': get_top_up_range_data(order_counter, now, 30),  # 30 days for month
+                'year': get_top_up_range_data(order_counter, now, 365),  # 365 days for year
+                'total': number(order_counter.total())
+            },
+            'unpaid_orders': int(unpaid_order_counter.total_in_range(now - timedelta(days=7), now)),
+            'tickets': Ticket.objects.filter(status='open').count()
+        }
+    elif user.is_staff:
+        top_up_counter = TopUpCounter()
+        invoice_paid_counter = InvoicePaidCounter()
+        order_counter = OrderCounter()
+        unpaid_order_counter = UnpaidOrderCounter()
+
+        now = get_now()
+
+        data = {
+            'deposits': {
+                'day': get_top_up_day_data(top_up_counter, now),
+                'month': get_top_up_range_data(top_up_counter, now, 30),  # 30 days for month
+                'year': get_top_up_range_data(top_up_counter, now, 365),  # 365 days for year
+                'total': number(top_up_counter.total())
+            },
+            'revenue': {
+                'day': get_top_up_day_data(invoice_paid_counter, now),
+                'month': get_top_up_range_data(invoice_paid_counter, now, 30),  # 30 days for month
+                'year': get_top_up_range_data(invoice_paid_counter, now, 365),  # 365 days for year
+                'total': number(invoice_paid_counter.total())
+            },
+            'orders': {
+                'day': get_top_up_day_data(order_counter, now),
+                'month': get_top_up_range_data(order_counter, now, 30),  # 30 days for month
+                'year': get_top_up_range_data(order_counter, now, 365),  # 365 days for year
+                'total': number(order_counter.total())
+            },
+            'unpaid_orders': int(unpaid_order_counter.total_in_range(now - timedelta(days=7), now)),
+            'tickets': Ticket.objects.filter(status='open').count(),
+            'balance': 0
+        }
+    else:
+        list_vps = Vps.objects.filter(user=request.user).filter(~Q(_deleted=True)).all()
+        monthly_fee = 0
+        plans = CachedPlan().get()
+        for vps in list_vps:
+            plan = next((p for p in plans if p.get('id') == vps.plan_id), {'price': 0})
+            monthly_fee += plan.get('price')
+
+        data = {
+            'balance': user.balance_amount,
+            'tickets': Ticket.objects.filter(status='open', user=request.user).count(),
+            'vps': len(list_vps),
+            'monthly_fee': monthly_fee
+
+        }
+
     context = {
+        'data': data,
         'segment': 'index',
-        # 'products' : Product.objects.all()
     }
     return render(request, "pages/index.html", context)
 
