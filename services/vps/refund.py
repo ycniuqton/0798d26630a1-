@@ -30,7 +30,7 @@ class RefundService:
 
         publisher = make_kafka_publisher(KafkaConfig)
         payload = {
-            "vps_id": refund_request.vps.id,
+            "user_id": refund_request.vps.user_id,
             "items": [refund_request.user.id],
         }
         publisher.publish('gen_refund_invoice', payload)
