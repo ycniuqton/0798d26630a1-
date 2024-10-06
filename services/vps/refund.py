@@ -10,7 +10,7 @@ class RefundService:
         if not vps.is_refundable:
             return False
 
-        existed_refund_request = RefundRequest.objects.filter(vps=vps, status_in=[
+        existed_refund_request = RefundRequest.objects.filter(vps=vps, status__in=[
             RefundRequest.RefundRequestStatus.PENDING, RefundRequest.RefundRequestStatus.APPROVED]).all()
         if existed_refund_request:
             return False
