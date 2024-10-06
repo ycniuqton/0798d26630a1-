@@ -89,7 +89,7 @@ class InvoiceRepository:
                 invoice=invoice,
                 vps=item.vps,
                 amount=0-item.amount,
-                description=f"VPS {item.plan_name}",
+                description=f"Refund {item.vps}",
                 start_time=from_time,
                 end_time=to_time,
                 cycle=cycle,
