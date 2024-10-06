@@ -32,7 +32,7 @@ class InvoiceRepository:
 
         total_fee = sum([i.price for i in items])
         now = get_now()
-        code = self.gen_code(user)
+        code = self.gen_code(user.id)
 
         if not cycle:
             cycle, from_time, to_time = get_billing_cycle(now)
@@ -67,7 +67,7 @@ class InvoiceRepository:
 
     def refund(self, user, invoice_lines):
         amount = 0 - sum([i.amount for i in invoice_lines])
-        code = self.gen_code(user)
+        code = self.gen_code(user.id)
         now = get_now()
         cycle, from_time, to_time = get_billing_cycle(now)
 
