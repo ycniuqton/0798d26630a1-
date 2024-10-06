@@ -32,6 +32,9 @@ def rebuild_vps(request):
         if os['name'] == image_version:
             osid = os['id']
             break
+    if not osid:
+        return JsonResponse({'error': 'Invalid image version'}, status=400)
+
     username = "Administrator" if os.get('distro') == 'windows' else 'root'
     if vps_id:
         vps = Vps.objects.filter(id=vps_id)
@@ -47,6 +50,9 @@ def rebuild_vps(request):
     publisher = make_kafka_publisher(KafkaConfig)
 
     vps.status = VpsStatus.REBUILDING
+    vps.password = password
+    vps.username = username
+    vps.os_version = os['name']
     vps.save()
     VPSLogger().log(user, vps, 'rebuild', VpsStatus.REBUILDING)
     payload = {
