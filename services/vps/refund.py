@@ -1,6 +1,7 @@
 from adapters.kafka_adapter import make_kafka_publisher
 from config import KafkaConfig
 from home.models import RefundRequest, VpsStatus
+from services.vps_log import VPSLogger
 
 
 class RefundService:
@@ -25,8 +26,8 @@ class RefundService:
     def approve(refund_request):
         refund_request.status = RefundRequest.RefundRequestStatus.APPROVED
         refund_request.save()
-        refund_request.vps._deleted = True
-        refund_request.vps.save()
+        vps = refund_request.vps
+        user = refund_request.user
 
         publisher = make_kafka_publisher(KafkaConfig)
         payload = {
@@ -34,6 +35,12 @@ class RefundService:
             "items": [refund_request.vps_id],
         }
         publisher.publish('gen_refund_invoice', payload)
+
+        VPSLogger().log(user, vps, 'delete', VpsStatus.DELETING)
+        payload = {
+            "vps_id": vps.id
+        }
+        publisher.publish('delete_vps', payload)
 
     @staticmethod
     def reject(refund_request):
