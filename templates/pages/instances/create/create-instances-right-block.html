@@ -31,10 +31,20 @@
         </ul>
         <hr>
         <div class="mb-3 ">
-            <label class="small-text" for="duration-input" >Duration (months):</label>
+            <label class="small-text" for="duration-input">Duration (months):</label>
+            <!--            <div class="input-group">-->
+            <!--                <input type="number" class="form-control" id="duration-input" value="1" min="1">-->
+            <!--            </div>-->
+
             <div class="input-group">
-                <input type="number" class="form-control" id="duration-input" value="1" min="1">
+                <select class="form-control" id="duration-input">
+                    <option value="1">1</option>
+                    <option value="3">3</option>
+                    <option value="6">6</option>
+                    <option value="12">12</option>
+                </select>
             </div>
+
         </div>
 
         <div class="mb-3">
@@ -45,7 +55,8 @@
     float: left;
     margin-right: 10px;
 ">
-                <button class="action-button pb-2 ml-1" data-color="#83f2b6" id="apply-coupon" style="    width: 25%;"><span>Apply</span>
+                <button class="action-button pb-2 ml-1" data-color="#83f2b6" id="apply-coupon" style="    width: 25%;">
+                    <span>Apply</span>
                 </button>
             </div>
         </div>
