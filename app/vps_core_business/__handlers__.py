@@ -555,6 +555,7 @@ class GenerateInvoice(BaseHandler):
             cycle = fields.String(required=False)
             from_time = fields.DateTime(required=False)
             to_time = fields.DateTime(required=False)
+            duration = fields.Integer(required=False, default=1)
 
             class Meta:
                 unknown = INCLUDE
@@ -570,9 +571,10 @@ class GenerateInvoice(BaseHandler):
         cycle = payload.get('cycle')
         from_time = payload.get('from_time')
         to_time = payload.get('to_time')
+        duration = payload.get('duration')
 
         if not cycle:
-            cycle, from_time, to_time = get_billing_cycle(get_now())
+            cycle, from_time, to_time = get_billing_cycle(get_now(), num=duration)
 
         if not user:
             raise DBInsertFailed("Missing User")
@@ -588,7 +590,7 @@ class GenerateInvoice(BaseHandler):
 
         invoice_repo = InvoiceRepository()
         invoice = invoice_repo.create(user.id, items=list_vps, cycle=cycle, from_time=from_time,
-                                      to_time=to_time)
+                                      to_time=to_time, duration=duration)
 
         for vps in list_vps:
             vps.cycle = cycle

@@ -8,7 +8,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from config import APPConfig
 from home.models import Vps, Invoice
 
-from services.invoice import get_billing_cycle
+from services.invoice import get_billing_cycle, get_now
+from utils import number
 
 
 @api_view(['GET'])
@@ -102,13 +103,14 @@ def billing_view(request):
     billing_records = list(billing_records.values())
     billing_records = sorted(billing_records, key=lambda x: x['cycle'], reverse=True)
 
-    now = datetime.now(timezone.utc)
+    now = get_now()
+    start_of_this_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0) - timedelta(hours=7)
     this_cycle, _, _ = get_billing_cycle(now)
     last_hour_invoices = [i for i in invoices if i._created > now - timedelta(hours=1)]
     billing_summary = {
-        "expenses": sum([i.amount for i in invoices]),
-        "charges_this_month": sum([i.amount for i in invoices if i.cycle == this_cycle]),
-        "charges_last_hour": sum([i.amount for i in last_hour_invoices]),
+        "expenses": number(sum([i.amount for i in invoices])),
+        "charges_this_month": number(sum([i.amount for i in invoices if i._created >= start_of_this_month])),
+        "charges_last_hour": number(sum([i.amount for i in last_hour_invoices])),
     }
 
     context = {

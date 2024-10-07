@@ -18,7 +18,7 @@ from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 
 from adapters.redis_service import CachedPlan
-from config import APPConfig
+from config import APPConfig, ADMIN_CONFIG
 from home.models import Vps, Ticket
 
 from django.http import JsonResponse, HttpResponse
@@ -51,6 +51,22 @@ def get_top_up_range_data(counter, now, days):
     previous_value = counter.total_in_range(now - timedelta(days=2 * days), now - timedelta(days=days))
     diff = calculate_diff(current_value, previous_value)
     return {'current': number(current_value), 'diff': diff}
+
+
+def get_ctv_balance():
+    url = ADMIN_CONFIG.URL + '/api/account/profile/'
+    headers = {
+            'Content-Type': 'application/json',
+            'x-api-key': ADMIN_CONFIG.API_KEY
+        }
+
+    response = requests.get(url, headers=headers)
+    if response.status_code != 200:
+        return 0
+    try:
+        return response.json().get('balance_amount', 0)
+    except Exception as e:
+        return 0
 
 
 @api_view(['GET'])
@@ -117,7 +133,7 @@ def index(request):
             },
             'unpaid_orders': int(unpaid_order_counter.total_in_range(now - timedelta(days=7), now)),
             'tickets': Ticket.objects.filter(status='open').count(),
-            'balance': 0
+            'balance': get_ctv_balance()
         }
     else:
         list_vps = Vps.objects.filter(user=request.user).filter(~Q(_deleted=True)).all()

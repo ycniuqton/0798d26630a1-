@@ -95,7 +95,8 @@ def create_vps(request):
             'items': [vps.id],
             'cycle': cycle,
             'from_time': from_time,
-            'to_time': to_time
+            'to_time': to_time,
+            'duration': duration
         })
 
     payload = {

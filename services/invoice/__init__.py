@@ -15,7 +15,7 @@ class InvoiceRepository:
         now = get_now()
         return f"{user_id[-4:]}-{now.month}-{now.year}-{now.microsecond}"
 
-    def create(self, user_id, items=[], cycle=None, from_time=None, to_time=None):
+    def create(self, user_id, items=[], cycle=None, from_time=None, to_time=None, duration=1):
         user = User.objects.get(id=user_id)
 
         plans = CachedPlan().get()
@@ -27,7 +27,7 @@ class InvoiceRepository:
                 item.price = 0
                 item.plan_name = ""
             else:
-                item.price = plan.get('price', 0)
+                item.price = plan.get('price', 0)*duration
                 item.plan_name = plan.get('name', "")
 
         total_fee = sum([i.price for i in items])

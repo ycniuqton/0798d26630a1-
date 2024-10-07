@@ -8,7 +8,7 @@
 <!-- [ Main Content ] start -->
 <div class="row mt-4">
     {% if request.user.is_staff %}
-    <div class="col-md-12 col-xl-4">
+    <div class="col-xl-4 col-md-6 pointable">
         <div class="card card-social">
             <div class="card-block border-bottom">
                 <div class="row align-items-center justify-content-center">
@@ -102,7 +102,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-12 col-xl-4">
+    <div class="col-xl-4 col-md-6 pointable" onclick="window.location.replace('/invoices/')">
         <div class="card card-social">
             <div class="card-block border-bottom">
                 <div class="row align-items-center justify-content-center">
@@ -150,7 +150,7 @@
         </div>
     </div>
     {% if request.user.is_staff and APP_ROLE != 'admin' %}
-    <div class="col-xl-4 col-md-6">
+    <div class="col-xl-4 col-md-6 pointable" >
         <div class="card card-event">
             <div class="card-block">
                 <div class="row align-items-center justify-content-center">
@@ -168,7 +168,7 @@
         </div>
     </div>
     {% endif %}
-    <div class="col-xl-4 col-md-6">
+    <div class="col-xl-4 col-md-6 pointable" onclick="window.location.replace('/invoices/')">
         <div class="card card-event">
             <div class="card-block">
                 <div class="row align-items-center justify-content-center">
@@ -185,7 +185,7 @@
             </div>
         </div>
     </div>
-    <div class="col-xl-4 col-md-6">
+    <div class="col-xl-4 col-md-6 pointable" onclick="window.location.replace('/your_tickets/')">
         <div class="card card-event">
             <div class="card-block">
                 <div class="row align-items-center justify-content-center">
@@ -205,7 +205,7 @@
 
     {% endif %}
     {% if not request.user.is_staff %}
-    <div class="col-xl-4 col-md-6">
+    <div class="col-xl-4 col-md-6 pointable" onclick="window.location.replace('/payment/')">
         <div class="card card-event">
             <div class="card-block">
                 <div class="row align-items-center justify-content-center">
@@ -222,7 +222,7 @@
             </div>
         </div>
     </div>
-    <div class="col-xl-4 col-md-6">
+    <div class="col-xl-4 col-md-6 pointable" onclick="window.location.replace('/instances/')">
         <div class="card card-event">
             <div class="card-block">
                 <div class="row align-items-center justify-content-center">
@@ -256,7 +256,7 @@
             </div>
         </div>
     </div>
-    <div class="col-xl-4 col-md-6">
+    <div class="col-xl-4 col-md-6 pointable" onclick="window.location.replace('/your_tickets/')">
         <div class="card card-event">
             <div class="card-block">
                 <div class="row align-items-center justify-content-center">
