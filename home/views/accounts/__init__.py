@@ -42,6 +42,23 @@ from django.views.generic.edit import CreateView
 
 # Custom Registration Form
 class RegistrationForm(UserCreationForm):
+    first_name = forms.CharField(
+        label=_("First Name"),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
+        required=True  # Set required as per your need
+    )
+    last_name = forms.CharField(
+        label=_("Last Name"),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
+        required=True
+    )
+
+    phone_number = forms.CharField(
+        label=_("Phone Number"),
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone Number'}),
+        required=True
+    )
+
     password1 = forms.CharField(
         label=_("Password"),
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}),
@@ -53,7 +70,7 @@ class RegistrationForm(UserCreationForm):
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'email',)
+        fields = ('username', 'email', 'first_name', 'last_name', 'phone_number')
 
         widgets = {
             'username': forms.TextInput(attrs={
@@ -63,14 +80,15 @@ class RegistrationForm(UserCreationForm):
             'email': forms.EmailInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Email'
-            })
+            }),
         }
 
-    # Overriding clean method to validate username and email
+    # Overriding clean method to validate username, email, and other fields if needed
     def clean(self):
         cleaned_data = super().clean()
         username = cleaned_data.get("username")
         email = cleaned_data.get("email")
+        phone_number = cleaned_data.get("phone_number")
 
         User = get_user_model()
 
@@ -81,6 +99,10 @@ class RegistrationForm(UserCreationForm):
         # Check if email already exists
         if User.objects.filter(email=email).exists():
             self.add_error('email', ValidationError(_("This email is already registered.")))
+
+        # Validate phone number (optional, add your custom logic)
+        if not phone_number.isdigit():
+            self.add_error('phone_number', ValidationError(_("Phone number should contain only digits.")))
 
         return cleaned_data
 

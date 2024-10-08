@@ -178,6 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     else{
                         tbody.innerHTML = '';
                         data.data.forEach(item => {
+                            var amount = parseFloat(item.amount).toFixed(2);
                             const row = document.createElement('tr');
                             row.innerHTML = `
                                 {% if user.is_staff %}
@@ -187,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 <td>${item._created}</td>
                                 <td>${item.due_date}</td>
                                 <td>${item.status}</td>
-                                <td>${item.amount}</td>
+                                <td>${amount}</td>
                                 <td>
                                     <a href="/invoices/${item.id}" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer">View</a>
                                 </td>

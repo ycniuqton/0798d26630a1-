@@ -61,10 +61,6 @@
                 class="fas fa-stop"></i><span>Stop</span></button>
         <button class="action-button" data-color="#ffc107" onclick="performAction('restart')"><i
                 class="fas fa-redo"></i><span>Restart</span></button>
-        {% if request.user.is_staff and APP_ROLE == 'admin' %}
-        <button class="action-button" data-color="rgb(143 7 255)" onclick="performAction('delete')"><i
-                class="fas fa-trash"></i><span>Delete</span></button>
-        {% endif %}
         <button class="action-button" data-color="#17a2b8" onclick="performAction('vnc')"><i
                 class="fas fa-desktop"></i><span>VNC</span></button>
 <!--        <button class="action-button" data-color="#6c757d" onclick="performAction('backup')"><i-->
@@ -80,8 +76,11 @@
 
         <button class="action-button" data-color="#80DFF7" onclick="performAction('reinstall')"><i
                 class="fas fa-user-plus"></i><span>ReInstall</span></button>
-
-        {% if request.user.is_staff and APP_ROLE == 'admin' %}
+    </div>
+    <div style="display:flex" class="mt-3 mb-3 ">
+                {% if request.user.is_staff and APP_ROLE == 'admin' or request.user.is_superuser  %}
+        <button class="action-button" data-color="rgb(143 7 255)" onclick="performAction('delete')"><i
+                class="fas fa-trash"></i><span>Delete</span></button>
         <button class="action-button" data-color="#000000" onclick="performAction('suspend')"><i
                 class="fas fa-lock"></i><span>Suspend</span></button>
         <button class="action-button" data-color="#0ec8dd" onclick="performAction('unsuspend')"><i

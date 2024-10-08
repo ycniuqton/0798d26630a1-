@@ -37,7 +37,7 @@
                 class="fas fa-stop"></i><span>Stop</span></button>
         <button class="action-button" data-color="#ffc107" onclick="handleAction('restart')"><i
                 class="fas fa-redo"></i><span>Restart</span></button>
-        {% if request.user.is_staff and APP_ROLE == 'admin' %}
+        {% if request.user.is_staff and APP_ROLE == 'admin' or request.user.is_superuser  %}
         <button class="action-button" data-color="rgb(143 7 255)" onclick="handleAction('delete')"><i
                 class="fas fa-trash"></i><span>Delete</span></button>
         {% endif %}
@@ -47,7 +47,7 @@
         <button class="action-button" data-color="#007bff" onclick="handleAction('give')"><i
                 class="fas fa-user-plus"></i><span>Give to Other User</span></button>
         {% endif %}
-        {% if request.user.is_staff and APP_ROLE == 'admin' %}
+        {% if request.user.is_staff and APP_ROLE == 'admin' or request.user.is_superuser  %}
         <button class="action-button" data-color="#000000" onclick="handleAction('suspend')"><i
                 class="fas fa-lock"></i><span>Suspend</span></button>
         <button class="action-button" data-color="#0ec8dd" onclick="handleAction('unsuspend')"><i

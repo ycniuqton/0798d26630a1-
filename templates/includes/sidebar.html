@@ -181,12 +181,14 @@
                     <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i
                             class="feather icon-user"></i></span><span class="pcoded-mtext">Admin</span></a>
                     <ul class="pcoded-submenu">
-                        {% if APP_ROLE != 'admin' %}
-                        <li class=""><a href="{% url 'ctv-financial' %}" class="">
-                            <span class="pcoded-mtext">Financial</span></a></li>
-                        {% endif %}
+<!--                        {% if APP_ROLE != 'admin' %}-->
+<!--                        <li class=""><a href="{% url 'ctv-financial' %}" class="">-->
+<!--                            <span class="pcoded-mtext">Financial</span></a></li>-->
+<!--                        {% endif %}-->
+                        {% if user.is_superuser %}
                         <li class=""><a href="{% url 'ctv-settings' %}" class="">
                             <span class="pcoded-mtext">Settings</span></a></li>
+                        {% endif %}
                         {% if  APP_ROLE != 'admin' %}
                         <li class=""><a href="{% url 'admin_invoices' %}" class="">
                             <span class="pcoded-mtext">Open Invoice</span></a></li>
