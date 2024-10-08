@@ -136,8 +136,11 @@ class Vps(BaseModel):
 
     @property
     def is_refundable(self):
-        return self.end_time > self._created + timezone.timedelta(
-            hours=APPConfig.VPS_REFUND_HOURS) > datetime.now(timezone.utc)
+        try:
+            return self.end_time > self._created + timezone.timedelta(
+                hours=APPConfig.VPS_REFUND_HOURS) > datetime.now(timezone.utc)
+        except:
+            return False
 
     class Meta:
         db_table = 'vps'
