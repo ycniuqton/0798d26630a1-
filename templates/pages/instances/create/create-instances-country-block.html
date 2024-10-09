@@ -35,9 +35,18 @@
     }
     .country-card .card-body h6{
         font-size: small;
+        margin-bottom: 0px;
+    }
+    .country-card .card-body p{
+        margin-bottom: 0px;
     }
     .country-card .card-body img{
             width: 85%;
+    }
+    .custom-region-card{
+            padding-right: 6px !important;
+            padding-left: 6px !important;
+}
     }
 </style>
 
@@ -71,7 +80,7 @@
             <div class="row">
                 {% for location in locations %}
                 {% if region.name == "ALL" or location.region == region.name %}
-                <div class="col-6 col-md-4 col-lg-2 mb-3">
+                <div class="col-lg-2 mb-3 custom-region-card">
                     <div class="card country-card {% if location.status == 'off' %}sold-out{% endif %}"
                          data-name="{{ location.name }}" data-country="{{ location.country }}" group-id="{{ location.group_id }}"
                          {% if location.status == 'off' %}style="pointer-events: none; opacity: 0.5;"{% endif %}>
