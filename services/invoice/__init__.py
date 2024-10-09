@@ -16,6 +16,8 @@ class InvoiceRepository:
         return f"{user_id[-4:]}-{now.month}-{now.year}-{now.microsecond}"
 
     def create(self, user_id, items=[], cycle=None, from_time=None, to_time=None, duration=1):
+        if not duration:
+            duration = 1
         user = User.objects.get(id=user_id)
 
         plans = CachedPlan().get()
