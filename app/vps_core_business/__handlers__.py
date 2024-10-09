@@ -124,7 +124,7 @@ class RefundVPS(BaseHandler):
         if not vps:
             raise DBInsertFailed("Missing Order")
 
-        invoice_line = InvoiceLine.objects.filter(vps_id=vps.id).latest('_created')
+        invoice_line = InvoiceLine.objects.filter(vps_id=vps.id).order_by('-_created').first()
         if not invoice_line:
             raise DBInsertFailed("Missing Invoice")
 
