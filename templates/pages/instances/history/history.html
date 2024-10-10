@@ -93,6 +93,55 @@
 </div>
 
 <script>
+    function make_pagination(element_id){
+        function renderPagination(currentPage, totalPages, load_table=false) {
+    console.log("renderPagination", currentPage, totalPages);
+    const pagination = document.getElementById(element_id);
+    pagination.innerHTML = '';
+
+    // Don't show 'Prev' and 'Next' if total pages are <= 10
+    if (totalPages > 10) {
+        // Calculate the previous and next block values
+        var prevBlock = Math.floor((currentPage - 1) / 10) * 10;
+        var nextBlock = Math.ceil(currentPage / 10) * 10 + 1;
+
+        // Show 'Prev' button if prev_block is valid (greater than 0)
+        if (prevBlock > 0) {
+            const prevItem = document.createElement('li');
+            prevItem.className = 'page-item';
+            prevItem.innerHTML = `<a class="page-link" onclick="renderPagination(${prevBlock}, ${totalPages})">Prev</a>`;
+            pagination.appendChild(prevItem);
+        }
+    }
+    console.log(currentPage, totalPages, nextBlock, prevBlock);
+
+    // Render page numbers
+    const startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+    const endPage = Math.min(startPage + 9, totalPages);
+    for (let i = startPage; i <= endPage; i++) {
+        const pageItem = document.createElement('li');
+        pageItem.className = 'page-item' + (i === currentPage ? ' active' : '');
+        pageItem.innerHTML = `<a class="page-link" onclick="load_table(${i})">${i}</a>`;
+        pagination.appendChild(pageItem);
+    }
+
+
+    // Show 'Next' button if next_block is valid (less than or equal to total pages)
+    if (totalPages > 10 && nextBlock <= totalPages) {
+        const nextItem = document.createElement('li');
+        nextItem.className = 'page-item';
+        nextItem.innerHTML = `<a class="page-link" onclick="renderPagination(${nextBlock}, ${totalPages}, true)">Next</a>`;
+        pagination.appendChild(nextItem);
+    }
+    if (load_table) {
+        window.load_table(currentPage)
+    }
+    }
+        return renderPagination;
+    }
+
+    var renderPagination = make_pagination('pagination');
+
     document.addEventListener('DOMContentLoaded', function() {
         let currentPage = 1;
         let currentSort = '-datetime';
@@ -128,14 +177,9 @@
                         tbody.appendChild(row);
                     });
 
-                    const pagination = document.getElementById('pagination');
-                    pagination.innerHTML = '';
-                    for (let i = 1; i <= data.total_pages; i++) {
-                        const pageItem = document.createElement('li');
-                        pageItem.className = 'page-item' + (i === data.current_page ? ' active' : '');
-                        pageItem.innerHTML = `<a class="page-link" onclick="load_table(${i})">${i}</a>`;
-                        pagination.appendChild(pageItem);
-                    }
+                    renderPagination(data.current_page, data.total_pages)
+
+
                     document.getElementById('loader').style.display = 'none';
                 })
                 .catch(error => console.log('Error:', error));
