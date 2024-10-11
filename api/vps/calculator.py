@@ -9,6 +9,8 @@ from home.models import Vps
 
 from django.http import JsonResponse
 
+from services.discount import DiscountRepository
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -33,13 +35,15 @@ def vps_calculator(request):
     except:
         plan = None
 
-    # try:
-    #     server = [server for server in servers if server['id'] == int(serid)][0]
-    # except:
-    #     server = None
+    discount_repo = DiscountRepository.get(duration=duration)
 
     if not plan:
         return JsonResponse({'error': 'Invalid request'}, status=400)
     total_fee = plan['price'] * duration
+    discounted_fee, discount_amount = discount_repo.apply(total_fee)
 
-    return JsonResponse({'total_cost': total_fee})
+    return JsonResponse({
+        'total_cost': discounted_fee,
+        'discount_percent': discount_repo.discount_percent,
+        'discount_amount': discount_amount
+    })

@@ -11,6 +11,7 @@ from django.http import JsonResponse
 from adapters.redis_service import CachedPlan, CachedOS, CachedServer, CachedServerGroup
 from adapters.kafka_adapter import make_kafka_publisher
 from config import KafkaConfig
+from services.discount import DiscountRepository
 from services.invoice import InvoiceRepository, get_billing_cycle
 from services.invoice.utils import get_now
 from services.vps_log import VPSLogger
@@ -56,7 +57,9 @@ def create_vps(request):
 
     if not osid or not plan or not server_group:
         return JsonResponse({'error': 'Invalid request'}, status=400)
+    discount_repo = DiscountRepository.get(duration=duration)
     total_fee = plan['price'] * duration
+    total_fee, _ = discount_repo.apply(total_fee)
     cycle, from_time, to_time = get_billing_cycle(from_time=get_now(), type='monthly', num=duration)
     if user.balance.amount < total_fee and not user.is_staff:
         return JsonResponse({'error': 'Insufficient balance'}, status=400)

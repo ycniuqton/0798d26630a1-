@@ -4,6 +4,7 @@ from adapters.redis_service import CachedPlan
 from home.models import User, Balance, Transaction, Invoice, InvoiceLine
 from services.app_setting import AppSettingRepository
 from services.balance import BalanceRepository
+from services.discount import DiscountRepository
 from services.invoice.utils import get_billing_cycle, get_now
 
 
@@ -21,6 +22,7 @@ class InvoiceRepository:
         user = User.objects.get(id=user_id)
 
         plans = CachedPlan().get()
+        discount_repo = DiscountRepository.get(duration=duration)
 
         # apply price
         for item in items:
@@ -29,7 +31,8 @@ class InvoiceRepository:
                 item.price = 0
                 item.plan_name = ""
             else:
-                item.price = plan.get('price', 0)*duration
+                item.price = plan.get('price', 0) * duration
+                item.price, _ = discount_repo.apply(item.price)
                 item.plan_name = plan.get('name', "")
 
         total_fee = sum([i.price for i in items])

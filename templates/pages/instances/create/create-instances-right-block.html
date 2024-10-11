@@ -46,8 +46,9 @@
             </div>
 
         </div>
+        <h6 id="discount_percent" class="red-text" ></h6>
 
-        <div class="mb-3">
+        <div class="mb-3" hidden>
             <label class="small-text" for="coupon-code">Add Coupon or Voucher:</label>
             <div>
                 <input type="text" class="form-control" id="coupon-code" style="
@@ -129,6 +130,7 @@
             var totalCost = data.total_cost;
             document.getElementById('summary-total').innerText = '$' + totalCost.toFixed(2);
             document.getElementById('summary-hourly').innerText = '$' + (totalCost / 720).toFixed(2) ;
+            document.getElementById('discount_percent').innerText = "Discounted " + data.discount_percent + "%";
             document.getElementById('submit-vps').disabled = false;
             document.getElementById('loader').style.display = 'none';
         })
