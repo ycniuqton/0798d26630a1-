@@ -130,7 +130,11 @@
             var totalCost = data.total_cost;
             document.getElementById('summary-total').innerText = '$' + totalCost.toFixed(2);
             document.getElementById('summary-hourly').innerText = '$' + (totalCost / 720).toFixed(2) ;
-            document.getElementById('discount_percent').innerText = "Discounted " + data.discount_percent + "%";
+            if (data.discount_percent > 0) {
+                document.getElementById('discount_percent').innerText = "Discounted " + data.discount_percent + "%";
+            } else {
+                document.getElementById('discount_percent').innerText = "";
+            }
             document.getElementById('submit-vps').disabled = false;
             document.getElementById('loader').style.display = 'none';
         })
