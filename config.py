@@ -65,6 +65,7 @@ class APPConfig:
     VND_USD_EXCHANGE_RATE = _data.get('VND_USD_EXCHANGE_RATE', 26000)
     MINIMUM_SUSPEND_THRESHOLD = _data.get('MINIMUM_SUSPEND_THRESHOLD', 2)
     VPS_REFUND_HOURS = _data.get('VPS_REFUND_HOURS', 24)
+    LOG_PATH = _data.get('LOG_PATH', './info.log')
 
 
 class KafkaNotifierConfig:
