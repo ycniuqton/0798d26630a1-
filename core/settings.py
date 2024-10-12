@@ -282,4 +282,26 @@ AUTH_USER_MODEL = 'home.User'
 USE_TZ = True  # This ensures that Django stores datetimes in UTC
 TIME_ZONE = 'UTC'  # Or any other timezone you are working with
 
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/vps/debug.log',  # Path for log file
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+}
+
+
+
 ########################################
