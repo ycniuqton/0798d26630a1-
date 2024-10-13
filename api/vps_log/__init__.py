@@ -34,7 +34,7 @@ def get_vps_logs(request):
     logs_data = [data.to_readable_dict() for data in logs]
 
     return JsonResponse({
-        'logs': logs_data,
+        'data': logs_data,
         'total_pages': (total - 1) // page_size + 1,
         'current_page': page,
         'has_next': total > page * page_size,

@@ -95,34 +95,11 @@
         </tr>
         </thead>
         <tbody id="general-tbody">
-        <!--        {% if instances %}-->
-        <!--        {% for instance in instances %}-->
-        <!--        <tr>-->
-        <!--            <td><input type="checkbox" class="instance-checkbox" data-instance-id="{{ instance.id }}"></td>-->
-        <!--            <td>{{ instance.hostname }}</td>-->
-        <!--            <td>{{ instance.location }}</td>-->
-        <!--            <td>{{ instance.ip }}</td>-->
-        <!--            <td>{{ instance.status }}</td>-->
-        <!--            <td>-->
-        <!--                <a href="{% url 'instance_detail' instance.id %}" class="btn btn-sm btn-outline-primary">Manage</a>-->
-        <!--            </td>-->
-        <!--        </tr>-->
-        <!--        {% endfor %}-->
-        <!--        {% else %}-->
-        <!--        <tr>-->
-        <!--            <td colspan="6" class="no-instances">-->
-        <!--                <img src="/static/assets/images/custom/vps.png" alt="No Instances">-->
-        <!--                <h4>No Instances</h4>-->
-        <!--                <p>Deploy a new server at any of our worldwide datacenter locations</p>-->
-        <!--                <button class="btn btn-primary" onclick="location.href='/instances/create/';">Deploy Instance</button>-->
-        <!--            </td>-->
-        <!--        </tr>-->
-        <!--        {% endif %}-->
+
         </tbody>
     </table>
     <nav>
         <ul class="pagination" id="pagination">
-            <!-- Pagination will be loaded here via AJAX -->
         </ul>
     </nav>
 </div>
@@ -149,12 +126,6 @@
             'action-backup': 'Backup'
         };
 
-<!--        for (var id in actionButtons) {-->
-<!--            document.getElementById(id).addEventListener('click', function(event) {-->
-<!--                var action = actionButtons[event.target.id];-->
-<!--                handleAction(action);-->
-<!--            });-->
-<!--        }-->
     });
 </script>
 
@@ -223,12 +194,14 @@ function copyErrorMessage(element) {
         let currentSearch = '';
         let api_url = '/api/vps/';
 
-        window.load_table = function(page = 1, sort = currentSort, filter = currentFilter, search = currentSearch) {
-        console.log("triggered");
+        function make_load_table_function(load_table_function, table_id = 'general-tbody') {
 
-        document.getElementById('loader').style.display = 'block';
+        return function(page = 1, sort = currentSort, filter = currentFilter, search = currentSearch) {
+
+            document.getElementById('loader').style.display = 'block';
+
             filter_str = Object.keys(filter).map(key => key + "=" + filter[key]).join('&');
-            fetch(`${api_url}?page=${page}&page_size=10&sort_by=${sort}&${filter_str}&search=${search}`)
+            fetch(api_url+`?page=${page}&page_size=10&sort_by=${sort}&${filter_str}&search=${search}`)
                 .then(response => response.json())
                 .then(data => {
                     const tbody = document.getElementById('general-tbody');
@@ -285,27 +258,77 @@ function copyErrorMessage(element) {
                         });
                     }
 
-                    const pagination = document.getElementById('pagination');
-                    pagination.innerHTML = '';
-                    for (let i = 1; i <= data.total_pages; i++) {
-                        const pageItem = document.createElement('li');
-                        pageItem.className = 'page-item' + (i === data.current_page ? ' active' : '');
-                        pageItem.innerHTML = `<a class="page-link" onclick="load_table(${i})">${i}</a>`;
-                        pagination.appendChild(pageItem);
-                    }
+                    renderPagination_1(data.current_page, data.total_pages)
+
+
                     document.getElementById('loader').style.display = 'none';
                 })
+                .catch(error => console.log('Error:', error));
         }
+    }
 
-        document.getElementById('search-button').addEventListener('click', () => {
+    function make_pagination(element_id, pagination_function, load_table_function) {
+        temp_function = function(currentPage, totalPages, load_table = false) {
+            console.log("renderPagination", currentPage, totalPages);
+            const pagination = document.getElementById(element_id);
+            pagination.innerHTML = '';
+
+            // Don't show 'Prev' and 'Next' if total pages are <= 10
+            if (totalPages > 10) {
+                // Calculate the previous and next block values
+                var prevBlock = Math.floor((currentPage - 1) / 10) * 10;
+                var nextBlock = Math.ceil(currentPage / 10) * 10 + 1;
+
+                // Show 'Prev' button if prev_block is valid (greater than 0)
+                if (prevBlock > 0) {
+                    const prevItem = document.createElement('li');
+                    prevItem.className = 'page-item';
+                    prevItem.innerHTML = `<a class="page-link" onclick="${pagination_function}(${prevBlock}, ${totalPages}, true)">Prev</a>`;
+                    pagination.appendChild(prevItem);
+                }
+            }
+            console.log(currentPage, totalPages, nextBlock, prevBlock);
+
+            // Render page numbers
+            const startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+            const endPage = Math.min(startPage + 9, totalPages);
+            for (let i = startPage; i <= endPage; i++) {
+                const pageItem = document.createElement('li');
+                pageItem.className = 'page-item' + (i === currentPage ? ' active' : '');
+                pageItem.innerHTML = `<a class="page-link" onclick="${load_table_function}(${i})">${i}</a>`;
+                pagination.appendChild(pageItem);
+            }
+
+
+            // Show 'Next' button if next_block is valid (less than or equal to total pages)
+            if (totalPages > 10 && nextBlock <= totalPages) {
+                const nextItem = document.createElement('li');
+                nextItem.className = 'page-item';
+                nextItem.innerHTML = `<a class="page-link" onclick="${pagination_function}(${nextBlock}, ${totalPages}, true)">Next</a>`;
+                pagination.appendChild(nextItem);
+            }
+            if (load_table) {
+                window[load_table_function](currentPage)
+            }
+        }
+        return temp_function;
+    }
+
+    var load_table_function = 'load_table_1';
+    var renderPagination = 'renderPagination_1';
+    window[renderPagination] = make_pagination('pagination', renderPagination, load_table_function);
+    window[load_table_function] = make_load_table_function(load_table_function, 'general-tbody');
+
+
+    document.getElementById('search-button').addEventListener('click', () => {
             currentSearch = document.getElementById('search-input').value.toLowerCase();
-            load_table(currentPage, currentSort, currentFilter, currentSearch);
+            window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
         });
 
         document.getElementById('search-input').addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
                 currentSearch = document.getElementById('search-input').value.toLowerCase();
-                load_table(currentPage, currentSort, currentFilter, currentSearch);
+                window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
             }
         });
 
@@ -313,7 +336,7 @@ function copyErrorMessage(element) {
             th.addEventListener('click', () => {
                 const sortField = th.getAttribute('data-sort');
                 currentSort = currentSort === sortField ? `-${sortField}` : sortField;
-                load_table(currentPage, currentSort, currentFilter, currentSearch);
+                window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
             });
         });
 
@@ -322,16 +345,18 @@ function copyErrorMessage(element) {
             username_fitler.addEventListener('change', function() {
             if (this.value === 'All user') {
                 currentFilter = {};
-                load_table(currentPage, currentSort, currentFilter, currentSearch);
+                window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
                 return;
             }
             currentFilter = {user__username: this.value};
             console.log(currentFilter);
-            load_table(currentPage, currentSort, currentFilter, currentSearch);
+            window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
         });
         }
 
-        load_table();
+    window[load_table_function]();
+
+
     });
 </script>
 
