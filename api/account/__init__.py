@@ -12,19 +12,6 @@ class AccountAPI(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        profile = {
-            'email': 'ngohongqui@gmail.com',
-            'first_name': 'Ngô',
-            'last_name': 'Quí',
-            'address': 'Số 60 ngách 52/25 phú mỹ mỹ đình từ liêm hà nội',
-            'city': 'Hà Nội',
-            'country_region': 'Hong Kong (China)',
-            'zip_code': '100000',
-            'company_name': '',
-            'phone_country': 'Vietnam(84)',
-            'phone_number': '365046569',
-            'subscribe_email': True
-        }
         user = request.user
         user = user.to_readable_dict()
         return JsonResponse(user)

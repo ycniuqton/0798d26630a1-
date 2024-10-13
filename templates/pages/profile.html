@@ -54,13 +54,6 @@
             <label for="companyName">Company name</label>
             <input type="text" class="form-control" id="companyName" placeholder="Company name">
         </div>
-        <div class="form-row">
-
-            <div class="form-group col-md-6">
-                <label for="phoneNumber">&nbsp;Phone number</label>
-                <input type="text" class="form-control" id="phoneNumber">
-            </div>
-        </div>
         <div class="form-check">
             <input type="checkbox" class="form-check-input" id="subscribeEmail">
             <label class="form-check-label" for="subscribeEmail">Subscribe to marketing email</label>
@@ -94,7 +87,6 @@ function fetchUserProfile() {
         document.getElementById('countryRegion').value = data.country_region;
         document.getElementById('zipCode').value = data.zip_code;
         document.getElementById('companyName').value = data.company_name;
-        document.getElementById('phoneNumber').value = data.phone_number;
         document.getElementById('subscribeEmail').checked = data.subscribe_email;
     })
     .catch(error => console.log('Error fetching profile:', error));
@@ -114,7 +106,6 @@ function saveProfile() {
         country_region: document.getElementById('countryRegion').value,
         zip_code: document.getElementById('zipCode').value,
         company_name: document.getElementById('companyName').value,
-        phone_number: document.getElementById('phoneNumber').value,
         subscribe_email: document.getElementById('subscribeEmail').checked
     };
 
