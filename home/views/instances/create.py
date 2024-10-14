@@ -68,7 +68,8 @@ def create_instances(request):
             "region": country_short_to_region.get(sg.get("country").upper()),
             "status": "on",
             "country_short": sg.get("country").upper(),
-            "group_id": sg.get("id")
+            "group_id": sg.get("id"),
+            "cluster_id": sg.get("cluster_id")
         })
 
     locations = sorted(locations, key=lambda x: x['status'], reverse=True)
@@ -93,39 +94,42 @@ def create_instances(request):
         if distro not in oses_dict:
             oses_dict[distro] = {
                 "name": distro,
-                "versions": [os.get("name")],
+                "versions": [{"name": os.get("name"), "cluster_id": os.get("cluster_id")}],
                 "category": "System Image",
                 "image_url": distro.lower() + ".png"
             }
         else:
-            oses_dict[distro]["versions"].append(os.get("name"))
+            oses_dict[distro]["versions"].append({"name": os.get("name"), "cluster_id": os.get("cluster_id")})
 
     images = list(oses_dict.values())
+    for image in images:
+        list_of_cluster_ids = [version["cluster_id"] for version in image["versions"]]
+        image["cluster_hash"] = "".join(set([f":{cluster_id}:" for cluster_id in list_of_cluster_ids]))
 
-    # images = [
-    #     {"name": "Ubuntu", "versions": ["18.04", "19.04", "20.04", "22.04"], "category": "System Image",
-    #      "image_url": "ubuntu.png"},
-    #     {"name": "Debian", "versions": ["9", "10", "11"], "category": "System Image",
-    #      "image_url": "debian.png"},
-    #     {"name": "AlmaLinux", "versions": ["8.4", "8.5", "8.6"], "category": "System Image",
-    #      "image_url": "almalinux.png"},
-    #     {"name": "CentOS", "versions": ["7", "8"], "category": "System Image",
-    #      "image_url": "centos.png"},
-    #     {"name": "FreeBSD", "versions": ["11", "12", "13"], "category": "System Image",
-    #      "image_url": "freebsd.png"},
-    #     {"name": "Rocky Linux", "versions": ["8.4", "8.5", "8.6"], "category": "System Image",
-    #      "image_url": "rockylinux.png"},
-    #     {"name": "Windows", "versions": ["10", "Server 2016", "Server 2019"], "category": "System Image",
-    #      "image_url": "windows.png"},
-    # ]
+        # images = [
+        #     {"name": "Ubuntu", "versions": ["18.04", "19.04", "20.04", "22.04"], "category": "System Image",
+        #      "image_url": "ubuntu.png"},
+        #     {"name": "Debian", "versions": ["9", "10", "11"], "category": "System Image",
+        #      "image_url": "debian.png"},
+        #     {"name": "AlmaLinux", "versions": ["8.4", "8.5", "8.6"], "category": "System Image",
+        #      "image_url": "almalinux.png"},
+        #     {"name": "CentOS", "versions": ["7", "8"], "category": "System Image",
+        #      "image_url": "centos.png"},
+        #     {"name": "FreeBSD", "versions": ["11", "12", "13"], "category": "System Image",
+        #      "image_url": "freebsd.png"},
+        #     {"name": "Rocky Linux", "versions": ["8.4", "8.5", "8.6"], "category": "System Image",
+        #      "image_url": "rockylinux.png"},
+        #     {"name": "Windows", "versions": ["10", "Server 2016", "Server 2019"], "category": "System Image",
+        #      "image_url": "windows.png"},
+        # ]
 
     context = {
         'segment': 'create_instances',
         'plans': plans,
-        'ipv4_options': ipv4_options,
-        'bandwidth_options': bandwidth_options,
-        'ram_options': ram_options,
-        'ssd_options': ssd_options,
+        # 'ipv4_options': ipv4_options,
+        # 'bandwidth_options': bandwidth_options,
+        # 'ram_options': ram_options,
+        # 'ssd_options': ssd_options,
         'regions': regions,
         'locations': locations,
         'categories': categories,

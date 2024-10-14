@@ -46,9 +46,8 @@ class VPSCreated(BaseHandler):
         if not vps:
             return False
 
-        ips = data.get('ips', {})
-        vps.ip = next(iter(ips.values()), None)
-        vps.linked_id = data.get('vpsid')
+        vps.ip = data.get('ip')
+        vps.linked_id = data.get('linked_id')
         vps.status = VpsStatus.ON
         vps.save()
 
