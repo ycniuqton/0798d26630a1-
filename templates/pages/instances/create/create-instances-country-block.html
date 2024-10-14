@@ -97,6 +97,7 @@
                 <div class="col-lg-2 mb-3 custom-region-card">
                     <div class="card country-card {% if location.status == 'off' %}sold-out{% endif %}"
                          data-name="{{ location.name }}" data-country="{{ location.country }}" group-id="{{ location.group_id }}"
+                         data-cluster-id={{ location.cluster_id }}
                          {% if location.status == 'off' %}style="pointer-events: none; opacity: 0.5;"{% endif %}>
                         <div class="card-body text-center">
                             <img src="/api/static/flags/{{ location.country_short }}" alt="{{ location.name }}" class="mb-2">
@@ -172,12 +173,18 @@
                 vpsConfiguration.location = {
                     name: card.getAttribute('data-name'),
                     country: card.getAttribute('data-country'),
-                    id: card.getAttribute('group-id')
+                    id: card.getAttribute('group-id'),
+                    cluster_id: card.getAttribute('data-cluster-id')
                 };
 
                 // Trigger configuration update
                 document.getElementById('config_updated').value = 'true';
                 document.getElementById('config_updated').dispatchEvent(new Event('change'));
+
+                document.getElementById('cluster_set').value = 'true';
+                document.getElementById('cluster_set').dispatchEvent(new Event('change'));
+                console.log(card.getAttribute('data-cluster-id'));
+
             });
         });
     });

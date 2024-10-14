@@ -41,14 +41,19 @@ def create_vps(request):
     plans = CachedPlan().get()
     server_groups = CachedServerGroup().get()
     oses = CachedOS().get()
-    for os in oses:
-        if os['name'] == image_version:
-            osid = os['id']
-            break
+
     try:
         plan = [plan for plan in plans if plan['id'] == int(plid)][0]
     except:
         plan = None
+
+    if not plan:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+    for os in oses:
+        if os['name'] == image_version and os['cluster_id'] == plan['cluster_id']:
+            osid = os['id']
+            break
 
     try:
         server_group = [sg for sg in server_groups if sg['id'] == int(sg_id)][0]
@@ -112,6 +117,7 @@ def create_vps(request):
         "raw_data": data,
         "server_group": server_group['id'],
         "identifier": identifier,
+        "cluster_id": server_group['cluster_id']
     }
 
     publisher.publish('create_vps', payload)

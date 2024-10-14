@@ -31,7 +31,7 @@
     <h5>VPS Plans</h5>
     <div class="row">
         {% for plan in plans %}
-        <div class="col-md-4">
+        <div class="col-md-4 plan-card-container" data-cluster-id={{plan.cluster_id}}>
             <div class="card plan-card" data-name="{{ plan.name }}" data-vcpu="{{ plan.cpu }}" data-ram="{{ plan.ram }}" data-bandwidth="{{ plan.bandwidth }}" data-storage="{{ plan.disk }}" data-price="{{ plan.price }}"
             plan-id="{{plan.id}}">
                 <div class="card-body ">
@@ -149,6 +149,19 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('config_updated').value = 'true';
         document.getElementById('config_updated').dispatchEvent(new Event('change'));
     }
+
+    document.getElementById('cluster_set').addEventListener('change', function() {
+        plan_card_containers = document.querySelectorAll('.plan-card-container');
+        for (var i = 0; i < plan_card_containers.length; i++) {
+            this_plan_card = plan_card_containers[i];
+            plan_card_cluster_id = this_plan_card.getAttribute('data-cluster-id');
+            if (plan_card_cluster_id != vpsConfiguration.location.cluster_id) {
+                this_plan_card.classList.add('d-none');
+            } else {
+                this_plan_card.classList.remove('d-none');
+            }
+        }
+    });
 
 <!--    ipv4Select.addEventListener('change', updateSummary);-->
 <!--    bandwidthSelect.addEventListener('change', updateSummary);-->
