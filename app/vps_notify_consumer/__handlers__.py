@@ -83,8 +83,9 @@ class VPSCreatedError(BaseHandler):
             return False
 
         vps.status = VpsStatus.ERROR
+        errors = data.get('error', [])
+        vps.error_message = '\n'.join(errors)
         vps.meta_data = data
-        vps.error_message = "Failed to create VPS"
         vps.save()
 
 

@@ -26,6 +26,7 @@ urlpatterns = [
     path('accounts/login/', CustomUserLoginView.as_view(), name='login'),
     path('accounts/register/', UserRegistrationView.as_view(), name='register'),
     path('accounts/logout/', logout_view, name='logout'),
+    path('admin/logout/', logout_view, name='admin_logout'),
 
     path('network/', views.network, name='network'),
     path('block_storage/', views.block_storage, name='block_storage'),
