@@ -7,6 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from adapters.kafka_adapter import make_kafka_publisher
+from adapters.redis_service import clear_cache
 from adapters.redis_service.resources.full_data_server_group import CachedServerGroupConfig
 from config import KafkaConfig, APPConfig
 from home.models import Vps, User, RefundRequest
@@ -182,3 +183,15 @@ def reject_refund_request(request, request_id):
     rs.reject(refund_request)
 
     return JsonResponse({'message': 'Refund request rejected'})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def admin_clear_cache(request):
+    user = request.user
+    if not user.is_staff:
+        return JsonResponse({'error': 'Permission denied'}, status=403)
+
+    clear_cache()
+
+    return JsonResponse({'message': 'Cache cleared'})

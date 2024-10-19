@@ -281,62 +281,62 @@ AUTH_USER_MODEL = 'home.User'
 USE_TZ = True  # This ensures that Django stores datetimes in UTC
 TIME_ZONE = 'UTC'  # Or any other timezone you are working with
 
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.FileHandler',
-            'filename': APPConfig.LOG_PATH,
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,
+#     'disable_existing_loggers': False,
+#     'handlers': {
+#         'file': {
+#             'level': 'INFO',
+#             'class': 'logging.FileHandler',
+#             'filename': APPConfig.LOG_PATH,
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file'],
+#             'level': 'DEBUG',
+#             'propagate': True,
+#         },
+#     },
+# }
 
-LOGGING = {
-    'version': 1,  # the dictConfig format version
-    'disable_existing_loggers': False,  # retain the default loggers
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'INFO',  # Log all levels from DEBUG upwards
-            'class': 'logging.FileHandler',
-            'filename': APPConfig.LOG_PATH,
-            'formatter': 'verbose',  # Use the verbose formatter
-        },
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],  # Attach file handler to Django logger
-            'level': 'INFO',  # Capture all log levels for Django
-            'propagate': True,
-        },
-        'django.request': {
-            'handlers': ['file'],  # Log HTTP request errors
-            'level': 'ERROR',
-            'propagate': False,
-        },
-    },
-}
+# LOGGING = {
+#     'version': 1,  # the dictConfig format version
+#     'disable_existing_loggers': False,  # retain the default loggers
+#     'formatters': {
+#         'verbose': {
+#             'format': '{levelname} {asctime} {module} {message}',
+#             'style': '{',
+#         },
+#         'simple': {
+#             'format': '{levelname} {message}',
+#             'style': '{',
+#         },
+#     },
+#     'handlers': {
+#         'file': {
+#             'level': 'INFO',  # Log all levels from DEBUG upwards
+#             'class': 'logging.FileHandler',
+#             'filename': APPConfig.LOG_PATH,
+#             'formatter': 'verbose',  # Use the verbose formatter
+#         },
+#         'console': {
+#             'class': 'logging.StreamHandler',
+#             'formatter': 'simple',
+#         },
+#     },
+#     'loggers': {
+#         'django': {
+#             'handlers': ['file'],  # Attach file handler to Django logger
+#             'level': 'INFO',  # Capture all log levels for Django
+#             'propagate': True,
+#         },
+#         'django.request': {
+#             'handlers': ['file'],  # Log HTTP request errors
+#             'level': 'ERROR',
+#             'propagate': False,
+#         },
+#     },
+# }
 
 ########################################

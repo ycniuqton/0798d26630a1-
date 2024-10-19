@@ -52,6 +52,7 @@
     <table class="table table-hover">
         <thead>
             <tr>
+                <th scope="col">User</th>
                 <th scope="col">Token</th>
                 <th scope="col">Description</th>
                 <th scope="col">Create Time</th>
@@ -106,6 +107,7 @@
         tokens.forEach(token => {
             const row = document.createElement('tr');
             row.innerHTML = `
+                <td>${token.user}</td>
                 <td>${token.token}</td>
                 <td>${token.description}</td>
                 <td>${token._created}</td>
