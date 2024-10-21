@@ -23,6 +23,7 @@ class CachedServerGroupConfig(RedisService):
 
     def get(self):
         data = super().get(self.key_name)
+        data = None
         if not data:
             data = self.cached_server_group.get()
         for k, v in data.items():
@@ -30,6 +31,9 @@ class CachedServerGroupConfig(RedisService):
                 v['is_locked'] = False
             if not v.get('servers'):
                 continue
+            # workaround for localhost
+            if isinstance(v['servers'], list):
+                v['servers'] = {i: {"name": i, "is_locked": False} for i in v['servers']}
             for server_id, server in v['servers'].items():
                 if isinstance(server, dict):
                     continue

@@ -94,6 +94,7 @@
                 .then(data => {
                     const tbody = document.getElementById('general-tbody_2');
                     tbody.innerHTML = '';
+                    console.log(data);
                     data.data.forEach(log => {
                         const row = document.createElement('tr');
                         row.innerHTML = `

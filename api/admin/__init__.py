@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from adapters.kafka_adapter import make_kafka_publisher
-from adapters.redis_service import clear_cache
+from adapters.redis_service import clear_cache, CachedCluster, CachedServerGroup
 from adapters.redis_service.resources.full_data_server_group import CachedServerGroupConfig
 from config import KafkaConfig, APPConfig
 from home.models import Vps, User, RefundRequest
@@ -24,9 +24,9 @@ def get_group_configs(request):
     user = request.user
     if not user.is_staff or APPConfig.APP_ROLE != 'admin':
         return JsonResponse({'error': 'Permission denied'}, status=403)
-    group_configs = CachedServerGroupConfig().get()
+    group_configs = CachedServerGroup().get()
 
-    return JsonResponse(group_configs)
+    return JsonResponse(group_configs, safe=False)
 
 
 @api_view(['POST'])
@@ -195,3 +195,18 @@ def admin_clear_cache(request):
     clear_cache()
 
     return JsonResponse({'message': 'Cache cleared'})
+
+
+class ClusterResource(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        cached_cluster = CachedCluster().get()
+
+        return JsonResponse({
+            'data': cached_cluster,
+            'total_pages': 1,
+            'current_page': 1,
+            'has_next': False,
+            'has_previous': False,
+        })

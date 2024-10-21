@@ -14,6 +14,7 @@ class AccountAPI(APIView):
     def get(self, request):
         user = request.user
         user = user.to_readable_dict()
+        del user['password']
         return JsonResponse(user)
 
     def put(self, request):
