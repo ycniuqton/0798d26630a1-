@@ -66,7 +66,7 @@ class CreateVPS(BaseHandler):
         except Exception as e:
             error = e
 
-        VPSService.error(vps.id, error)
+        # VPSService.error(vps.id, error)
 
 
 class StartVPS(BaseHandler):
