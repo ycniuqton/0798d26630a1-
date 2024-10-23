@@ -2,6 +2,8 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 import requests
 
 from adapters.redis_service.resources.full_data_server_group import CachedServerGroupConfig
+from config import VIRTUALIZOR_CONFIG
+from core import settings
 from home.models import Vps, VpsStatus
 
 
@@ -14,7 +16,7 @@ class VPSService:
             'x-api-key': self.api_key
         }
 
-    #@retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+    # @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def create(self, payload):
         # group_configs = CachedServerGroupConfig().get()
         url = f"{self.base_url}/system/vpss/create"
@@ -161,6 +163,18 @@ class VPSService:
 
     def refund(self, vps_id):
         return True
+
+    def stat(self, vps_id):
+        url = f"{VIRTUALIZOR_CONFIG.MANAGER_URL}/system/vpss/stat"
+        payload = {'vps_ids': [vps_id]}
+        response = requests.post(url, headers=self.headers, json=payload)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            stat = response.json().get(str(vps_id))
+            return stat
+        else:
+            return {}
 
 
 class CtvVPSService(VPSService):

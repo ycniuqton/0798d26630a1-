@@ -4,13 +4,16 @@ from datetime import datetime, timedelta
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 
+from api.vps.__base__ import apply_vps_status
+from core import settings
 from home.models import Vps, VpsStatus
 
 from django.http import JsonResponse
-from adapters.redis_service import CachedPlan, CachedOS, CachedServer
+from adapters.redis_service import CachedPlan, CachedOS, CachedServer, CachedVpsStatRepository
 from adapters.kafka_adapter import make_kafka_publisher
 from config import KafkaConfig
 from services.invoice import InvoiceRepository
+from services.vps import VPSService
 from services.vps_log import VPSLogger
 from services.balance import BalanceRepository
 
@@ -32,6 +35,9 @@ def start_vps(request):
     list_vps = list(list_vps)
 
     publisher = make_kafka_publisher(KafkaConfig)
+
+    apply_vps_status(list_vps)
+
     for vps in list_vps:
         if vps.status not in [VpsStatus.OFF, VpsStatus.ERROR, VpsStatus.STOPPING]:
             continue

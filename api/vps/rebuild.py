@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 
+from api.vps.__base__ import apply_vps_status
 from home.models import Vps, VpsStatus
 
 from django.http import JsonResponse
@@ -48,6 +49,8 @@ def rebuild_vps(request):
         return JsonResponse({'error': 'Invalid request'}, status=400)
 
     publisher = make_kafka_publisher(KafkaConfig)
+
+    apply_vps_status([vps])
 
     vps.status = VpsStatus.REBUILDING
     vps.password = password

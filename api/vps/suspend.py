@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 
+from api.vps.__base__ import apply_vps_status
 from home.models import Vps, VpsStatus
 
 from django.http import JsonResponse
@@ -30,6 +31,8 @@ def suspend_vps(request):
     else:
         list_vps = Vps.objects.filter(linked_id__in=vps_linked_ids)
     list_vps = list(list_vps)
+
+    apply_vps_status(list_vps)
 
     publisher = make_kafka_publisher(KafkaConfig)
     for vps in list_vps:
