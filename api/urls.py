@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .admin import get_group_configs, lock_group, SuspendConfig, VpsConfig, RefundRequestAPI, approve_refund_request, \
-    reject_refund_request, admin_clear_cache, ClusterResource
+    reject_refund_request, admin_clear_cache, ClusterResource, GroupResource
 from .snapshot import VpsSnapshotAPI, restore_vsp
 from .support import TicketCollectionAPI, TicketAPI, ticket_reply
 from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token, AccountCollectionAPI
@@ -78,4 +78,5 @@ urlpatterns = [
     path('admin/refund_requests/<str:request_id>/approve/', approve_refund_request, name='approve-refund-request'),
     path('admin/refund_requests/<str:request_id>/reject/', reject_refund_request, name='reject-refund-request'),
     path('admin/setting/cluster/', ClusterResource.as_view(), name='cluster-setting'),
+    path('admin/setting/region/', GroupResource.as_view(), name='region-setting'),
 ]

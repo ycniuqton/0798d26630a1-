@@ -185,14 +185,29 @@ def reject_refund_request(request, request_id):
     return JsonResponse({'message': 'Refund request rejected'})
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def admin_clear_cache(request):
     user = request.user
     if not user.is_staff:
         return JsonResponse({'error': 'Permission denied'}, status=403)
 
-    clear_cache()
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        data = None
+
+    if not data:
+        clear_cache(True, True, True, True, True, True)
+    else:
+        plan = data.get('plan', False)
+        os = data.get('os', False)
+        server = data.get('server', False)
+        server_group = data.get('server_group', False)
+        full_server_group = data.get('full_server_group', False)
+        cluster = data.get('cluster', False)
+
+        clear_cache(plan, os, server, server_group, full_server_group, cluster)
 
     return JsonResponse({'message': 'Cache cleared'})
 
@@ -205,6 +220,25 @@ class ClusterResource(APIView):
 
         return JsonResponse({
             'data': cached_cluster,
+            'total_pages': 1,
+            'current_page': 1,
+            'has_next': False,
+            'has_previous': False,
+        })
+
+
+class GroupResource(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        cached_cluster = CachedCluster().get()
+        mapping_cluster = {cluster['id']: cluster for cluster in cached_cluster}
+        cached_group = CachedServerGroup().get()
+        for group in cached_group:
+            group['cluster'] = mapping_cluster.get(group['cluster_id'])
+
+        return JsonResponse({
+            'data': cached_group,
             'total_pages': 1,
             'current_page': 1,
             'has_next': False,

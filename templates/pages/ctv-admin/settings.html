@@ -64,26 +64,22 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="vps-tab" data-toggle="tab" href="#vps" role="tab" aria-controls="vps"
+            <a class="nav-link" id="region-tab" data-toggle="tab" href="#region" role="tab" aria-controls="region"
                aria-selected="false">
-                {% if customer.vps_len > 0 %}
-                <label> Vps ({{customer.vps_len}})</label>
-                {% else %}
-                <label> Vps</label>
-                {% endif %}
+                <label> Region</label>
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" id="ticket-tab" data-toggle="tab" href="#ticket" role="tab" aria-controls="ticket"
-               aria-selected="false">
-                {% if customer.vps_len > 0 %}
-                <label> Ticket ({{customer.open_ticket}})</label>
-                {% else %}
-                <label> Ticket</label>
-                {% endif %}
+<!--        <li class="nav-item">-->
+<!--            <a class="nav-link" id="ticket-tab" data-toggle="tab" href="#ticket" role="tab" aria-controls="ticket"-->
+<!--               aria-selected="false">-->
+<!--                {% if customer.vps_len > 0 %}-->
+<!--                <label> Ticket ({{customer.open_ticket}})</label>-->
+<!--                {% else %}-->
+<!--                <label> Ticket</label>-->
+<!--                {% endif %}-->
 
-            </a>
-        </li>
+<!--            </a>-->
+<!--        </li>-->
 
     </ul>
 
@@ -97,6 +93,11 @@
         <!-- invoices Tab -->
         <div class="tab-pane fade" id="invoices" role="tabpanel" aria-labelledby="invoices-tab">
             {% include 'pages/ctv-admin/setting/cluster.html' %}
+        </div>
+
+        <!-- invoices Tab -->
+        <div class="tab-pane fade" id="region" role="tabpanel" aria-labelledby="region-tab">
+            {% include 'pages/ctv-admin/setting/region.html' %}
         </div>
 
 

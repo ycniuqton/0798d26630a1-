@@ -5,17 +5,21 @@ from .resources.cluster import CachedCluster
 from .resources.full_data_server_group import CachedFullServerGroup
 
 
-def clear_cache():
-    cached_plan = CachedPlan()
-    cached_os = CachedOS()
-    cached_server = CachedServer()
-    cached_server_group = CachedServerGroup()
-    cached_full_server_group = CachedFullServerGroup()
-    cached_cluster = CachedCluster()
+def clear_cache(plan=False, os=False, server=False, server_group=False, full_server_group=False, cluster=False):
+    if plan:
+        CachedPlan().delete()
 
-    cached_plan.delete()
-    cached_os.delete()
-    cached_server.delete()
-    cached_server_group.delete()
-    cached_full_server_group.delete()
-    cached_cluster.delete()
+    if os:
+        CachedOS().delete()
+
+    if server:
+        CachedServer().delete()
+
+    if server_group:
+        CachedServerGroup().delete()
+
+    if full_server_group:
+        CachedFullServerGroup().delete()
+
+    if cluster:
+        CachedCluster().delete()

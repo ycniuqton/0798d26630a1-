@@ -45,3 +45,6 @@ def delete_vps(request):
         publisher.publish('delete_vps', payload)
 
     return JsonResponse('VPS is deleting', safe=False)
+
+
+
