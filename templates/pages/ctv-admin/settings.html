@@ -55,6 +55,7 @@
                aria-selected="true">
                 <label> Options</label></a>
         </li>
+        {% if request.user.is_staff and APP_ROLE == 'admin'  %}
         <li class="nav-item">
             <a class="nav-link" id="invoices-tab" data-toggle="tab" href="#invoices" role="tab" aria-controls="invoices"
                aria-selected="false">
@@ -75,6 +76,8 @@
                 <label> Price</label>
             </a>
         </li>
+
+        {% endif %}
 <!--        <li class="nav-item">-->
 <!--            <a class="nav-link" id="ticket-tab" data-toggle="tab" href="#ticket" role="tab" aria-controls="ticket"-->
 <!--               aria-selected="false">-->
@@ -96,6 +99,7 @@
             {% include 'pages/ctv-admin/setting/options.html' %}
         </div>
 
+        {% if request.user.is_staff and APP_ROLE == 'admin'  %}
         <!-- invoices Tab -->
         <div class="tab-pane fade" id="invoices" role="tabpanel" aria-labelledby="invoices-tab">
             {% include 'pages/ctv-admin/setting/cluster.html' %}
@@ -109,6 +113,7 @@
         <div class="tab-pane fade" id="price" role="tabpanel" aria-labelledby="price-tab">
             {% include 'pages/ctv-admin/setting/price.html' %}
         </div>
+        {% endif %}
 
 
     </div>
