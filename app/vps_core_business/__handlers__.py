@@ -8,6 +8,7 @@ from marshmallow import Schema, fields, INCLUDE
 from typing import Dict, Any
 from tenacity import RetryError
 
+from adapters.redis_service import CachedServerGroup
 from config import KafkaConfig, APPConfig
 from do_some_django import app_setting
 from home.models import Vps, VpsStatus, User, TriggeredOnceEvent, Invoice, InvoiceLine
@@ -59,6 +60,11 @@ class CreateVPS(BaseHandler):
         service = VPSService(base_url, api_key)
         error = ""
         try:
+            server_group_id = payload.get('server_group')
+            lock_config = AppSettingRepository().REGION_LOCKED_CONFIG
+            if str(server_group_id) in lock_config:
+                payload['serid'] = lock_config[str(server_group_id)]
+                del payload['server_group']
             response = service.create(payload)
             return True
         except RetryError as e:

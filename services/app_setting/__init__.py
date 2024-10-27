@@ -10,10 +10,26 @@ class AppSettingRepository:
         self._SUFFICIENT_BALANCE_SUSPEND_DAYS = setting.sufficient_balance_suspend_days
         self._VPS_AUTO_ARCHIVE = setting.vps_auto_archive
         self._VPS_REFUND_HOURS = setting.vps_refund_hours
+        self._REGION_LOCKED_CONFIG = setting.group_locked_config
+
+    def lock_region(self, region_id, server_id):
+        current_setting = self.REGION_LOCKED_CONFIG
+        current_setting[region_id] = server_id
+        AppSetting.objects.update(group_locked_config=current_setting)
+
+    def unlock_region(self, region_id):
+        current_setting = self.REGION_LOCKED_CONFIG
+        if region_id in current_setting:
+            del current_setting[region_id]
+            AppSetting.objects.update(group_locked_config=current_setting)
 
     @property
     def INVOICE_DUE_DAYS(self):
         return self._INVOICE_DUE_DAYS
+
+    @property
+    def REGION_LOCKED_CONFIG(self):
+        return self._REGION_LOCKED_CONFIG
 
     @property
     def VPS_REFUND_HOURS(self):

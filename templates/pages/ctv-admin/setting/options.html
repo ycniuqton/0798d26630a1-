@@ -201,209 +201,6 @@
         </div>
     </div>
 
-    {% if APP_ROLE == 'admin' %}
-    <div class="mt-4">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <h5 class="mb-0">Server Group Configuration</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <!-- Server Group List (Left Column) -->
-                            <div class="col-5 mt-3">
-                                <label>Server Groups</label>
-                                <ul class="list-group" id="server-group-list">
-                                    <!-- Server groups will be populated here dynamically -->
-                                </ul>
-                            </div>
-
-                            <!-- Server List (Right Column) -->
-                            <div class="col-5 mt-3">
-                                <label>Servers in Group</label>
-                                <ul class="list-group" id="server-list">
-                                    <!-- Servers will be populated here dynamically -->
-                                </ul>
-                            </div>
-                            <!-- Lock/Unlock Button -->
-                            <div class="col-2 " id="lock-container" style="display: none;">
-                                <button id="lock-button" class="btn btn-danger" onclick="lockGroup()">Lock Group
-                                </button>
-                                <button id="unlock-button" class="btn btn-success" style="display: none;"
-                                        onclick="unlockGroup()">Unlock Group
-                                </button>
-                            </div>
-                        </div>
-
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let data = {}; // Will hold the server group data from the API
-        let selectedGroup = null;
-        let selectedServer = null;
-
-        // Function to fetch data from the API
-        async function fetchData() {
-            try {
-                const response = await fetch('/api/admin/group_config/'); // Replace with actual API endpoint
-                data = await response.json();
-                renderServerGroups();
-            } catch (error) {
-                console.error('Error fetching data:', error);
-            }
-        }
-
-        // Function to render server groups and servers
-        function renderServerGroups() {
-            const serverGroupList = document.getElementById('server-group-list');
-            serverGroupList.innerHTML = ''; // Clear existing groups
-
-            for (const groupId in data) {
-                const group = data[groupId];
-                const groupItem = document.createElement('li');
-                groupItem.classList.add('list-group-item');
-                groupItem.setAttribute('data-group-id', group.id);
-
-                // Add lock icon if the group is locked
-                if (group.is_locked) {
-                    groupItem.innerHTML = `<i class="fas fa-lock"></i> ${group.name}`;
-                } else {
-                    groupItem.textContent = group.name;
-                }
-
-                groupItem.addEventListener('click', () => selectGroup(groupId, groupItem));
-                serverGroupList.appendChild(groupItem);
-            }
-        }
-
-        // Function to handle group selection
-function selectGroup(groupId, groupElement) {
-    console.log(groupId, groupElement, data);
-    selectedGroup = groupId;
-    const group = data[groupId];
-    const serverList = document.getElementById('server-list');
-    serverList.innerHTML = ''; // Clear existing servers
-
-    // Highlight selected group
-    document.querySelectorAll('#server-group-list .list-group-item').forEach(item => item.classList.remove('active'));
-    groupElement.classList.add('active');
-
-    // Populate the server list for the selected group
-    for (const serverId in group.server) {
-        const server = group.server[serverId];
-        const serverItem = document.createElement('li');
-        serverItem.classList.add('list-group-item');
-        serverItem.setAttribute('data-server-id', serverId);
-
-        // Add lock icon if this server is locked
-        if (server.is_locked) {
-            serverItem.innerHTML = `<i class="fas fa-lock"></i> ${server.vir_server_name}`;
-        } else {
-            serverItem.textContent = server.vir_server_name;
-        }
-
-        serverItem.addEventListener('click', () => selectServer(serverId, serverItem));
-        serverList.appendChild(serverItem);
-    }
-
-    // Always show the unlock button if the group is locked
-    if (group.is_locked) {
-        document.getElementById('lock-button').style.display = 'none';
-        document.getElementById('unlock-button').style.display = 'block';
-    } else {
-        document.getElementById('lock-button').style.display = 'none'; // Hide lock button initially
-        document.getElementById('unlock-button').style.display = 'none'; // Hide unlock button for unlocked groups
-    }
-
-    document.getElementById('lock-container').style.display = 'block'; // Show lock/unlock container
-}
-
-
-       // Function to handle server selection
-function selectServer(serverId, serverElement) {
-    selectedServer = serverId;
-
-    // Highlight selected server
-    document.querySelectorAll('#server-list .list-group-item').forEach(item => item.classList.remove('active'));
-    serverElement.classList.add('active');
-
-    // Show lock button only if the group is not locked
-    if (!data[selectedGroup].is_locked) {
-        document.getElementById('lock-button').style.display = 'block';
-    }
-
-    document.getElementById('unlock-button').style.display = 'none'; // Hide unlock button if group is not locked
-}
-
-        // Function to lock the group to the selected server
-        async function lockGroup() {
-            try {
-                await updateLockStatus(selectedGroup, selectedServer, true); // Lock the group
-                data[selectedGroup].is_locked = true;
-                data[selectedGroup].servers[selectedServer].is_locked = true;
-                renderServerGroups(); // Re-render the groups to update the lock icons
-                selectGroup(selectedGroup, document.querySelector(`[data-group-id="${selectedGroup}"]`)); // Re-render the server list for the locked group
-            } catch (error) {
-                console.error('Error locking the group:', error);
-            }
-        }
-
-        // Function to unlock the group
-        async function unlockGroup() {
-            try {
-                await updateLockStatus(selectedGroup, null, false); // Unlock the group
-                data[selectedGroup].is_locked = false;
-                for (const serverId in data[selectedGroup].servers) {
-                    data[selectedGroup].servers[serverId].is_locked = false;
-                }
-                renderServerGroups(); // Re-render the groups to update the lock icons
-                selectGroup(selectedGroup, document.querySelector(`[data-group-id="${selectedGroup}"]`)); // Re-render the server list for the unlocked group
-            } catch (error) {
-                console.error('Error unlocking the group:', error);
-            }
-        }
-
-        // Function to update the lock status via the API
-        async function updateLockStatus(groupId, serverId, isLocked) {
-            const payload = {
-                group_id: groupId,
-                server_id: serverId,
-                is_locked: isLocked
-            };
-            const response = await fetch(`/api/admin/group_config/lock`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload),
-            });
-            if (!response.ok) {
-                throw new Error('Failed to update lock status');
-            }
-        }
-
-        // Load server groups from API when the page loads
-        fetchData( )
-    </script>
-
-    <style>
-        .list-group-item.active {
-            background-color: #007bff;
-            color: white;
-        }
-        .list-group-item i {
-            margin-right: 8px;
-        }
-    </style>
-
-    {% endif %}
-
     <div class="card mb-4">
         <div class="card-header bg-primary text-white">
             <h5 class="mb-0">Suspend Config</h5>
@@ -428,7 +225,7 @@ function selectServer(serverId, serverElement) {
 
     <div class="row">
         <!-- Left Column: Big (8 columns) -->
-        <div class="col-md-8">
+        <div class="col-md-6">
             <div class="card mb-4">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0">VPS Configuration</h5>
@@ -447,6 +244,88 @@ function selectServer(serverId, serverElement) {
                 </div>
             </div>
         </div>
+
+        <div class="col-md-6">
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Cache Setting</h5>
+        </div>
+        <div class="card-body">
+            <form>
+                <table class="table table-borderless">
+                    <tbody>
+                        <tr>
+                            <td>Plan</td>
+                            <td><button type="button" class="btn btn-link text-danger p-0" onclick="clearCache('plan')">Clear</button></td>
+                        </tr>
+                        <tr>
+                            <td>OS</td>
+                            <td><button type="button" class="btn btn-link text-danger p-0" onclick="clearCache('os')">Clear</button></td>
+                        </tr>
+                        <tr>
+                            <td>Server</td>
+                            <td><button type="button" class="btn btn-link text-danger p-0" onclick="clearCache('server')">Clear</button></td>
+                        </tr>
+                        <tr>
+                            <td>Server Group</td>
+                            <td><button type="button" class="btn btn-link text-danger p-0" onclick="clearCache('server_group')">Clear</button></td>
+                        </tr>
+                        <tr>
+                            <td>Full Server Group</td>
+                            <td><button type="button" class="btn btn-link text-danger p-0" onclick="clearCache('full_server_group')">Clear</button></td>
+                        </tr>
+                        <tr>
+                            <td>Cluster</td>
+                            <td><button type="button" class="btn btn-link text-danger p-0" onclick="clearCache('cluster')">Clear</button></td>
+                        </tr>
+                        <tr>
+                            <td>All</td>
+                            <td><button type="button" class="btn btn-link text-danger p-0" onclick="clearCache('all')">Clear</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Style adjustments for a clean look */
+    .table {
+        border-collapse: collapse;
+    }
+    .table td {
+        padding: 0.5rem 0; /* Adjust padding for a cleaner layout */
+        border: none; /* Remove borders */
+    }
+    .btn-link {
+        text-decoration: none; /* Remove underline from button */
+        font-weight: bold; /* Make button text bold */
+    }
+</style>
+
+<script>
+    function clearCache(name) {
+        let url = '/api/admin/clear_cache/';
+        let data = name === 'all' ? {} : { [name]: true };
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(`${name === 'all' ? 'All caches' : name} cache cleared successfully!`);
+        })
+        .catch(error => {
+            console.error('Error clearing cache:', error);
+        });
+    }
+</script>
+
 
     </div>
 

@@ -1,7 +1,7 @@
 from django.urls import path
 
 from .admin import get_group_configs, lock_group, SuspendConfig, VpsConfig, RefundRequestAPI, approve_refund_request, \
-    reject_refund_request, admin_clear_cache, ClusterResource, GroupResource
+    reject_refund_request, admin_clear_cache, ClusterResource, GroupResource, test_cluster
 from .snapshot import VpsSnapshotAPI, restore_vsp
 from .support import TicketCollectionAPI, TicketAPI, ticket_reply
 from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token, AccountCollectionAPI
@@ -13,6 +13,7 @@ from .vps.create import create_vps
 from .vps import VPSAPI, start_vps, stop_vps, restart_vps, suspend_vps, unsuspend_vps, give_vps, change_vps_plan, \
     update_info
 from .vps.delete import delete_vps
+from .vps.plan import list_plan, set_price
 from .vps.rebuild import rebuild_vps
 from .vps.refund import refund_vps
 from .vps_log import get_vps_logs
@@ -39,6 +40,8 @@ urlpatterns = [
     path('vps/<str:vps_id>/change_plan', change_vps_plan, name='change_vps_plan'),
     path('vps/<str:vps_id>/refund/', refund_vps, name='refund_vps'),
     path('vps/<str:vps_id>/update_info/', update_info, name='update_info'),
+    path('vps/plan/', list_plan, name='list_plan'),
+    path('vps/plan/set_price/', set_price, name='set_price'),
 
     path('vps/calculator', vps_calculator, name='vps_calculator'),
     path('vps/logs/', get_vps_logs, name='get_vps_logs'),
@@ -78,5 +81,6 @@ urlpatterns = [
     path('admin/refund_requests/<str:request_id>/approve/', approve_refund_request, name='approve-refund-request'),
     path('admin/refund_requests/<str:request_id>/reject/', reject_refund_request, name='reject-refund-request'),
     path('admin/setting/cluster/', ClusterResource.as_view(), name='cluster-setting'),
+    path('admin/setting/cluster/test_cluster/', test_cluster, name='test-cluster'),
     path('admin/setting/region/', GroupResource.as_view(), name='region-setting'),
 ]

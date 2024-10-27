@@ -69,6 +69,12 @@
                 <label> Region</label>
             </a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" id="price-tab" data-toggle="tab" href="#price" role="tab" aria-controls="price"
+               aria-selected="false">
+                <label> Price</label>
+            </a>
+        </li>
 <!--        <li class="nav-item">-->
 <!--            <a class="nav-link" id="ticket-tab" data-toggle="tab" href="#ticket" role="tab" aria-controls="ticket"-->
 <!--               aria-selected="false">-->
@@ -98,6 +104,10 @@
         <!-- invoices Tab -->
         <div class="tab-pane fade" id="region" role="tabpanel" aria-labelledby="region-tab">
             {% include 'pages/ctv-admin/setting/region.html' %}
+        </div>
+
+        <div class="tab-pane fade" id="price" role="tabpanel" aria-labelledby="price-tab">
+            {% include 'pages/ctv-admin/setting/price.html' %}
         </div>
 
 

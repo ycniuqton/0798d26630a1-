@@ -17,7 +17,7 @@
 
 {% block content %}
 
-{% include 'layouts/modal/base.html' %}
+{% include 'layouts/modal/region_detail.html' %}
 
 
 <div class="container" style="min-width: 90%;">
@@ -49,9 +49,18 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-            const modalId = createModalTemplate('examplePrefix', function() {
-                alert('Action confirmed!');
-            });
+
+        let currentPage = 1;
+        let currentSort = '-_created';
+        let currentActionFilter = '';
+        let currentStatusFilter = '';
+        let currentFilter = {};
+        let currentSearch = '';
+        let api_url = '/api/admin/setting/region/';
+        let list_region = [];
+
+
+
 
         // Sync button event listener
         document.getElementById('sync-button').addEventListener('click', function() {
@@ -72,13 +81,38 @@
             .catch(error => console.error('Error:', error));
         });
 
-        let currentPage = 1;
-        let currentSort = '-_created';
-        let currentActionFilter = '';
-        let currentStatusFilter = '';
-        let currentFilter = {};
-        let currentSearch = '';
-        let api_url = '/api/admin/setting/region/';
+        window.show_region = function show_region(region_id) {
+    const region_data = list_region[region_id];
+    const prefix = 'regionDetail';
+    document.getElementById(`${prefix}ClusterName`).innerText = region_data.cluster.name;
+    document.getElementById(`${prefix}RegionNameInput`).value = region_data.name;
+    document.getElementById(`${prefix}CountryInput`).value = region_data.country;
+    document.getElementById(`${prefix}ConfirmButton`).setAttribute("region_id", region_id);
+
+    if (! region_data.is_locked ) {
+        document.getElementById(`${prefix}HeaderLockCheckbox`).checked = true;
+    } else {
+        document.getElementById(`${prefix}HeaderLockCheckbox`).checked = false;
+    }
+
+    const serverList = document.getElementById(`${prefix}ServerList`);
+    serverList.innerHTML = region_data.server.map(server => `
+        <tr>
+            <td>${server.vir_server_name || 'N/A'}</td>
+            <td>${server.cpu}</td>
+            <td>${server.ram}</td>
+            <td>${server.disk}</td>
+            <td>${server.virt}</td>
+            <td><input type="checkbox" class="row-lock-checkbox" server_id="${server.id}" ${server.is_locked || !region_data.is_locked ? 'checked' : ''}></td>
+
+        </tr>
+    `).join('');
+
+
+    $(`#${prefix}Modal`).modal('show');
+}
+
+
 
         function make_load_table_function(load_table_function, table_id = 'general-tbody-2') {
             return function(page = 1, sort = currentSort, filter = currentFilter, search = currentSearch) {
@@ -89,6 +123,7 @@
                     .then(response => response.json())
                     .then(data => {
                         const tbody = document.getElementById('general-tbody-2');
+                        list_region = [];
                         if (data.data.length === 0) {
                             tbody.innerHTML = '';
                             const row = document.createElement('tr');
@@ -102,10 +137,11 @@
                             `;
                             tbody.appendChild(row);
                         } else {
+                            list_region = Object.fromEntries(data.data.map(obj => [obj.id, obj]));
                             tbody.innerHTML = '';
                             data.data.forEach(item => {
                                 const operation_button = `<a class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer"
-                                onclick="$(`#${modalId}`).modal('show');">Manage</a>`;
+                                onclick="show_region(${item.id})">Manage</a>`;
                                 const row = document.createElement('tr');
                                 row.innerHTML = `
                                     <td>${item.name}</td>
@@ -167,7 +203,7 @@
         const renderPagination = 'renderPagination_2';
         window[renderPagination] = make_pagination('pagination-2', renderPagination, load_table_function);
         window[load_table_function] = make_load_table_function(load_table_function, 'general-tbody-2');
-
+        const modalId = createRegionModal('regionDetail', window[load_table_function]);
         window[load_table_function]();
     });
 

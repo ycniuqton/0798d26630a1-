@@ -15,6 +15,7 @@ from django.http import JsonResponse, HttpResponse
 
 from services.app_setting import AppSettingRepository
 from services.balance import BalanceRepository
+from services.cluster import ClusterManager
 from services.vps.refund import RefundService
 
 
@@ -226,6 +227,20 @@ class ClusterResource(APIView):
             'has_previous': False,
         })
 
+    def post(self, request):
+        user = request.user
+        if not user.is_staff:
+            return JsonResponse({'error': 'Permission denied'}, status=403)
+
+        data = request.data
+        updatable_fields = ['name', 'ip', 'api_key', 'api_pass', 'user_api_key', 'user_api_pass']
+        data = {field: data.get(field) for field in updatable_fields}
+
+        cluster_manager = ClusterManager()
+        res = cluster_manager.create_cluster(**data)
+
+        return JsonResponse(res, safe=False)
+
 
 class GroupResource(APIView):
     permission_classes = [IsAuthenticated]
@@ -237,6 +252,20 @@ class GroupResource(APIView):
         for group in cached_group:
             group['cluster'] = mapping_cluster.get(group['cluster_id'])
 
+        lock_config = AppSettingRepository().REGION_LOCKED_CONFIG
+        for group in cached_group:
+            locked = lock_config.get(str(group['id']))
+            if locked:
+                group['is_locked'] = True
+            else:
+                group['is_locked'] = False
+
+            for server in group['server']:
+                if str(server.get('id')) == locked:
+                    server['is_locked'] = True
+                else:
+                    server['is_locked'] = False
+
         return JsonResponse({
             'data': cached_group,
             'total_pages': 1,
@@ -244,3 +273,45 @@ class GroupResource(APIView):
             'has_next': False,
             'has_previous': False,
         })
+
+    def post(self, request):
+        user = request.user
+        if not user.is_staff:
+            return JsonResponse({'error': 'Permission denied'}, status=403)
+
+        data = request.data
+        updatable_fields = ['name', 'country']
+        group_id = data.get('id')
+        locked = data.get('lock')
+        data = {field: data.get(field) for field in updatable_fields}
+
+        if not group_id:
+            return JsonResponse({'error': 'Region id is required'}, status=400)
+
+        res = CachedServerGroup().update(group_id, data)
+        if locked:
+            AppSettingRepository().lock_region(region_id=group_id, server_id=locked)
+        else:
+            AppSettingRepository().unlock_region(region_id=group_id)
+
+        return JsonResponse(res, safe=False)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def test_cluster(request):
+    user = request.user
+    if not user.is_staff or APPConfig.APP_ROLE != 'admin':
+        return JsonResponse({'error': 'Permission denied'}, status=403)
+
+    ip = request.data.get('ip')
+    api_key = request.data.get('api_key')
+    api_pass = request.data.get('api_pass')
+    user_api_key = request.data.get('user_api_key')
+    user_api_pass = request.data.get('user_api_pass')
+
+    cluster_manager = ClusterManager()
+    if cluster_manager.test_cluster(ip, api_key, api_pass, user_api_key, user_api_pass):
+        return JsonResponse({'message': 'Test success', 'data': {'is_ok': True}})
+    else:
+        return JsonResponse({'message': 'Test failed', 'data': {'is_ok': False}}, status=400)

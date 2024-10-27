@@ -1,3 +1,5 @@
+import requests
+
 from adapters.redis_service.__base__ import CachedResource
 from core import settings
 
@@ -45,6 +47,15 @@ class CachedServerGroup(CachedResource):
         ex = 60 * 60 * 24  # 24 hours
         super().__init__(redis_uri=redis_uri, data_url=data_url, auth_header=auth_header, ex=ex)
 
+    def update(self, id, data):
+        data_url = settings.VIRTUALIZOR_CONFIG.MANAGER_URL + "/system/server_groups/update"
+        data["id"] = id
+        fields = ["country", "name", "id"]
+        data = {field: data.get(field) for field in fields}
+        res = requests.post(data_url, json=data, headers=self.auth_header)
+        self.delete()
+        return self.get()
+
 
 class CachedVpsBackup(CachedResource):
     key_name = "cached_vps_backup"
@@ -90,4 +101,3 @@ if __name__ == "__main__":
 
     vps_backup = CachedVpsBackup()
     print(vps_backup.get(1249))
-

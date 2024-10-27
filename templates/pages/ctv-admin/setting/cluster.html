@@ -16,6 +16,7 @@
 
 {% block content %}
 
+{% include 'layouts/modal/add_cluster.html' %}
 
 <div class="container" style="
     min-width: 90%;
@@ -23,7 +24,7 @@
     <div class="top-bar my-4">
 
         <button class="action-button" data-color="#007bff">
-            <span>+ Create</span></button>
+            <span onclick="show_create_cluster()">+ Create</span></button>
     </div>
 
     <table class="table table-hover table-custom">
@@ -89,6 +90,13 @@
         let currentFilter = {};
         let currentSearch = '';
         let api_url = '/api/admin/setting/cluster/';
+
+        let modal_id = createClusterModalTemplate("CreateCluster");
+
+
+        window.show_create_cluster = function show_create_cluster() {
+            $(`#${modal_id}`).modal('show');
+        }
 
         function make_load_table_function(load_table_function, table_id = 'general-tbody') {
 

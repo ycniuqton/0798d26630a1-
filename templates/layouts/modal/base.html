@@ -53,7 +53,7 @@ function createModalTemplate(prefix, confirmCallback) {
     // Set up the Confirm button callback
     document.getElementById(confirmButtonId).addEventListener('click', () => {
         confirmCallback();
-        $(`#${modalId}`).modal('hide'); // Hide modal after confirming
+        $(`#`+modalId).modal('hide'); // Hide modal after confirming
     });
 
     // Return the unique modal ID so it can be triggered later

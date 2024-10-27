@@ -380,6 +380,7 @@ class AppSetting(BaseModel):
     sufficient_balance_suspend_days = models.IntegerField(default=0)
     vps_auto_archive = models.IntegerField(default=0)
     vps_refund_hours = models.IntegerField(default=0)
+    group_locked_config = JSONField(default=dict)
 
     class Meta:
         db_table = 'app_setting'

@@ -1,0 +1,215 @@
+{% block extrastyle %}
+<style>
+    .iframe-container {display: flex; width: 100%; height: 100%; flex-direction: column; overflow: hidden;}
+    .parent-fit { flex-grow: 1; border: none; margin: 0; padding: 0; height: 100vh; }
+    .table-custom { margin-top: 20px; }
+    .table thead th { background-color: #f8f9fa; }
+    .no-instances { text-align: center; padding: 50px 0; }
+    .no-instances img { max-width: 400px; margin-bottom: 20px; }
+    .no-instances button { background-color: #007bff; color: white; }
+    .top-bar { display: flex; justify-content: space-between; align-items: center; }
+    .btn-add { background-color: #007bff; color: white; }
+    .modal-content { overflow-y: auto; max-height: 70vh; }
+    .float-right-buttons { float: right; }
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+
+{% include 'layouts/modal/set_price.html' %}
+
+
+<div class="container" style="min-width: 90%;">
+    <div class="top-bar">
+        <!-- Bootstrap Dropdown for Cluster Filter -->
+        <select id="clusterFilter" style="width: 300px" class="form-select form-control" aria-label="Cluster Filter">
+            <option value="">Select Cluster</option>
+        </select>
+    </div>
+
+    <table class="table table-hover table-custom">
+        <thead>
+        <tr>
+            <th scope="col">Plan Name</th>
+            <th scope="col">Cluster Name</th>
+            <th scope="col">Cpu</th>
+            <th scope="col">Ram</th>
+            <th scope="col">Disk</th>
+            <th scope="col">Price</th>
+            <th scope="col">Operation</th>
+        </tr>
+        </thead>
+        <tbody id="general-tbody-3">
+        </tbody>
+    </table>
+    <nav>
+        <ul class="pagination" id="pagination">
+        </ul>
+    </nav>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let currentPage = 1;
+        let currentSort = '-_created';
+        let currentFilter = {};
+        let currentSearch = '';
+        let api_url = '/api/vps/plan/';
+        let list_plan = {};
+
+        price_modal_prefix = 'setPrice';
+        set_price_modal_id = createSetPriceModal(price_modal_prefix);
+        const clusterFilter = document.getElementById('clusterFilter');
+
+        // Function to load the cluster filter options
+        function loadClusterFilter() {
+            fetch(api_url)
+                .then(response => response.json())
+                .then(data => {
+                    const clusters = data.meta_data.list_cluster;
+                    clusters.forEach(cluster => {
+                        const option = document.createElement('option');
+                        option.value = cluster;
+                        option.textContent = cluster;
+                        clusterFilter.appendChild(option);
+                    });
+                })
+                .catch(error => console.log('Error loading clusters:', error));
+        }
+
+        // Load initial table and cluster options
+        loadClusterFilter();
+
+        // Event listener for cluster filter change
+        clusterFilter.addEventListener('change', function() {
+            const selectedCluster = clusterFilter.value;
+            if (selectedCluster) {
+                currentFilter.cluster_name = selectedCluster;
+            } else {
+                delete currentFilter.cluster_name;
+            }
+            loadTable();
+        });
+        
+        window.show_set_price = function show_set_price(plan_id) {
+        // Assume list_plan is a global object containing plan details by ID
+        const plan = list_plan[plan_id];
+
+        // Check if the plan data is available
+        if (plan) {
+            // Populate the modal fields with plan details
+            document.getElementById(price_modal_prefix+ 'ClusterName').value = plan.cluster_name || '';
+            document.getElementById(price_modal_prefix+ 'PlanBandwidth').value = plan.bandwidth || '';
+            document.getElementById(price_modal_prefix+ 'PlanCpu').value = plan.cpu || '';
+            document.getElementById(price_modal_prefix+ 'PlanDisk').value = plan.disk || '';
+            document.getElementById(price_modal_prefix+ 'PlanRam').value = plan.ram || '';
+            document.getElementById(price_modal_prefix+ 'PlanRam').value = plan.ram || '';
+            document.getElementById(price_modal_prefix+ 'SetPriceInput').value = plan.price || '0';
+
+            // Set the modal's data attribute for plan ID to use it in the price update function
+            document.getElementById(set_price_modal_id).setAttribute('data-plan-id', plan_id);
+
+            // Update plan name in the title (if there's a name or identifier in your plan data)
+            document.getElementById(price_modal_prefix+ 'PlanName').innerText = plan.name || '';
+
+            // Show the modal
+            $(`#`+set_price_modal_id).modal('show');
+        } else {
+            console.error(`Plan with ID ${plan_id} not found.`);
+        }
+    };
+
+
+        // Modified loadTable function to include filtering
+        function loadTable(page = 1, sort = currentSort, filter = currentFilter, search = currentSearch) {
+            document.getElementById('loader').style.display = 'block';
+
+            const filterStr = Object.keys(filter).map(key => `${key}=${filter[key]}`).join('&');
+            fetch(`${api_url}?page=${page}&page_size=10&sort_by=${sort}&${filterStr}&search=${search}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('general-tbody-3');
+                    tbody.innerHTML = '';
+
+                    if (data.data.length === 0) {
+                        list_plan = {}
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="8" class="no-instances">
+                                    <img src="/static/assets/images/custom/vps.png" alt="No Instances">
+                                    <h4>No Instances</h4>
+                                    <p>Deploy a new server at any of our worldwide datacenter locations</p>
+                                    <button class="btn btn-primary" onclick="location.href='/instances/create/';">Deploy Instance</button>
+                                </td>
+                            </tr>
+                        `;
+                    } else {
+                        list_plan = Object.fromEntries(data.data.map(obj => [obj.id, obj]));
+                        data.data.forEach(item => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${item.name}</td>
+                                <td>${item.cluster_name}</td>
+                                <td>${item.cpu}</td>
+                                <td>${item.ram}</td>
+                                <td>${item.disk}</td>
+                                <td>${item.price}</td>
+                                <td><a class="btn btn-sm btn-outline-primary" target="_blank" onclick='show_set_price(${item.id})' rel="noopener noreferrer">Manage</a></td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    }
+
+                    renderPagination(data.current_page, data.total_pages);
+                    document.getElementById('loader').style.display = 'none';
+                })
+                .catch(error => console.log('Error:', error));
+        }
+
+        // Pagination function
+        function renderPagination(currentPage, totalPages) {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            // Render 'Prev' and 'Next' buttons only if total pages > 10
+            if (totalPages > 10) {
+                const prevBlock = Math.floor((currentPage - 1) / 10) * 10;
+                const nextBlock = Math.ceil(currentPage / 10) * 10 + 1;
+
+                if (prevBlock > 0) {
+                    const prevItem = document.createElement('li');
+                    prevItem.className = 'page-item';
+                    prevItem.innerHTML = `<a class="page-link" onclick="loadTable(${prevBlock})">Prev</a>`;
+                    pagination.appendChild(prevItem);
+                }
+
+                const startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+                const endPage = Math.min(startPage + 9, totalPages);
+                for (let i = startPage; i <= endPage; i++) {
+                    const pageItem = document.createElement('li');
+                    pageItem.className = 'page-item' + (i === currentPage ? ' active' : '');
+                    pageItem.innerHTML = `<a class="page-link" onclick="loadTable(${i})">${i}</a>`;
+                    pagination.appendChild(pageItem);
+                }
+
+                if (nextBlock <= totalPages) {
+                    const nextItem = document.createElement('li');
+                    nextItem.className = 'page-item';
+                    nextItem.innerHTML = `<a class="page-link" onclick="loadTable(${nextBlock})">Next</a>`;
+                    pagination.appendChild(nextItem);
+                }
+            } else {
+                for (let i = 1; i <= totalPages; i++) {
+                    const pageItem = document.createElement('li');
+                    pageItem.className = 'page-item' + (i === currentPage ? ' active' : '');
+                    pageItem.innerHTML = `<a class="page-link" onclick="loadTable(${i})">${i}</a>`;
+                    pagination.appendChild(pageItem);
+                }
+            }
+        }
+
+        loadTable();
+    });
+</script>
+
+{% endblock content %}
