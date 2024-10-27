@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from adapters.kafka_adapter import make_kafka_publisher
 from adapters.redis_service import clear_cache, CachedCluster, CachedServerGroup
 from adapters.redis_service.resources.full_data_server_group import CachedServerGroupConfig
-from config import KafkaConfig, APPConfig
+from config import KafkaConfig, APPConfig, KafkaNotifierConfig
 from home.models import Vps, User, RefundRequest
 from django.http import JsonResponse, HttpResponse
 
@@ -199,6 +199,9 @@ def admin_clear_cache(request):
         data = None
 
     if not data:
+        publisher = make_kafka_publisher(KafkaNotifierConfig)
+        publisher.publish('CacheCleaned', {})
+
         clear_cache(True, True, True, True, True, True)
     else:
         plan = data.get('plan', False)

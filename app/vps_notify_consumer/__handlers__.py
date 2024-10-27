@@ -4,6 +4,8 @@ from marshmallow import Schema, fields, INCLUDE
 from typing import Dict, Any
 from tenacity import RetryError
 
+from adapters.redis_service import clear_cache
+from config import APPConfig
 from home.models import Vps, VpsStatus, User
 from adapters.kafka_adapter._exceptions import SkippableException
 from services.mail_service import VPSMailService
@@ -504,3 +506,24 @@ class VPSRebuiltError(BaseHandler):
             vps.save()
         except:
             raise SkippableException("Failed to start VPS")
+
+
+class CacheCleaned(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            data = fields.Dict(required=False)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        if APPConfig.APP_ROLE != 'admin':
+            clear_cache(True, True, True, True, True, True)
