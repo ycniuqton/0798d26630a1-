@@ -1,6 +1,10 @@
 from django.shortcuts import render
+from rest_framework.decorators import permission_classes, api_view
+from rest_framework.permissions import IsAuthenticated
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def ctv_financial(request):
     user = request.user
     balance = user.balance
@@ -24,6 +28,8 @@ def ctv_financial(request):
     return render(request, "pages/ctv-admin/financial.html", context)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def ctv_settings(request):
     user = request.user
     balance = user.balance
@@ -47,10 +53,13 @@ def ctv_settings(request):
     return render(request, "pages/ctv-admin/settings.html", context)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def admin_invoices(request):
     return render(request, "pages/ctv-admin/invoices.html", context={})
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def refund_requests(request):
     return render(request, "pages/ctv-admin/refund_requests.html", context={})
-

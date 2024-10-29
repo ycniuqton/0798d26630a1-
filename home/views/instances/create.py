@@ -1,9 +1,12 @@
 from django.shortcuts import render
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 
 from adapters.redis_service import CachedPlan, CachedOS, CachedServer, CachedServerGroup
 from utils import country_mapping, country_short_to_region
 
-
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def create_instances(request):
     plans = CachedPlan().get()
     # plans = [

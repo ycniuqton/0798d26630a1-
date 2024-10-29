@@ -20,6 +20,7 @@ from django.views import View
 import os
 from .detail import *
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_customer(request):

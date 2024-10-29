@@ -53,12 +53,14 @@ def get_top_up_range_data(counter, now, days):
     return {'current': number(current_value), 'diff': diff}
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_ctv_balance():
     url = ADMIN_CONFIG.URL + '/api/account/profile/'
     headers = {
-            'Content-Type': 'application/json',
-            'x-api-key': ADMIN_CONFIG.API_KEY
-        }
+        'Content-Type': 'application/json',
+        'x-api-key': ADMIN_CONFIG.API_KEY
+    }
 
     response = requests.get(url, headers=headers)
     if response.status_code != 200:
