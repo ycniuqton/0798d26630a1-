@@ -108,9 +108,6 @@
             {% endif %}
 
             <th scope="col">Server</th>
-            {% if request.user.is_staff %}
-            <th scope="col">OS</th>
-            {% endif %}
             <th scope="col">Location</th>
             <th scope="col">IP Address</th>
             <th scope="col">End Date</th>
@@ -284,9 +281,7 @@
                         <small class="text-muted">${item.cpu} vCPU ${item.ram} GB</small>
                     </div>
                 </td>
-                                {% if request.user.is_staff %}
-                                <td>${item.os }</td>
-                                {% endif %}
+
                                 <td>
                                 <img  style="
     height: 30px;
