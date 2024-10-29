@@ -16,6 +16,27 @@
     .btn-add { background-color: #007bff; color: white; }
     .modal-content { overflow-y: auto; max-height: 70vh; }
     .float-right-buttons { float: right; }
+        .status-circle {
+            width: 20px;
+            margin-top: 10px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.2); /* Adds subtle shadow */
+        }
+        .status-on {
+        background: radial-gradient(circle, #4CAF50, #388E3C); /* Green gradient */
+    }
+    .status-off {
+        background: radial-gradient(circle, #FF6B6B, #D32F2F); /* Red gradient */
+    }
+    .status-suspended {
+        background: radial-gradient(circle, #FFA726, #FB8C00); /* Orange gradient */
+    }
+    .status-changing {
+        background: radial-gradient(circle, #64B5F6, #1976D2); /* Blue gradient */
+    }
 </style>
 {% endblock extrastyle %}
 
@@ -37,17 +58,17 @@
                 class="fas fa-stop"></i><span>Stop</span></button>
         <button class="action-button" data-color="#ffc107" onclick="handleAction('restart')"><i
                 class="fas fa-redo"></i><span>Restart</span></button>
-        {% if request.user.is_staff and APP_ROLE == 'admin' or request.user.is_superuser  %}
+        {% if request.user.is_staff and APP_ROLE == 'admin' or request.user.is_superuser %}
         <button class="action-button" data-color="rgb(143 7 255)" onclick="handleAction('delete')"><i
                 class="fas fa-trash"></i><span>Delete</span></button>
         {% endif %}
-<!--        <button class="action-button" data-color="#6c757d" onclick="handleAction('backup')"><i-->
-<!--                class="fas fa-database"></i><span>Backup</span></button>-->
+        <!--        <button class="action-button" data-color="#6c757d" onclick="handleAction('backup')"><i-->
+        <!--                class="fas fa-database"></i><span>Backup</span></button>-->
         {% if request.user.is_staff %}
         <button class="action-button" data-color="#007bff" onclick="handleAction('give')"><i
                 class="fas fa-user-plus"></i><span>Give to Other User</span></button>
         {% endif %}
-        {% if request.user.is_staff and APP_ROLE == 'admin' or request.user.is_superuser  %}
+        {% if request.user.is_staff and APP_ROLE == 'admin' or request.user.is_superuser %}
         <button class="action-button" data-color="#000000" onclick="handleAction('suspend')"><i
                 class="fas fa-lock"></i><span>Suspend</span></button>
         <button class="action-button" data-color="#0ec8dd" onclick="handleAction('unsuspend')"><i
@@ -69,7 +90,8 @@
         <input type="text" class="form-control" placeholder="Please enter" aria-label="Server Name" id="search-input"
                aria-describedby="basic-addon2">
         <div class="input-group-append">
-            <button class="btn btn-outline-secondary" type="button" id="search-button"><i class="fas fa-search"></i></button>
+            <button class="btn btn-outline-secondary" type="button" id="search-button"><i class="fas fa-search"></i>
+            </button>
             <select class="custom-select">
                 <option selected>Server Name</option>
                 <!-- Add more options here -->
@@ -86,7 +108,9 @@
             {% endif %}
 
             <th scope="col">Server</th>
+            {% if request.user.is_staff %}
             <th scope="col">OS</th>
+            {% endif %}
             <th scope="col">Location</th>
             <th scope="col">IP Address</th>
             <th scope="col">End Date</th>
@@ -131,26 +155,26 @@
 
 <script>
 
-function htmlEncode(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-}
+    function htmlEncode(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
 
-function copyErrorMessage(element) {
-    // Get the error message from the data-error-message attribute
-    const errorMessage = element.getAttribute('data-error-message');
+    function copyErrorMessage(element) {
+        // Get the error message from the data-error-message attribute
+        const errorMessage = element.getAttribute('data-error-message');
 
-    // Copy the error message to the clipboard
-    navigator.clipboard.writeText(errorMessage).then(function() {
-        alert('Copied to clipboard!\n\n' + errorMessage);
-    }).catch(function(err) {
-        console.error('Could not copy text: ', err);
-    });
-}
+        // Copy the error message to the clipboard
+        navigator.clipboard.writeText(errorMessage).then(function() {
+            alert('Copied to clipboard!\n\n' + errorMessage);
+        }).catch(function(err) {
+            console.error('Could not copy text: ', err);
+        });
+    }
 
 
 </script>
@@ -193,6 +217,14 @@ function copyErrorMessage(element) {
         let currentFilter = {};
         let currentSearch = '';
         let api_url = '/api/vps/';
+        let mapping_os_icon = {
+        "windows": "windows-10",
+        "ubuntu": "ubuntu",
+        "centos": "centos",
+        "debian": "debian",
+        "rocky": "linux",
+        "almalinux": "linux",
+        }
 
         function make_load_table_function(load_table_function, table_id = 'general-tbody') {
 
@@ -245,13 +277,32 @@ function copyErrorMessage(element) {
                                 {% if request.user.is_staff %}
                                 <td>${ item.user }</td>
                                 {% endif %}
-
-                                <td>${ item.hostname }</td>
+                                <td class="d-flex align-items-center">
+                    <img src="https://img.icons8.com/color/48/000000/${mapping_os_icon[item.os]}.png" alt="${item.os}" class="server-icon mr-2">
+                    <div>
+                        <span class="d-block">${ item.hostname }</span>
+                        <small class="text-muted">${item.cpu} vCPU ${item.ram} GB</small>
+                    </div>
+                </td>
+                                {% if request.user.is_staff %}
                                 <td>${item.os }</td>
-                                <td>${item.location }</td>
+                                {% endif %}
+                                <td>
+                                <img  style="
+    height: 30px;
+" src="https://flagsapi.com/${item.region.country}/flat/64.png" alt="${item.region.name}" class="flag-icon mr-2">
+                    <span>${item.location }</span>
+                                </td>
                                 <td>${ item.ip }</td>
                                 <td>${ item.end_time }</td>
-                                <td>${ item.status }</td>
+                                <td>
+                                <span class="status-circle ${
+            item.status === 'on' ? 'status-on' :
+            item.status === 'off' ? 'status-off' :
+            item.status === 'suspended' ? 'status-suspended' :
+            'status-changing'
+        }"  title="${item.status}" ></span>
+                                </td>
                                 <td> ${operation_button} ${refund_button}</td>
                             `;
                             tbody.appendChild(row);
