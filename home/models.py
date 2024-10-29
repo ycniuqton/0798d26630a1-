@@ -116,6 +116,7 @@ class Vps(BaseModel):
     auto_renew = models.BooleanField(default=True)
     log_count = models.IntegerField(default=0)
     backup_count = models.IntegerField(default=0)
+    region = JSONField(null=True, blank=True)
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
