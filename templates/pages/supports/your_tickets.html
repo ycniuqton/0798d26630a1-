@@ -27,6 +27,11 @@
     .reply-input { width: 100%; height: 50px; padding: 10px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 5px; }
     .reply-button { padding: 10px 20px; background: #007bff; color: #fff; border: none; border-radius: 5px; cursor: pointer; }
     .reply-button:hover { background: #0056b3; }
+    .flag-cycle {
+    color: green;
+    font-size: 40px;
+    line-height: 17px;
+}
 
 </style>
 {% endblock extrastyle %}
@@ -116,7 +121,14 @@
                             <td>${ticket.subject}</td>
                             <td>${ticket.ticket_type}</td>
                             <td>${ticket.submission_time}</td>
-                            <td>${ticket.status}</td>
+                            <td>
+                            ${
+            ticket.flag === 'unread' ? '<span class="flag-cycle" style="color: red;">●</span>' :
+            ticket.flag === 'resolved' ? '<span class="flag-cycle"  style="color: green;">●</span>' :
+            ticket.flag === 'expired' ? '<span  class="flag-cycle"  style="color: grey;">●</span>' :
+            ticket.status
+        }
+                            </td>
                             <td>
                                 <button class="btn btn-sm btn-outline-primary" onclick="showTicketDetails('${ticket.id}')">Details</button>
                             </td>

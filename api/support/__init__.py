@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from functools import reduce
 
 from admin_datta.utils import JsonResponse
@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from home.models import Ticket, TicketChat
+from services.invoice import get_now
 
 
 class TicketCollectionAPI(APIView):
@@ -59,9 +60,22 @@ class TicketCollectionAPI(APIView):
         objects = logs.order_by(sort_by).all()[page_size * (page - 1):page_size * page]
 
         data = []
+        now = get_now()
         for obj in objects:
             obj_data = obj.to_readable_dict()
             obj_data.update({'messages': [msg.to_readable_dict() for msg in obj.messages.all()]})
+
+            flag = 'unread'
+
+            last_msg = obj.messages.last()
+            if last_msg:
+                if last_msg._created < now - timedelta(days=3):
+                    flag = 'expired'
+                elif last_msg.user.is_staff:
+                    flag = 'resolved'
+                elif last_msg.user == user:
+                    flag = 'unread'
+            obj_data['flag'] = flag
             data.append(obj_data)
 
         return JsonResponse({
