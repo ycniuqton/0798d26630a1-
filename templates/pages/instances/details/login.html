@@ -81,10 +81,24 @@
     }
 
     function copyPassword() {
-        const passwordField = document.getElementById('password-field');
-        passwordField.select();
-        passwordField.setSelectionRange(0, 99999); // For mobile devices
-        document.execCommand('copy');
-        alert('Password copied to clipboard');
-    }
+    const passwordField = document.getElementById('password-field');
+    const passwordValue = passwordField.value;
+
+    // Create a temporary hidden textarea to copy the password
+    const tempTextArea = document.createElement('textarea');
+    tempTextArea.value = passwordValue;
+    tempTextArea.style.position = 'absolute';
+    tempTextArea.style.left = '-9999px';
+    document.body.appendChild(tempTextArea);
+
+    // Select and copy the text from the temporary element
+    tempTextArea.select();
+    document.execCommand('copy');
+
+    // Remove the temporary element
+    document.body.removeChild(tempTextArea);
+
+    alert('Password copied to clipboard');
+}
+
 </script>
