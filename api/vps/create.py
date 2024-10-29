@@ -86,7 +86,7 @@ def create_vps(request):
         os=os['distro'],
         identifier=identifier,
         auto_renew=auto_renew,
-        region=server_groups
+        region=server_group
     )
     vps.plan = plan
     if user.is_staff:
