@@ -56,6 +56,7 @@ def rebuild_vps(request):
     vps.password = password
     vps.username = username
     vps.os_version = os['name']
+    vps.os = os['distro']
     vps.save()
     VPSLogger().log(user, vps, 'rebuild', VpsStatus.REBUILDING)
     payload = {
