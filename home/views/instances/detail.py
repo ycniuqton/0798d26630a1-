@@ -15,6 +15,8 @@ def instance_detail(request, instance_id):
         vps = vps.filter(user_id=user.id)
 
     vps = vps.first()
+    region = vps.region
+    cluster_id = region.get('cluster_id')
 
     plans = CachedPlan().get()
     if not vps:
@@ -55,6 +57,8 @@ def instance_detail(request, instance_id):
     oses = CachedOS().get()
     oses_dict = {}
     for os in oses:
+        if os.get("cluster_id") != cluster_id:
+            continue
         distro = os.get("distro")
         if distro not in oses_dict:
             oses_dict[distro] = {
