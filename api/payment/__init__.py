@@ -14,6 +14,8 @@ from services.balance import BalanceRepository
 from utils import extract_url_params
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
 def get_payment_url(request):
     payment_type = request.GET.get('type')
     amount = request.GET.get('amount')
@@ -48,7 +50,7 @@ def get_payment_url(request):
 
         payment_transaction = PaypalTransaction()
         payment_transaction.amount = amount
-        payment_transaction.user_id = user.id
+        payment_transaction.user = user
         payment_transaction.payment_id = payment_id
         payment_transaction.token = next(iter(params.get('token')), None)
         payment_transaction.save()
