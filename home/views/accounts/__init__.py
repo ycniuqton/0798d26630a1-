@@ -9,6 +9,7 @@ from services.account import AccountRepository
 from services.mail_service import VPSMailService
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class CustomUserLoginView(UserLoginView):
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
@@ -54,7 +55,6 @@ class RegistrationForm(UserCreationForm):
         widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
         required=True
     )
-
 
     password1 = forms.CharField(
         label=_("Password"),
