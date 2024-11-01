@@ -23,7 +23,17 @@ Cài đặt docker
 ```commandline
 apt install docker.io
 apt install docker-compose
+
 ```
+
+Sửa lại file docker-compose.yml
+- update ip cho kafka
+
+Run docker-compose
+```commandline
+docker-compose up -d
+```
+
 
 Cài đặt nginx
 ```commandline
@@ -35,29 +45,14 @@ sudo certbot renew --dry-run
 
 ```
 
+Cài đặt các tham số env.yaml
+- key của tài khoản tương ưng trong resellvps
+- ip của kafka update virtualizor event
+- ip db
+.. 
 
-```bash
-$ virtualenv env
-$ source env/bin/activate
-$ pip3 install -r requirements.txt
-```
 
-<br />
 
-> Set Up Database
-
-```bash
-$ python manage.py makemigrations
-$ python manage.py migrate
-```
-
-<br />
-
-> Generate API
-
-```bash
-$ python manage.py generate-api -f
-```
 
 <br />
 
