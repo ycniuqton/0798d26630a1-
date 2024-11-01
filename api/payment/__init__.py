@@ -48,7 +48,7 @@ def get_payment_url(request):
 
         payment_transaction = PaypalTransaction()
         payment_transaction.amount = amount
-        payment_transaction.user = user
+        payment_transaction.user_id = user.id
         payment_transaction.payment_id = payment_id
         payment_transaction.token = next(iter(params.get('token')), None)
         payment_transaction.save()
