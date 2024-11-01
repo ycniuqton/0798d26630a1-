@@ -1,5 +1,7 @@
 from admin_datta.views import UserLoginView
 from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.models import Token
 from datetime import datetime, timedelta
 from django.views.generic import CreateView
@@ -98,6 +100,7 @@ class RegistrationForm(UserCreationForm):
 
 
 # User Registration View
+@method_decorator(csrf_exempt, name='dispatch')
 class UserRegistrationView(CreateView):
     template_name = 'accounts/auth-signup.html'
     form_class = RegistrationForm

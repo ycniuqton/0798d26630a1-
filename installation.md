@@ -19,6 +19,21 @@ pip install -r requirements.txt
 
 ```
 
+Cài đặt docker
+```commandline
+apt install docker.io
+apt install docker-compose
+```
+
+Cài đặt nginx
+```commandline
+apt install nginx -y
+sudo apt install certbot python3-certbot-nginx -y
+
+sudo certbot --nginx -d example.com
+sudo certbot renew --dry-run
+
+```
 
 
 ```bash
