@@ -1,7 +1,10 @@
+import uuid
+
 import requests
 from django.http import JsonResponse, HttpResponse
 from django.http import HttpResponseRedirect
 import json
+from cryptomus import Client
 
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.decorators import permission_classes, api_view
@@ -55,6 +58,33 @@ def get_payment_url(request):
         payment_transaction.token = next(iter(params.get('token')), None)
         payment_transaction.save()
 
+    elif payment_type == 'crypto':
+        PAYMENT_KEY = APPConfig.CRYPTO_API_KEY
+        MERCHANT_UUID = APPConfig.MERCHANT_ID
+
+        payment_id = uuid.uuid4().hex
+
+        client = Client.payment(PAYMENT_KEY, MERCHANT_UUID)
+
+        payment_data = {
+            'amount': amount,  # Amount in USD
+            'currency': 'USD',
+            'order_id': payment_id,
+            'url_return': APPConfig.CRYPTO_RETURN_URL,
+            'url_callback': APPConfig.CRYPTO_WEBHOOK_URL,
+            'lifetime': '3600',  # Lifetime in seconds
+            'to_currency': 'BTC'  # Cryptocurrency to receive
+        }
+
+        # payment_transaction = PaypalTransaction()
+        # payment_transaction.amount = amount
+        # payment_transaction.user = user
+        # payment_transaction.payment_id = payment_id
+        # payment_transaction.save()
+
+        response = client.create(payment_data)
+        payment_link = response.get('url')
+
     else:
         payment_link = None
 
@@ -101,6 +131,13 @@ def paypal_success_callback(request):
     return JsonResponse({'error': 'Payment verification failed'}, status=400)
 
 
+def crypto_success_callback(request):
+    print(request.body)
+    print(request.headers)
+
+    return JsonResponse({'message': 'Success'}, status=200)
+
+
 def paypal_cancel_callback(request):
     token = request.GET.get('token')
 
@@ -113,6 +150,26 @@ def paypal_cancel_callback(request):
         p_transaction.save()
 
     return HttpResponseRedirect('/payment/')
+
+
+@csrf_exempt
+@permission_classes([AllowAny])
+def crypto_webhook(request):
+    # Mock payment success callback
+    try:
+        data = json.loads(request.body)
+    except:
+        data = []
+    # get url params
+    params = request.GET
+
+    print("########### Webhook ###########")
+    print(data)
+    print(params)
+    print(request.headers)
+
+    # return the data
+    return JsonResponse({'data': data, 'params': params}, status=200)
 
 
 @csrf_exempt

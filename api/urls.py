@@ -20,7 +20,7 @@ from .vps_log import get_vps_logs
 from .balances import topup, reclaim
 from .vps.calculator import vps_calculator
 from .payment import get_payment_url, paypal_success_callback, paypal_cancel_callback, paypal_webhook, \
-    bank_webhook, generate_qr_code
+    bank_webhook, generate_qr_code, crypto_success_callback, crypto_webhook
 
 urlpatterns = [
     path('register/', RegisterAPI.as_view(), name='register'),
@@ -55,9 +55,12 @@ urlpatterns = [
     path('payment/get_payment_url/', get_payment_url, name='get_payment_url'),
     path('payment/get_qr_code/', generate_qr_code, name='get_qr_code'),
     path('payment/paypal/success/', paypal_success_callback, name='paypal_success_callback'),
+    path('payment/crypto/success/', crypto_success_callback, name='crypto_success_callback'),
     path('payment/paypal/cancel/', paypal_cancel_callback, name='paypal_cancel_callback'),
     path('payment/paypal/webhook/', paypal_webhook, name='paypal_webhook'),
+    path('payment/crypto/webhook/', crypto_webhook, name='crypto_webhook'),
     path('payment/bank/webhook/', bank_webhook, name='bank_webhook'),
+
 
     path('invoice/', InvoiceCollectionAPI.as_view(), name='invoice'),
     path('invoices/', InvoiceCollectionAPI.as_view(), name='api-invoices'),

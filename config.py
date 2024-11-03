@@ -66,6 +66,10 @@ class APPConfig:
     MINIMUM_SUSPEND_THRESHOLD = _data.get('MINIMUM_SUSPEND_THRESHOLD', 2)
     VPS_REFUND_HOURS = _data.get('VPS_REFUND_HOURS', 24)
     LOG_PATH = _data.get('LOG_PATH', './info.log')
+    CRYPTO_API_KEY = _data.get('CRYPTO_API_KEY', '1234567890123456')
+    MERCHANT_ID = _data.get('MERCHANT_ID', '1234567890123456')
+    CRYPTO_RETURN_URL = _data.get('CRYPTO_RETURN_URL', 'http://localhost:5000/api/v1/payment/callback')
+    CRYPTO_WEBHOOK_URL = _data.get('CRYPTO_WEBHOOK_URL', 'http://localhost:5000/api/v1/payment/webhook')
 
 
 class KafkaNotifierConfig:
