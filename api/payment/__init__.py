@@ -73,7 +73,6 @@ def get_payment_url(request):
             'url_return': APPConfig.CRYPTO_RETURN_URL,
             'url_callback': APPConfig.CRYPTO_WEBHOOK_URL,
             'lifetime': '3600',  # Lifetime in seconds
-            'to_currency': 'BTC'  # Cryptocurrency to receive
         }
 
         # payment_transaction = PaypalTransaction()
