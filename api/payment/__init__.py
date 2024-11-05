@@ -160,7 +160,12 @@ def crypto_webhook(request):
     except:
         data = {}
 
-    payment_amount = float(data.get('payment_amount', 0))
+    payment_amount = data.get('payment_amount')
+    if payment_amount:
+        payment_amount = float(payment_amount)
+    else:
+        payment_amount = 0
+
     payment_id = data.get('order_id')
     payment_status = data.get('status')
 
@@ -175,7 +180,7 @@ def crypto_webhook(request):
         p_transaction.raw_data = data
         p_transaction.save()
 
-    else:
+    elif p_transaction.status == CryptoTransaction.Status.PENDING:
         p_transaction.status = CryptoTransaction.Status.PAID
         p_transaction.amount = payment_amount
         p_transaction.raw_data = data
