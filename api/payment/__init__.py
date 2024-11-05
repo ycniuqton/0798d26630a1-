@@ -164,7 +164,7 @@ def crypto_webhook(request):
     payment_id = data.get('order_id')
     payment_status = data.get('status')
 
-    if payment_status != 'paid':
+    if payment_status not in ['paid', 'paid_over']:
         return JsonResponse({'error': 'Payment not paid'}, status=200)
 
     p_transaction = CryptoTransaction.objects.filter(payment_id=payment_id).first()
