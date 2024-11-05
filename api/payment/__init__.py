@@ -12,7 +12,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from adapters.paypal import PayPalClient
 from config import PaypalConfig, APPConfig
-from home.models import PaypalTransaction, User, BankTransaction
+from home.models import PaypalTransaction, User, BankTransaction, CryptoTransaction
 from services.balance import BalanceRepository
 from utils import extract_url_params
 
@@ -51,12 +51,12 @@ def get_payment_url(request):
         # extract token
         params = extract_url_params(payment_link)
 
-        payment_transaction = PaypalTransaction()
-        payment_transaction.amount = amount
-        payment_transaction.user = user
-        payment_transaction.payment_id = payment_id
-        payment_transaction.token = next(iter(params.get('token')), None)
-        payment_transaction.save()
+        p_transaction = PaypalTransaction()
+        p_transaction.amount = amount
+        p_transaction.user = user
+        p_transaction.payment_id = payment_id
+        p_transaction.token = next(iter(params.get('token')), None)
+        p_transaction.save()
 
     elif payment_type == 'crypto':
         PAYMENT_KEY = APPConfig.CRYPTO_API_KEY
@@ -75,11 +75,11 @@ def get_payment_url(request):
             'lifetime': '3600',  # Lifetime in seconds
         }
 
-        # payment_transaction = PaypalTransaction()
-        # payment_transaction.amount = amount
-        # payment_transaction.user = user
-        # payment_transaction.payment_id = payment_id
-        # payment_transaction.save()
+        p_transaction = CryptoTransaction()
+        p_transaction.amount = amount
+        p_transaction.user = user
+        p_transaction.payment_id = payment_id
+        p_transaction.save()
 
         response = client.create(payment_data)
         payment_link = response.get('url')
@@ -158,17 +158,32 @@ def crypto_webhook(request):
     try:
         data = json.loads(request.body)
     except:
-        data = []
-    # get url params
-    params = request.GET
+        data = {}
 
-    print("########### Webhook ###########")
-    print(data)
-    print(params)
-    print(request.headers)
+    payment_amount = float(data.get('payment_amount', 0))
+    payment_id = data.get('order_id')
+    payment_status = data.get('status')
+
+    if payment_status != 'paid':
+        return JsonResponse({'error': 'Payment not paid'}, status=200)
+
+    p_transaction = CryptoTransaction.objects.filter(payment_id=payment_id).first()
+    if not p_transaction:
+        p_transaction = CryptoTransaction()
+        p_transaction.amount = payment_amount
+        p_transaction.payment_id = payment_id
+        p_transaction.raw_data = data
+        p_transaction.save()
+
+    else:
+        p_transaction.status = CryptoTransaction.Status.PAID
+        p_transaction.amount = payment_amount
+        p_transaction.raw_data = data
+        p_transaction.save()
+        BalanceRepository().topup(p_transaction.user_id, payment_amount)
 
     # return the data
-    return JsonResponse({'data': data, 'params': params}, status=200)
+    return JsonResponse({}, status=200)
 
 
 @csrf_exempt

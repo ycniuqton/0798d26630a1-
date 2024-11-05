@@ -327,6 +327,28 @@ class PaypalTransaction(BaseModel):
         db_table = 'paypal_transaction'
 
 
+class CryptoTransaction(BaseModel):
+    class Status(models.TextChoices):
+        PENDING = 'P', 'Pending'
+        PAID = 'A', 'Paid'
+        UNKNOWN = 'U', 'Unknown'
+        CANCELED = 'C', 'Canceled'
+
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True, blank=True)
+    amount = models.FloatField()
+    currency = models.CharField(max_length=200, default='USD')
+    status = models.CharField(max_length=200, choices=Status.choices, default=Status.PENDING)
+    description = models.TextField()
+    payment_id = models.CharField(max_length=200, unique=True)
+    raw_data = JSONField(null=True, blank=True)
+
+    def __str__(self):
+        return f'{self.amount} ({self.status})'
+
+    class Meta:
+        db_table = 'crypto_transaction'
+
+
 class BankTransaction(BaseModel):
     class Status(models.TextChoices):
         PENDING = 'P', 'Pending'
