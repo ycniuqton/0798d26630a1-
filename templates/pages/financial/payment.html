@@ -126,7 +126,9 @@
 {% endblock extrastyle %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4" style="
+    min-width: 75% !important;!i;!;
+">
     <h2>Balance</h2>
     <div class="row">
         <div class="col-md-8">
@@ -153,6 +155,13 @@
                             <img src="/static/assets/images/custom/BIDV_Logo.png" style="width: 140px;">
                         </div>
                         <h4>Bank Transfer</h4>
+                    </div>
+
+                    <div id="stripe-card" class="card payment-method">
+                        <div class="icon">
+                            <img src="/static/assets/images/custom/stripe_logo.png" style="width: 140px;">
+                        </div>
+                        <h4>Stripe</h4>
                     </div>
 
                 </div>
@@ -233,6 +242,7 @@
         document.getElementById('paypal-card').classList.remove('active');
         document.getElementById('bank-card').classList.remove('active');
         document.getElementById('crypto-card').classList.remove('active');
+        document.getElementById('stripe-card').classList.remove('active');
     }
 
     document.getElementById('paypal-card').addEventListener('click', function() {
@@ -255,6 +265,12 @@
         document.getElementById('crypto-card').classList.add('active');
         selectedMethod = 'crypto';
     });
+    document.getElementById('stripe-card').addEventListener('click', function() {
+        hideAllPaymentInfo();
+        deactivateAllCards();
+        document.getElementById('stripe-card').classList.add('active');
+        selectedMethod = 'stripe';
+    });
 
     document.querySelectorAll('.suggestion-amount').forEach(function(el) {
         el.addEventListener('click', function() {
@@ -274,8 +290,8 @@
             document.getElementById('loader').style.display = 'none';
         }, 3000);
 
-        if (selectedMethod === 'paypal' || selectedMethod === 'crypto') {
-            var paymentType = selectedMethod === 'paypal' ? 'paypal' : 'crypto';
+        if (selectedMethod === 'paypal' || selectedMethod === 'crypto' || selectedMethod === 'stripe') {
+            var paymentType = selectedMethod;
             fetch(`/api/payment/get_payment_url?type=${paymentType}&amount=${amount}`)
                 .then(response => response.json())
                 .then(data => {

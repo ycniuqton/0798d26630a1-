@@ -1,6 +1,7 @@
 import uuid
 
 import requests
+import stripe
 from django.http import JsonResponse, HttpResponse
 from django.http import HttpResponseRedirect
 import json
@@ -12,7 +13,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from adapters.paypal import PayPalClient
 from config import PaypalConfig, APPConfig
-from home.models import PaypalTransaction, User, BankTransaction, CryptoTransaction
+from home.models import PaypalTransaction, User, BankTransaction, CryptoTransaction, StripeTransaction
 from services.balance import BalanceRepository
 from utils import extract_url_params
 
@@ -83,6 +84,39 @@ def get_payment_url(request):
 
         response = client.create(payment_data)
         payment_link = response.get('url')
+
+    elif payment_type == 'stripe':
+        payment_id = uuid.uuid4().hex
+        try:
+            stripe.api_key = "sk_test_your_secret_key"
+            payment_link = stripe.PaymentLink.create(
+                line_items=[
+                    {
+                        'price_data': {
+                            'currency': 'usd',
+                            'product_data': {
+                                'name': 'Top up wallet',
+                            },
+                            'unit_amount': amount,
+                        },
+                        'quantity': 1,
+                    },
+                ],
+                metadata={
+                    'order_id': payment_id,
+                    'customer_email': user.email,
+                },
+            )
+            payment_link = payment_link.url
+
+            p_transaction = StripeTransaction()
+            p_transaction.amount = amount
+            p_transaction.user = user
+            p_transaction.payment_id = payment_id
+            p_transaction.save()
+
+        except stripe.error.StripeError as e:
+            return JsonResponse({'error': str(e)}, status=400)
 
     else:
         payment_link = None

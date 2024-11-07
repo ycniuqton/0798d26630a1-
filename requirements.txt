@@ -39,3 +39,4 @@ apscheduler
 paypalrestsdk
 
 cryptomus
+stripe
