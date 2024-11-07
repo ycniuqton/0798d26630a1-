@@ -108,8 +108,9 @@ def get_payment_url(request):
                     'order_id': payment_id,
                     'customer_email': user.email,
                 },
-                success_url='https://yourdomain.com/success?session_id={CHECKOUT_SESSION_ID}',
-                cancel_url='https://yourdomain.com/cancel',
+                success_url=APPConfig.STRIPE_RETURN_URL,
+                # 'https://yourdomain.com/success?session_id={CHECKOUT_SESSION_ID}'
+                cancel_url=APPConfig.STRIPE_RETURN_URL,
             )
 
             payment_link = checkout_session.url
@@ -229,6 +230,26 @@ def crypto_webhook(request):
 
     # return the data
     return JsonResponse({}, status=200)
+
+
+@csrf_exempt
+@permission_classes([AllowAny])
+def stripe_webhook(request):
+    # Mock payment success callback
+    try:
+        data = json.loads(request.body)
+    except:
+        data = []
+    # get url params
+    params = request.GET
+
+    print("########### Webhook ###########")
+    print(data)
+    print(params)
+    print(request.headers)
+
+    # return the data
+    return JsonResponse({'data': data, 'params': params}, status=200)
 
 
 @csrf_exempt

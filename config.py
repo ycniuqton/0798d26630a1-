@@ -71,6 +71,7 @@ class APPConfig:
     CRYPTO_RETURN_URL = _data.get('CRYPTO_RETURN_URL', 'http://localhost:5000/api/v1/payment/callback')
     CRYPTO_WEBHOOK_URL = _data.get('CRYPTO_WEBHOOK_URL', 'http://localhost:5000/api/v1/payment/webhook')
     STRIPE_API_KEY = _data.get('STRIPE_API_KEY', '1234567890123456')
+    STRIPE_RETURN_URL = _data.get('STRIPE_RETURN_URL', 'http://localhost:5000/api/v1/payment/callback')
 
 
 class KafkaNotifierConfig:
