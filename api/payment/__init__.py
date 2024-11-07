@@ -22,7 +22,7 @@ from utils import extract_url_params
 @permission_classes([IsAuthenticated])
 def get_payment_url(request):
     payment_type = request.GET.get('type')
-    amount = request.GET.get('amount')
+    amount = float(request.GET.get('amount'))
     user = request.user
 
     # Mock receiver data
@@ -88,8 +88,9 @@ def get_payment_url(request):
     elif payment_type == 'stripe':
         payment_id = uuid.uuid4().hex
         try:
-            stripe.api_key = "sk_test_your_secret_key"
-            payment_link = stripe.PaymentLink.create(
+            stripe.api_key = APPConfig.STRIPE_API_KEY
+            checkout_session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
                 line_items=[
                     {
                         'price_data': {
@@ -97,17 +98,21 @@ def get_payment_url(request):
                             'product_data': {
                                 'name': 'Top up wallet',
                             },
-                            'unit_amount': amount,
+                            'unit_amount': int(amount * 100),  # Amount should be in cents (e.g., $10.00 = 1000)
                         },
                         'quantity': 1,
                     },
                 ],
+                mode='payment',
                 metadata={
                     'order_id': payment_id,
                     'customer_email': user.email,
                 },
+                success_url='https://yourdomain.com/success?session_id={CHECKOUT_SESSION_ID}',
+                cancel_url='https://yourdomain.com/cancel',
             )
-            payment_link = payment_link.url
+
+            payment_link = checkout_session.url
 
             p_transaction = StripeTransaction()
             p_transaction.amount = amount
@@ -116,6 +121,7 @@ def get_payment_url(request):
             p_transaction.save()
 
         except stripe.error.StripeError as e:
+            raise e
             return JsonResponse({'error': str(e)}, status=400)
 
     else:
