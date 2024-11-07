@@ -105,7 +105,7 @@ def get_payment_url(request):
                 ],
                 mode='payment',
                 metadata={
-                    'order_id': payment_id,
+                    'payment_id': payment_id,
                     'customer_email': user.email,
                 },
                 success_url=APPConfig.STRIPE_RETURN_URL,
@@ -240,16 +240,34 @@ def stripe_webhook(request):
         data = json.loads(request.body)
     except:
         data = []
-    # get url params
-    params = request.GET
 
-    print("########### Webhook ###########")
-    print(data)
-    print(params)
-    print(request.headers)
+    payment_id = data.get('data', {}).get('object', {}).get('metadata', {}).get('payment_id')
+    payment_amount = data.get('data', {}).get('object', {}).get('amount_total', 0)
+    status = data.get('data', {}).get('object', {}).get('status')
+    if status != 'complete':
+        return JsonResponse({'error': 'Payment not paid'}, status=200)
+
+    if payment_amount:
+        payment_amount = float(payment_amount) / 100
+
+    p_transaction = StripeTransaction.objects.filter(payment_id=payment_id).first()
+
+    if not p_transaction:
+        p_transaction = StripeTransaction()
+        p_transaction.amount = payment_amount
+        p_transaction.payment_id = payment_id
+        p_transaction.raw_data = data
+        p_transaction.save()
+
+    elif p_transaction.status == StripeTransaction.Status.PENDING:
+        p_transaction.status = StripeTransaction.Status.PAID
+        p_transaction.amount = payment_amount
+        p_transaction.raw_data = data
+        p_transaction.save()
+        BalanceRepository().topup(p_transaction.user_id, payment_amount)
 
     # return the data
-    return JsonResponse({'data': data, 'params': params}, status=200)
+    return JsonResponse({}, status=200)
 
 
 @csrf_exempt
