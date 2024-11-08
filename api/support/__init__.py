@@ -36,7 +36,7 @@ class TicketCollectionAPI(APIView):
     def get(self, request):
         user = request.user
 
-        filterable_fields = ['subject', 'ticket_type', 'description', 'status', 'user__username']
+        filterable_fields = ['subject', 'ticket_type', 'description', 'status', 'user__username', 'user_id']
         search_fields = ['subject', 'ticket_type', 'description', 'status', 'user__username']
         page = int(request.GET.get('page', 1))
         page_size = int(request.GET.get('page_size', 10))

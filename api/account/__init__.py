@@ -51,7 +51,7 @@ class AccountCollectionAPI(APIView):
             return JsonResponse({'error': 'Invalid request'}, status=400)
 
         filterable_fields = []
-        search_fields = []
+        search_fields = ['email', 'username']
         page = int(request.GET.get('page', 1))
         page_size = int(request.GET.get('page_size', 10))
         sort_by = request.GET.get('sort_by', '-_created')
