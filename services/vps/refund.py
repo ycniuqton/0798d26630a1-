@@ -47,5 +47,5 @@ class RefundService:
         refund_request.status = RefundRequest.RefundRequestStatus.REJECTED
         refund_request.save()
 
-        refund_request.vps.status = VpsStatus.ACTIVE
+        refund_request.vps.status = VpsStatus.ON
         refund_request.vps.save()

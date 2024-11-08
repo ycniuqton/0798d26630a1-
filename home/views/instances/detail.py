@@ -48,12 +48,12 @@ def instance_detail(request, instance_id):
         instance = vps
         instance.created = vps._created
         instance.updated = vps._updated
+        instance.deleted = vps._deleted
 
         try:
             instance.plan_name = [i['name'] for i in plans if i['id'] == vps.plan_id][0]
         except:
             instance.plan_name = ""
-
     oses = CachedOS().get()
     oses_dict = {}
     for os in oses:

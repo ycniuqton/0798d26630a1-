@@ -111,7 +111,9 @@
                 <th>Image</th>
                 <td>
                     <span id="os-text">{{ instance.os_version }}</span>
+                    {% if not instance.deleted %}
                     <i class="fas fa-edit" id="change-os-icon" style="cursor: pointer;" onclick="performAction('reinstall')"></i>
+                    {% endif %}
 
                     <!-- OS Dropdown populated dynamically -->
 <!--                    <select id="os-dropdown" class="form-control d-none">-->

@@ -121,3 +121,12 @@ class NotificationGatewayConfig:
     KAFKA_SASL_PLAIN_PASSWORD = _data.get('KAFKA_SASL_PLAIN_PASSWORD')
     KAFKA_SSL_CHECK_HOSTNAME = _data.get('KAFKA_SSL_CHECK_HOSTNAME')
     KAFKA_SSL_CA_FILE = _data.get('KAFKA_SSL_CA_FILE')
+
+
+class CustomInfo:
+    _data = config_data.get("CUSTOM_INFO", {})
+
+    INVOICE_TERM_CONDITION = _data.get("INVOICE_TERM_CONDITION", "No refund")
+    COMPANY_ADDRESS = _data.get("COMPANY_ADDRESS", "Hanoi, Vietnam")
+    COMPANY_PHONE = _data.get("COMPANY_PHONE", "0123456789")
+    APP_DOMAIN = _data.get("APP_DOMAIN", "https://yourdomain.com")
