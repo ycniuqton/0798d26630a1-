@@ -81,13 +81,15 @@
                 class="fas fa-user-plus"></i><span>ReInstall</span></button>
     </div>
     <div style="display:flex" class="mt-3 mb-3 ">
-                {% if ( request.user.is_staff and APP_ROLE == 'admin' or request.user.is_superuser ) and ! instance.deleted %}
+                {% if request.user.is_staff and APP_ROLE == 'admin' or request.user.is_superuser  %}
+                {% if instance.deleted != True %}
         <button class="action-button" data-color="rgb(143 7 255)" onclick="performAction('delete')"><i
                 class="fas fa-trash"></i><span>Delete</span></button>
         <button class="action-button" data-color="#000000" onclick="performAction('suspend')"><i
                 class="fas fa-lock"></i><span>Suspend</span></button>
         <button class="action-button" data-color="#0ec8dd" onclick="performAction('unsuspend')"><i
                 class="fas fa-unlock-alt"></i><span>Unsuspend</span></button>
+                {% endif %}
         {% endif %}
     </div>
 
