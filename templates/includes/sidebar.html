@@ -99,8 +99,10 @@
                     <a href="javascript:" class="nav-link "><span class="pcoded-micon"><i
                             class="feather icon-bar-chart"></i></span><span class="pcoded-mtext">Financial</span></a>
                     <ul class="pcoded-submenu">
+                        {% if not user.is_staff %}
                         <li class=""><a href="{% url 'payment' %}" class="">
                             <span class="pcoded-mtext">Payment</span></a></li>
+                        {% endif %}
 <!--                        <li class=""><a href="{% url 'resource_record' %}" class="">-->
 <!--                            <span class="pcoded-mtext">Resource record</span></a></li>-->
 
