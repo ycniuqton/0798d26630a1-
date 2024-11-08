@@ -6,7 +6,7 @@ from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated, AllowAny
 
 from config import APPConfig
-from home.models import Vps, Invoice
+from home.models import Vps, Invoice, Transaction
 
 from services.invoice import get_billing_cycle, get_now
 from utils import number
@@ -140,8 +140,11 @@ def invoices_view(request):
 @permission_classes([IsAuthenticated])
 def transaction_history(request):
     user = request.user
-    balance = user.balance
-    balance_records = balance.transactions.all()
+    if user.is_staff:
+        balance_records = Transaction.objects.all()
+    else:
+        balance = user.balance
+        balance_records = balance.transactions.all()
     balance_records = [
         {
             "payment_account": record.user.email,
