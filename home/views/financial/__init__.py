@@ -141,23 +141,11 @@ def invoices_view(request):
 def transaction_history(request):
     user = request.user
     if user.is_staff:
-        balance_records = Transaction.objects.all()
-    else:
-        balance = user.balance
-        balance_records = balance.transactions.all()
-    balance_records = [
-        {
-            "payment_account": record.user.email,
-            "payment_type": record.type,
-            "payment_method": record.method,
-            "time": record._created,
-            "recharge_amount": record.amount,
-            "operation": "View"
-        }
-        for record in balance_records
-    ]
+        list_user = Vps.objects.values('user__username').distinct()
+        list_user = [user['user__username'] for user in list_user]
+
     context = {
-        'balance_records': balance_records,
+        'list_user': list_user
     }
 
     return render(request, 'pages/financial/balance_record.html', context)

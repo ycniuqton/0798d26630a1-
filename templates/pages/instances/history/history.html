@@ -56,7 +56,7 @@
             <option value="Upgrade">Upgrade</option>
             <!-- Add more options here if needed -->
         </select>
-        <select class="form-control width-auto mr-1" id="status-filter-select">
+        <select class="form-control width-auto mr-1" id="status-filter-select" hidden>
             <option value="">All Statuses</option>
             <option value="Success">Success</option>
             <option value="Failure">Failure</option>
@@ -75,7 +75,6 @@
             {% endif %}
             <th scope="col" data-sort="instance_name">Instance Name</th>
             <th scope="col" data-sort="action">Action</th>
-            <th scope="col" data-sort="status">Status</th>
             <th scope="col" data-sort="performed_by">Performed By</th>
             <th scope="col" data-sort="datetime">Date and Time</th>
             <th scope="col">Details</th>
@@ -122,7 +121,6 @@
                                    {% endif %}
                                <td>${log.hostname}</td>
                                <td>${log.action}</td>
-                               <td>${log.status}</td>
                                <td>${log.performed_by}</td>
                                <td>${log.datetime}</td>
                                <td>${log.description}</td>
@@ -138,51 +136,6 @@
                     .catch(error => console.log('Error:', error));
             }
 
-            document.getElementById('search-button').addEventListener('click', () => {
-                currentSearch = document.getElementById('search-input').value.toLowerCase();
-                window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
-            });
-
-            document.getElementById('search-input').addEventListener('keypress', (event) => {
-                if (event.key === 'Enter') {
-                    currentSearch = document.getElementById('search-input').value.toLowerCase();
-                    window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
-                }
-            });
-
-            document.getElementById('action-filter-select').addEventListener('change', (event) => {
-                currentFilter["action"] = event.target.value.toLowerCase();
-                window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
-            });
-
-            document.getElementById('status-filter-select').addEventListener('change', (event) => {
-                currentFilter["status"] = event.target.value.toLowerCase();
-                window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
-            });
-
-            document.querySelectorAll('th[data-sort]').forEach(th => {
-                th.addEventListener('click', () => {
-                    const sortField = th.getAttribute('data-sort');
-                    currentSort = currentSort === sortField ? `-${sortField}` : sortField;
-                    window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
-                });
-            });
-
-            username_fitler = document.getElementById('username_fitler')
-            if (username_fitler) {
-                username_fitler.addEventListener('change', function() {
-                    if (this.value === 'All user') {
-                        currentFilter = {};
-                        window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
-                        return;
-                    }
-                    currentFilter = {
-                        user__username: this.value
-                    };
-                    console.log(currentFilter);
-                    window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
-                });
-            }
         }
 
     function make_pagination(element_id, pagination_function, load_table_function) {
@@ -237,6 +190,54 @@
         var renderPagination = 'renderPagination_1';
         window[renderPagination] = make_pagination('pagination', renderPagination, load_table_function);
         window[load_table_function] = make_load_table_function(load_table_function);
+
+        document.getElementById('search-button').addEventListener('click', () => {
+                currentSearch = document.getElementById('search-input').value.toLowerCase();
+                window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
+            });
+
+            document.getElementById('search-input').addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    currentSearch = document.getElementById('search-input').value.toLowerCase();
+                    window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
+                }
+            });
+
+            document.getElementById('action-filter-select').addEventListener('change', (event) => {
+                currentFilter["action"] = event.target.value.toLowerCase();
+                window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
+            });
+
+            document.getElementById('status-filter-select').addEventListener('change', (event) => {
+                currentFilter["status"] = event.target.value.toLowerCase();
+                window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
+            });
+
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                th.addEventListener('click', () => {
+                    const sortField = th.getAttribute('data-sort');
+                    currentSort = currentSort === sortField ? `-${sortField}` : sortField;
+                    window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
+                });
+            });
+
+            username_fitler = document.getElementById('username_fitler')
+            if (username_fitler) {
+                username_fitler.addEventListener('change', function() {
+                    if (this.value === 'All user') {
+                        currentFilter = {};
+                        window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
+                        return;
+                    }
+                    currentFilter = {
+                        user__username: this.value
+                    };
+                    console.log(currentFilter);
+                    window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
+                });
+            }
+
+
 
         console.log("triggered");
         window[load_table_function]();

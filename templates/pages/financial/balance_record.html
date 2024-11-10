@@ -44,21 +44,36 @@
 ">
     <h3>Balance Record</h3>
     <!-- Your Balance Record content here -->
-    <div class="row mt-3" hidden>
-        <div class="col">
-            <input type="date" class="form-control">
+    <div class="input-group mb-3">
+        {% if request.user.is_staff %}
+        <div class="input-group-append" style="margin-right:10px">
+            <select class="custom-select" id="username_fitler">
+                <option selected>All user</option>
+                {% for username in list_user %}
+                <option>{{ username }}</option>
+                {% endfor %}
+
+            </select>
         </div>
-        <div class="col">
-            <input type="date" class="form-control">
-        </div>
-        <div class="col">
-            <button class="btn btn-outline-secondary"><i class="fas fa-sync-alt"></i></button>
+        {% endif %}
+        <input  type="text" class="form-control" placeholder="Please enter" aria-label="Server Name" id="search-input"
+               aria-describedby="basic-addon2">
+        <div  class="input-group-append">
+            <button  class="btn btn-outline-secondary" type="button" id="search-button"><i class="fas fa-search"></i>
+            </button>
+            <select hidden class="custom-select">
+                <option selected>Server Name</option>
+                <!-- Add more options here -->
+            </select>
+            <button hidden class="btn btn-outline-secondary" type="button"><i class="fas fa-sync-alt"></i></button>
         </div>
     </div>
     <table class="table table-hover mt-3">
         <thead>
         <tr>
-            <th scope="col">Account</th>
+            {% if request.user.is_staff %}
+                <th scope="col">User</th>
+            {% endif %}
             <th scope="col">Type</th>
             <th scope="col">Method</th>
             <th scope="col">Time</th>
@@ -66,57 +81,159 @@
             <th scope="col">Operation</th>
         </tr>
         </thead>
-        <tbody>
-        {% if balance_records %}
-        {% for record in balance_records %}
-        <tr>
-            <td>{{ record.payment_account }}</td>
-            <td>{{ record.payment_type }}</td>
-            <td>{{ record.payment_method }}</td>
-            <td>{{ record.time }}</td>
-            <td>{{ record.recharge_amount }}</td>
-            <td>
-                <button class="btn btn-sm btn-outline-primary">{{ record.operation }}</button>
-            </td>
-        </tr>
-        {% endfor %}
-        {% else %}
-        <tr>
-            <td colspan="6" class="no-records">
-                <img src="https://via.placeholder.com/150" alt="No Records">
-                <h4>No Records</h4>
-            </td>
-        </tr>
-        {% endif %}
+        <tbody id="general-tbody">
+        <!-- Logs will be loaded here via AJAX -->
         </tbody>
     </table>
+    <nav>
+        <ul class="pagination" id="pagination">
+            <!-- Pagination will be loaded here via AJAX -->
+        </ul>
+    </nav>
 </div>
 
+
 <script>
-    document.getElementById('other-btn').addEventListener('click', function() {
-        var otherAmountInput = document.getElementById('other-amount');
-        otherAmountInput.style.display = otherAmountInput.style.display === 'none' ? 'block' : 'none';
-    });
-
-    var amountButtons = document.querySelectorAll('.amount-btn');
-    amountButtons.forEach(function(button) {
-        button.addEventListener('click', function() {
-            var otherAmountInput = document.getElementById('other-amount');
-            otherAmountInput.style.display = 'none';
-        });
-    });
-
     document.addEventListener('DOMContentLoaded', function() {
-        var triggerTabList = [].slice.call(document.querySelectorAll('#paymentTabs a'))
-        triggerTabList.forEach(function (triggerEl) {
-            var tabTrigger = new bootstrap.Tab(triggerEl)
+        let currentPage = 1;
+        let currentSort = '-datetime';
+        let currentActionFilter = '';
+        let currentStatusFilter = '';
+        let currentFilter = {};
+        let currentSearch = '';
 
-            triggerEl.addEventListener('click', function (event) {
-                event.preventDefault()
-                tabTrigger.show()
-            })
-        })
+        function make_load_table_function(load_table_function) {
+
+            return function(page = 1, sort = currentSort, filter = currentFilter, search = currentSearch) {
+
+                document.getElementById('loader').style.display = 'block';
+
+                console.log("triggered");
+                filter_str = Object.keys(filter).map(key => key + "=" + filter[key]).join('&');
+                fetch(`/api/transactions/?page=${page}&page_size=10&sort_by=${sort}&${filter_str}&search=${search}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const tbody = document.getElementById('general-tbody');
+                        tbody.innerHTML = '';
+                        data.data.forEach(log => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                           {% if request.user.is_staff %}
+                                   <td>${ log.user }</td>
+                                   {% endif %}
+                               <td>${log.type}</td>
+                               <td>${log.method}</td>
+                               <td>${log.created}</td>
+                               <td>${log.amount}</td>
+                               <td></td>
+                           `;
+                            tbody.appendChild(row);
+                        });
+
+                        renderPagination_1(data.current_page, data.total_pages)
+
+
+                        document.getElementById('loader').style.display = 'none';
+                    })
+                    .catch(error => console.log('Error:', error));
+            }
+
+        }
+
+    function make_pagination(element_id, pagination_function, load_table_function) {
+        temp_function = function(currentPage, totalPages, load_table = false) {
+            console.log("renderPagination", currentPage, totalPages);
+            const pagination = document.getElementById(element_id);
+            pagination.innerHTML = '';
+
+            // Don't show 'Prev' and 'Next' if total pages are <= 10
+            if (totalPages > 10) {
+                // Calculate the previous and next block values
+                var prevBlock = Math.floor((currentPage - 1) / 10) * 10;
+                var nextBlock = Math.ceil(currentPage / 10) * 10 + 1;
+
+                // Show 'Prev' button if prev_block is valid (greater than 0)
+                if (prevBlock > 0) {
+                    const prevItem = document.createElement('li');
+                    prevItem.className = 'page-item';
+                    prevItem.innerHTML = `<a class="page-link" onclick="${pagination_function}(${prevBlock}, ${totalPages}, true)">Prev</a>`;
+                    pagination.appendChild(prevItem);
+                }
+            }
+            console.log(currentPage, totalPages, nextBlock, prevBlock);
+
+            // Render page numbers
+            const startPage = Math.floor((currentPage - 1) / 10) * 10 + 1;
+            const endPage = Math.min(startPage + 9, totalPages);
+            for (let i = startPage; i <= endPage; i++) {
+                const pageItem = document.createElement('li');
+                pageItem.className = 'page-item' + (i === currentPage ? ' active' : '');
+                pageItem.innerHTML = `<a class="page-link" onclick="${load_table_function}(${i})">${i}</a>`;
+                pagination.appendChild(pageItem);
+            }
+
+
+            // Show 'Next' button if next_block is valid (less than or equal to total pages)
+            if (totalPages > 10 && nextBlock <= totalPages) {
+                const nextItem = document.createElement('li');
+                nextItem.className = 'page-item';
+                nextItem.innerHTML = `<a class="page-link" onclick="${pagination_function}(${nextBlock}, ${totalPages}, true)">Next</a>`;
+                pagination.appendChild(nextItem);
+            }
+            if (load_table) {
+                window[load_table_function](currentPage)
+            }
+        }
+        return temp_function;
+    }
+
+
+        var load_table_function = 'load_table_1';
+        var renderPagination = 'renderPagination_1';
+        window[renderPagination] = make_pagination('pagination', renderPagination, load_table_function);
+        window[load_table_function] = make_load_table_function(load_table_function);
+
+        document.getElementById('search-button').addEventListener('click', () => {
+                currentSearch = document.getElementById('search-input').value.toLowerCase();
+                window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
+            });
+
+            document.getElementById('search-input').addEventListener('keypress', (event) => {
+                if (event.key === 'Enter') {
+                    currentSearch = document.getElementById('search-input').value.toLowerCase();
+                    window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
+                }
+            });
+
+            document.querySelectorAll('th[data-sort]').forEach(th => {
+                th.addEventListener('click', () => {
+                    const sortField = th.getAttribute('data-sort');
+                    currentSort = currentSort === sortField ? `-${sortField}` : sortField;
+                    window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
+                });
+            });
+
+            username_fitler = document.getElementById('username_fitler')
+            if (username_fitler) {
+                username_fitler.addEventListener('change', function() {
+                    if (this.value === 'All user') {
+                        currentFilter = {};
+                        window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
+                        return;
+                    }
+                    currentFilter = {
+                        user__username: this.value
+                    };
+                    console.log(currentFilter);
+                    window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
+                });
+            }
+
+
+
+        console.log("triggered");
+        window[load_table_function]();
     });
-
 </script>
+
 {% endblock content %}

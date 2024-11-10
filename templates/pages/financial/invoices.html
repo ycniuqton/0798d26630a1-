@@ -89,61 +89,6 @@
     </nav>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('search-invoices');
-    const statusSelect = document.getElementById('filter-status');
-    const itemsPerPageSelect = document.getElementById('items-per-page');
-    const applyFiltersButton = document.getElementById('apply-filters');
-
-    const urlParams = new URLSearchParams(window.location.search);
-    searchInput.value = urlParams.get('search') || '';
-    statusSelect.value = urlParams.get('status') || '';
-    itemsPerPageSelect.value = urlParams.get('items') || '10';
-
-    applyFiltersButton.addEventListener('click', function() {
-        const search = searchInput.value;
-        const status = statusSelect.value;
-        const items = itemsPerPageSelect.value;
-        const params = new URLSearchParams(window.location.search);
-
-        if (search) {
-            params.set('search', search);
-        } else {
-            params.delete('search');
-        }
-
-        if (status) {
-            params.set('status', status);
-        } else {
-            params.delete('status');
-        }
-
-        params.set('items', items);
-
-        window.location.search = params.toString();
-    });
-
-    const thCode = document.getElementById('th-code');
-    const thCreated = document.getElementById('th-created');
-    const thDueDate = document.getElementById('th-due-date');
-    const thStatus = document.getElementById('th-status');
-    const thTotal = document.getElementById('th-total');
-
-    [thCode, thCreated, thDueDate, thStatus, thTotal].forEach(th => {
-        th.addEventListener('click', function() {
-            const params = new URLSearchParams(window.location.search);
-            const sortField = th.id.replace('th-', '');
-            const currentSort = params.get('sort');
-            const sortOrder = currentSort === sortField ? '-' + sortField : sortField;
-
-            params.set('sort', sortOrder);
-            window.location.search = params.toString();
-        });
-    });
-});
-</script>
-
 
 
 <script>
@@ -264,27 +209,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('search-button').addEventListener('click', () => {
             currentSearch = document.getElementById('search-input').value.toLowerCase();
-            load_table(currentPage, currentSort, currentFilter, currentSearch);
+            window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
         });
 
         document.getElementById('search-input').addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
                 currentSearch = document.getElementById('search-input').value.toLowerCase();
-                load_table(currentPage, currentSort, currentFilter, currentSearch);
+                window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
             }
         });
 
 
         document.getElementById('status-filter-select').addEventListener('change', (event) => {
             currentFilter["status"] = event.target.value.toLowerCase();
-            load_table(currentPage, currentSort, currentFilter, currentSearch);
+            window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
         });
 
         document.querySelectorAll('th[data-sort]').forEach(th => {
             th.addEventListener('click', () => {
                 const sortField = th.getAttribute('data-sort');
                 currentSort = currentSort === sortField ? `-${sortField}` : sortField;
-                load_table(currentPage, currentSort, currentFilter, currentSearch);
+                window[load_table_function](currentPage, currentSort, currentFilter, currentSearch);
             });
         });
 
