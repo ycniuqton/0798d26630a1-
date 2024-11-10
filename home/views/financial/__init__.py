@@ -140,6 +140,7 @@ def invoices_view(request):
 @permission_classes([IsAuthenticated])
 def transaction_history(request):
     user = request.user
+    list_user = []
     if user.is_staff:
         list_user = Vps.objects.values('user__username').distinct()
         list_user = [user['user__username'] for user in list_user]
