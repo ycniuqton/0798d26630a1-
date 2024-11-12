@@ -169,13 +169,11 @@
                             <span class="pcoded-mtext">Authentication</span></a></li>
                     </ul>
                 </li>
-<!--                {% if user.is_staff == False %}-->
-<!--                <li class="nav-item">-->
-<!--                    <a target="_blank" href="/api/product/" class="nav-link "><span class="pcoded-micon"><i-->
-<!--                            class="feather icon-zap text-c-green"></i></span><span-->
-<!--                            class="pcoded-mtext">Generated API</span></a>-->
-<!--                </li>-->
-<!--                {% endif %}-->
+                <li class="nav-item">
+                    <a target="_blank" href="{% url 'swagger-ui' %}"  class="nav-link "><span class="pcoded-micon"><i
+                            class="feather icon-zap text-c-green"></i></span><span
+                            class="pcoded-mtext">API Document</span></a>
+                </li>
 
                 {% if user.is_staff %}
                 <li
