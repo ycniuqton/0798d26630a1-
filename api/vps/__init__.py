@@ -1,6 +1,8 @@
 from functools import reduce
 
 from django.db.models import Q
+from drf_spectacular.types import OpenApiTypes
+from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiParameter
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from home.models import Vps
@@ -18,6 +20,62 @@ from .update_info import update_info
 class VPSAPI(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=None,  # No request body for GET method
+        responses={200: dict},  # Adjust response schema as needed
+        description="Retrieve a list of VPS instances with optional filtering, sorting, and pagination.",
+        parameters=[
+            OpenApiParameter(
+                name="page",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Page number for pagination",
+                required=False
+            ),
+            OpenApiParameter(
+                name="page_size",
+                type=OpenApiTypes.INT,
+                location=OpenApiParameter.QUERY,
+                description="Number of items per page",
+                required=False
+            ),
+            OpenApiParameter(
+                name="sort_by",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Field to sort by (e.g., 'name' or '-created')",
+                required=False
+            ),
+            OpenApiParameter(
+                name="search",
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                description="Search term to filter results",
+                required=False
+            ),
+        ],
+        examples=[
+            OpenApiExample(
+                'Example Request with Pagination',
+                value={"page": 1, "page_size": 10},
+                request_only=True,  # Applies to the request only
+            ),
+            OpenApiExample(
+                'Example Response',
+                value={
+                    "count": 100,
+                    "page": 1,
+                    "page_size": 10,
+                    "results": [
+                        {"id": "vps123", "name": "VPS Instance 1"},
+                        {"id": "vps124", "name": "VPS Instance 2"},
+                        # more results...
+                    ]
+                },
+                response_only=True,  # Applies to the response only
+            )
+        ]
+    )
     def get(self, request):
         user = request.user
         filterable_fields = ['hostname', 'location', 'ip', 'status', 'user__username', 'user_id']
@@ -45,9 +103,16 @@ class VPSAPI(APIView):
 
         data = [data.to_readable_dict() for data in objects]
 
+        # exclude some fields from the response
+        for item in data:
+            region = item.get('region', {})
+            if isinstance(region, dict):
+                region.pop('server', None)
+            item.pop('password', None)
+
         return JsonResponse({
             'data': data,
-            'total_pages': (total-1) // page_size + 1,
+            'total_pages': (total - 1) // page_size + 1,
             'current_page': page,
             'has_next': total > page * page_size,
             'has_previous': page > 1,

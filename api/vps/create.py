@@ -2,6 +2,8 @@ import time
 import json
 import uuid
 from datetime import datetime, timedelta
+
+from drf_spectacular.utils import extend_schema, OpenApiExample
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 
@@ -18,6 +20,54 @@ from services.vps_log import VPSLogger
 from services.balance import BalanceRepository
 
 
+@extend_schema(
+    request=dict,
+    responses={200: dict},
+    description="""Create a new VPS instance with the specified configuration.
+    <br>
+    
+    The request body should contain the following fields:
+    
+    - `location`: The location where the VPS will be hosted.
+    - `image`: The OS image to use for the VPS.
+    - `plan`: The plan to use for the VPS.
+    
+    These fields get from `/api/vps/configurations` endpoint.
+    All the configurations should be in the same cluster (cluster_id).
+    
+    """,
+    examples=[
+        OpenApiExample(
+            'Example Request',
+            value={
+                "location": {
+                    "id": "43"
+                },
+                "image": {
+                    "version": "windows-10-rutgon1"
+                },
+                "plan": {
+                    "id": "302"
+                },
+                "login": {
+                    "username": "Administrator",
+                    "password": "YourPassword@123",
+                    "hostname": "your_hostname"
+                },
+                "duration": 1,
+                "auto_renew": True,
+                "identifier": "random_uuid"  # must be unique
+            },
+            request_only=True,  # this example only applies to the request body
+        ),
+        OpenApiExample(
+            'Example Response',
+            value={"status": "success",
+                   "message": "VPS created successfully"},
+            response_only=True,  # this example only applies to the response
+        )
+    ]
+)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_vps(request):
@@ -124,7 +174,72 @@ def create_vps(request):
     publisher.publish('create_vps', payload)
     response_data = {
         'status': 'success',
-        'message': 'VPS created successfully',
-        'vpsConfiguration': data
+        'message': 'VPS created successfully'
+    }
+    return JsonResponse(response_data)
+
+
+@extend_schema(
+    responses={200: dict},
+    description="""Get the available VPS configurations.""",
+    examples=[
+        OpenApiExample(
+            'Example Response',
+            value={
+                "plans": [
+                    {
+                        "id": "302",
+                        "name": "VPS 1",
+                        "cpu": 1,
+                        "ram": 1024,
+                        "disk": 20,
+                        "network_speed": 1000,
+                        "bandwidth": 1000,
+                        "price": 10,
+                        "cluster_id": 1
+                    }
+                ],
+                "locations": [
+                    {
+                        "id": "43",
+                        "name": "Vietnam",
+                        "cluster_id": 1
+                    }
+                ],
+                "images": [
+                    {
+                        "id": "1",
+                        "type": "kvm",
+                        "distro": "windows",
+                        "filename": "windows-10-rutgon1",
+                        "fstype": "ext3",
+                        "name": "windows-10-rutgon1",
+                        "version": "windows-10-rutgon1",
+                        "cluster_id": 1
+                    }
+                ]
+            },
+            response_only=True,  # this example only applies to the response
+        )
+    ]
+)
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def vps_configurations(request):
+    plans = CachedPlan().get()
+    server_groups = CachedServerGroup().get()
+    oses = CachedOS().get()
+
+    # exclude some fields from the response
+    for region in server_groups:
+        if isinstance(region, dict):
+            region.pop('server', None)
+    for image in oses:
+        image['version'] = image.get('name')
+
+    response_data = {
+        'plans': plans,
+        'locations': server_groups,
+        'images': oses
     }
     return JsonResponse(response_data)

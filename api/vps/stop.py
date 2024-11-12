@@ -1,6 +1,8 @@
 import time
 import json
 from datetime import datetime, timedelta
+
+from drf_spectacular.utils import extend_schema, OpenApiExample
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 
@@ -16,6 +18,30 @@ from services.vps_log import VPSLogger
 from services.balance import BalanceRepository
 
 
+@extend_schema(
+    request=dict,
+    responses={200: dict},
+    description="Stop a VPS instance with specified parameters",
+    examples=[
+        OpenApiExample(
+            'Example Request',
+            value={
+                "vps_ids": [
+                    "your_vps_id"
+                ]
+            },
+            request_only=True,  # this example only applies to the request body
+        ),
+        OpenApiExample(
+            'Example Response',
+            value={
+                "status": "success",
+                "message": 'VPS is stopping'
+            },
+            response_only=True,  # this example only applies to the response
+        )
+    ]
+)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def stop_vps(request):
@@ -46,4 +72,4 @@ def stop_vps(request):
         }
         publisher.publish('stop_vps', payload)
 
-    return JsonResponse('VPS is stopping', safe=False)
+    return JsonResponse({"status": "success", "message": 'VPS is stopping'}, status=200)

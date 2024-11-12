@@ -77,7 +77,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
+    "drf_spectacular",
     "home",
     "api",
 
@@ -230,7 +230,7 @@ API_GENERATOR = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
+        # 'rest_framework.authentication.BasicAuthentication',
         'core.authentication.APIKeyAuthentication',
         'core.authentication.CookieBasicAuthentication',
 
@@ -241,6 +241,7 @@ REST_FRAMEWORK = {
 
     ),
     'EXCEPTION_HANDLER': 'core.exception_handlers.custom_exception_handler',
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 AUTHENTICATION_BACKENDS = [
@@ -281,62 +282,37 @@ AUTH_USER_MODEL = 'home.User'
 USE_TZ = True  # This ensures that Django stores datetimes in UTC
 TIME_ZONE = 'UTC'  # Or any other timezone you are working with
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'file': {
-#             'level': 'INFO',
-#             'class': 'logging.FileHandler',
-#             'filename': APPConfig.LOG_PATH,
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['file'],
-#             'level': 'DEBUG',
-#             'propagate': True,
-#         },
-#     },
-# }
+SPECTACULAR_SETTINGS = {
+    'TITLE': f'{APPConfig.APP_NAME} API Documentation',
+    'DESCRIPTION': '''<div style="font-family: Arial, sans-serif; line-height: 1.6;">
+    <h2 style="color: #2b7de9;">Detailed API Documentation</h2>
+    <p>
+        Welcome to the API documentation. This API offers comprehensive access to manage VPS instances, 
+        with customizable options and filterable endpoints for efficient data retrieval.
+    </p>
+    <h3 style="color: #333; margin-top: 20px;">Authentication Methods</h3>
+    <p>
+        <strong>APIKeyAuth</strong> - This API requires an API key for authorization.
+        <br>
+        <em style="color: #888;">To use the API, add the API key as a header in each request:</em><br>
+        <code style="background: #f4f4f4; padding: 4px 8px; border-radius: 4px;">
+            x-api-key: YOUR_API_KEY
+        </code>
+    </p>
+    <h3 style="color: #333; margin-top: 20px;">Getting Your API Key</h3>
+    <p>
+        To obtain an API key, go to <strong>Dashboard &gt; Account &gt; Authentication</strong>. Here, you can:
+    </p>
+    <ul>
+        <li>Create a new API key by clicking <strong>"Generate New Key"</strong>.</li>
+        <li>Use your default API key if one is already provided.</li>
+    </ul>
+    <p style="color: #888;">Keep your API key secure and avoid sharing it publicly.</p>
+</div>
+''',
+    'VERSION': '1.0.0',
+    'DEFAULT_AUTO_SCHEMA_CLASS': None,
+    'PREPROCESSING_HOOKS': ['core.drf.preprocess_exclude_paths'],
+}
 
-# LOGGING = {
-#     'version': 1,  # the dictConfig format version
-#     'disable_existing_loggers': False,  # retain the default loggers
-#     'formatters': {
-#         'verbose': {
-#             'format': '{levelname} {asctime} {module} {message}',
-#             'style': '{',
-#         },
-#         'simple': {
-#             'format': '{levelname} {message}',
-#             'style': '{',
-#         },
-#     },
-#     'handlers': {
-#         'file': {
-#             'level': 'INFO',  # Log all levels from DEBUG upwards
-#             'class': 'logging.FileHandler',
-#             'filename': APPConfig.LOG_PATH,
-#             'formatter': 'verbose',  # Use the verbose formatter
-#         },
-#         'console': {
-#             'class': 'logging.StreamHandler',
-#             'formatter': 'simple',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['file'],  # Attach file handler to Django logger
-#             'level': 'INFO',  # Capture all log levels for Django
-#             'propagate': True,
-#         },
-#         'django.request': {
-#             'handlers': ['file'],  # Log HTTP request errors
-#             'level': 'ERROR',
-#             'propagate': False,
-#         },
-#     },
-# }
-
-########################################
+from core.drf.extentions import APIKeyAuthenticationExtension

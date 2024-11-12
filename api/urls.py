@@ -1,4 +1,5 @@
 from django.urls import path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from .admin import get_group_configs, lock_group, SuspendConfig, VpsConfig, RefundRequestAPI, approve_refund_request, \
     reject_refund_request, admin_clear_cache, ClusterResource, GroupResource, test_cluster
@@ -9,7 +10,7 @@ from .invoices import InvoiceCollectionAPI, InvoiceAPI, TransactionCollectionAPI
 from .views import RegisterAPI, LoginAPI, LogoutAPI
 from .vps.archived_vps import archived_vps
 from .vps.change_pass import change_pass_vps
-from .vps.create import create_vps
+from .vps.create import create_vps, vps_configurations
 from .vps import VPSAPI, start_vps, stop_vps, restart_vps, suspend_vps, unsuspend_vps, give_vps, change_vps_plan, \
     update_info
 from .vps.delete import delete_vps
@@ -27,6 +28,7 @@ urlpatterns = [
     path('login/', LoginAPI.as_view(), name='login'),
     path('logout/', LogoutAPI.as_view(), name='logout'),
     path('vps/create', create_vps, name='create-vps'),
+    path('vps/configurations', vps_configurations, name='vps_configurations'),
     path('vps/get_archived_vps', archived_vps, name='archived_vps'),
     path('vps/start/', start_vps, name='start-vps'),
     path('vps/stop/', stop_vps, name='stop-vps'),
@@ -88,4 +90,7 @@ urlpatterns = [
     path('admin/setting/cluster/', ClusterResource.as_view(), name='cluster-setting'),
     path('admin/setting/cluster/test_cluster/', test_cluster, name='test-cluster'),
     path('admin/setting/region/', GroupResource.as_view(), name='region-setting'),
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),  # OpenAPI JSON schema
+    path('docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),  # Swagger UI
+
 ]

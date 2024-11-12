@@ -1,6 +1,8 @@
 import time
 import json
 from datetime import datetime, timedelta
+
+from drf_spectacular.utils import extend_schema, OpenApiExample
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 
@@ -16,6 +18,27 @@ from services.vps_log import VPSLogger
 from services.balance import BalanceRepository
 
 
+@extend_schema(
+    request=dict,
+    responses={200: dict},
+    description="Rebuild a VPS instance with specified parameters",
+    examples=[
+        OpenApiExample(
+            'Example Request',
+            value={
+                "vps_id": "25de1b45-e8a5-4c08-8d3a-7626f724112e",
+                "image_version": "ubuntu-18.04-x86_64x",
+                "password": "Abcd@123ab"
+            },
+            request_only=True,  # this example only applies to the request body
+        ),
+        OpenApiExample(
+            'Example Response',
+            value={"status": "success", "message": 'VPS is rebuilding'},
+            response_only=True,  # this example only applies to the response
+        )
+    ]
+)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def rebuild_vps(request):
@@ -69,4 +92,4 @@ def rebuild_vps(request):
     }
     publisher.publish('rebuild_vps', payload)
 
-    return JsonResponse({}, safe=False)
+    return JsonResponse({"status": "success", "message": 'VPS is rebuilding'}, status=200)

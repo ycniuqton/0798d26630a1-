@@ -40,3 +40,5 @@ paypalrestsdk
 
 cryptomus
 stripe
+
+drf-spectacular
