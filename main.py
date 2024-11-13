@@ -50,6 +50,17 @@ def run_notification_gateway():
     notification_gateway()
 
 
+@cli.command()
+def shell():
+    import IPython
+    from IPython.terminal.ipapp import load_default_config
+
+    ip_config = load_default_config()
+    ctx = {}
+
+    IPython.start_ipython(argv=[], user_ns=ctx, config=ip_config)
+
+
 if __name__ == '__main__':
     logger = logging.getLogger(__name__)
     logger.info("Starting the app")

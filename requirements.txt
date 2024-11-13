@@ -42,3 +42,5 @@ cryptomus
 stripe
 
 drf-spectacular
+
+ipython
