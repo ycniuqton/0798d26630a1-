@@ -32,7 +32,7 @@ class CachedVpsStatRepository(CachedRepository):
         api_key = settings.VIRTUALIZOR_CONFIG.API_KEY
 
         vps_service = VPSService(base_url, api_key)
-        stats = vps_service.get_stat(vps_ids)
+        stats = vps_service.get_stats(vps_ids)
         for vps_id, stat in stats.items():
             self.set(vps_id, stat)
 

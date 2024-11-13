@@ -22,7 +22,9 @@ class UpdateVpsStat(BaseJob):
     def run(self):
         print("Updating VPS stats")
         cvr = CachedVpsStatRepository()
-        cvr.reload()
+        all_vps = Vps.objects.filter(~Q(_deleted=True)).all()
+        vps_ids = [vps.linked_id for vps in all_vps if vps.linked_id]
+        cvr.reload(vps_ids)
         print("Vps stats updated!")
 
 

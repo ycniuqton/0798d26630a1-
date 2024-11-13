@@ -134,7 +134,7 @@ class VPSService:
             response.raise_for_status()
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
-    def get_stat(self, vps_ids):
+    def get_stats(self, vps_ids):
         url = f"{self.base_url}/system/vpss/stat"
         if not vps_ids:
             response = requests.post(url, headers=self.headers)
