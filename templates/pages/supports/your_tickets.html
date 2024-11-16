@@ -122,12 +122,12 @@
                             <td>${ticket.ticket_type}</td>
                             <td>${ticket.submission_time}</td>
                             <td>
-                            ${
-            ticket.flag === 'unread' ? '<span class="flag-cycle" style="color: red;">●</span>' :
-            ticket.flag === 'resolved' ? '<span class="flag-cycle"  style="color: green;">●</span>' :
-            ticket.flag === 'expired' ? '<span  class="flag-cycle"  style="color: grey;">●</span>' :
-            ticket.status
-        }
+
+        <span class="status-circle ${
+            ticket.flag === 'unread' ? 'status-circle-red' :
+            ticket.flag === 'resolved' ? 'status-circle-green' : 'status-circle-grey'
+        }"  title="${ticket.flag}" ></span>
+
                             </td>
                             <td>
                                 <button class="btn btn-sm btn-outline-primary" onclick="showTicketDetails('${ticket.id}')">Details</button>

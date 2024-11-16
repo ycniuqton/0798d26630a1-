@@ -170,7 +170,14 @@ function copyErrorMessage(element) {
                                     <td>${item.location }</td>
                                     <td>${ item.ip }</td>
                                     <td>${ item.end_time }</td>
-                                    <td>${ item.status }</td>
+                                    <td><span class="status-circle ${
+            item.status === 'on' ? 'status-on' :
+            item.status === 'off' ? 'status-off' :
+            item.status === 'deleted' ? 'status-circle-black' :
+            item.status === 'suspended' ? 'status-suspended' :
+            'status-changing'
+        }"  title="${item.status}" ></span></td>
+
                                     <td> ${operation_button} ${refund_button}</td>
                                 `;
                             tbody.appendChild(row);
