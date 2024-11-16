@@ -135,7 +135,14 @@
                                 <td>${item.code.toUpperCase()}</td>
                                 <td>${item._created}</td>
                                 <td>${item.due_date}</td>
-                                <td>${item.status}</td>
+                                <td>
+
+                                <span class="status-circle ${
+            item.status === 'paid' ? 'status-circle-green' :
+            item.status === 'unpaid' ? 'status-circle-red' : 'status-circle-grey'
+        }"  title="${item.status}" ></span>
+
+                                </td>
                                 <td>${amount}</td>
                                 <td>
                                     <a href="/invoices/${item.id}" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer">View</a>
