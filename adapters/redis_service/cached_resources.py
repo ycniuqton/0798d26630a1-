@@ -1,3 +1,5 @@
+import json
+
 import requests
 
 from adapters.kafka_adapter import make_kafka_publisher
@@ -72,7 +74,13 @@ class CachedObject(RedisService):
         all_keys = [key for key in all_keys if key == self.key_name or key.startswith(f"{self.key_name}:")]
 
         all_values = self.client.mget(all_keys)
-        return dict(zip(all_keys, all_values))
+        json_values = []
+        for value in all_values:
+            try:
+                json_values.append(json.loads(value))
+            except:
+                json_values.append(value)
+        return dict(zip(all_keys, json_values))
 
     def get_sync_data(self):
         data = self.get_all()
