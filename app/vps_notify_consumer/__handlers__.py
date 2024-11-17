@@ -4,7 +4,7 @@ from marshmallow import Schema, fields, INCLUDE
 from typing import Dict, Any
 from tenacity import RetryError
 
-from adapters.redis_service import clear_cache
+from adapters.redis_service import clear_cache, CachedPlanInRegion
 from config import APPConfig
 from home.models import Vps, VpsStatus, User
 from adapters.kafka_adapter._exceptions import SkippableException
@@ -527,3 +527,29 @@ class CacheCleaned(BaseHandler):
     def _handle(self, payload: Dict[str, Any]) -> None:
         if APPConfig.APP_ROLE != 'admin':
             clear_cache(True, True, True, True, True, True)
+
+
+class AgencySync(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            data = fields.Dict(required=False)
+            sync_type = fields.String(required=False)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        if APPConfig.APP_ROLE != 'admin':
+            sync_type = payload.get('sync_type')
+            data = payload.get('data')
+            if sync_type == 'REGION_PLAN':
+                CachedPlanInRegion().set_all(data)
+

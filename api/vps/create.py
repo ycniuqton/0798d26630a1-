@@ -226,9 +226,16 @@ def create_vps(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def vps_configurations(request):
+    cluster_filter = request.GET.get('cluster_id', None)
+
     plans = CachedPlan().get()
     server_groups = CachedServerGroup().get()
     oses = CachedOS().get()
+
+    if cluster_filter:
+        plans = [plan for plan in plans if plan['cluster_id'] == int(cluster_filter)]
+        server_groups = [sg for sg in server_groups if sg['cluster_id'] == int(cluster_filter)]
+        oses = [os for os in oses if os['cluster_id'] == int(cluster_filter)]
 
     # exclude some fields from the response
     for region in server_groups:

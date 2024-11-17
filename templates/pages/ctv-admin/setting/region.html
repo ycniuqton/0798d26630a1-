@@ -81,6 +81,51 @@
             .catch(error => console.error('Error:', error));
         });
 
+async function fetchAndRenderPlans(table_id, checked_plan_ids) {
+  try {
+    // Fetch data from the API
+    const response = await fetch('/api/vps/configurations');
+    if (!response.ok) {
+      throw new Error(`Failed to fetch plans: ${response.statusText}`);
+    }
+
+    // Parse the JSON response
+    const data = await response.json();
+    const plans = data.plans;
+
+    // Select the target element
+    const planList = document.getElementById(table_id);
+    if (!planList) {
+      console.error('Element with ID not found:', table_id);
+      return;
+    }
+
+    // Clear existing content
+    planList.innerHTML = '';
+
+    // Render each plan as a table row
+    for (const plan of plans) {
+      // Check if the current plan's ID exists in the checked_plan_ids array
+      const isChecked = checked_plan_ids.includes(plan.id);
+
+      const row = `
+        <tr>
+          <td>${plan.name || 'N/A'}</td>
+          <td>${plan.cpu}</td>
+          <td>${plan.ram}</td>
+          <td>${plan.disk}</td>
+          <td>${plan.price}</td>
+          <td><input type="checkbox" class="row-plan-group-checkbox" plan_id="${plan.id}" ${isChecked ? 'checked' : ''}></td>
+        </tr>
+      `;
+      planList.innerHTML += row;
+    }
+  } catch (error) {
+    console.error('Error fetching or rendering plans:', error);
+  }
+}
+
+
         window.show_region = function show_region(region_id) {
     const region_data = list_region[region_id];
     const prefix = 'regionDetail';
@@ -107,6 +152,9 @@
 
         </tr>
     `).join('');
+
+
+    fetchAndRenderPlans(`${prefix}PlanList`, region_data['list_plan'])
 
 
     $(`#${prefix}Modal`).modal('show');

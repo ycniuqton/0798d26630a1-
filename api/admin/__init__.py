@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
 from adapters.kafka_adapter import make_kafka_publisher
-from adapters.redis_service import clear_cache, CachedCluster, CachedServerGroup
+from adapters.redis_service import clear_cache, CachedCluster, CachedServerGroup, CachedPlanInRegion
 from adapters.redis_service.resources.full_data_server_group import CachedServerGroupConfig
 from config import KafkaConfig, APPConfig, KafkaNotifierConfig
 from home.models import Vps, User, RefundRequest
@@ -200,7 +200,7 @@ def admin_clear_cache(request):
 
     if not data:
         publisher = make_kafka_publisher(KafkaNotifierConfig)
-        publisher.publish('CacheCleaned', {})
+        publisher.publish('cache_cleaned', {})
 
         clear_cache(True, True, True, True, True, True)
     else:
@@ -252,8 +252,10 @@ class GroupResource(APIView):
         cached_cluster = CachedCluster().get()
         mapping_cluster = {cluster['id']: cluster for cluster in cached_cluster}
         cached_group = CachedServerGroup().get()
+
         for group in cached_group:
             group['cluster'] = mapping_cluster.get(group['cluster_id'])
+            group['list_plan'] = CachedPlanInRegion().get(group['id']) if CachedPlanInRegion().get(group['id']) else []
 
         lock_config = AppSettingRepository().REGION_LOCKED_CONFIG
         for group in cached_group:
@@ -286,6 +288,8 @@ class GroupResource(APIView):
         updatable_fields = ['name', 'country']
         group_id = data.get('id')
         locked = data.get('lock')
+        list_plan = data.get('list_plan')
+
         data = {field: data.get(field) for field in updatable_fields}
 
         if not group_id:
@@ -296,6 +300,10 @@ class GroupResource(APIView):
             AppSettingRepository().lock_region(region_id=group_id, server_id=locked)
         else:
             AppSettingRepository().unlock_region(region_id=group_id)
+
+        if list_plan is not None and isinstance(list_plan, list):
+            list_plan = [int(i) for i in list_plan]
+            CachedPlanInRegion().set(list_plan, group_id)
 
         return JsonResponse(res, safe=False)
 

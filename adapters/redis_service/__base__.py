@@ -40,6 +40,10 @@ class RedisService:
             px = self.px
         return self.client.set(key, value, ex=ex, px=px)
 
+    def set_all(self, data):
+        data = {key: json.dumps(value) for key, value in data.items()}
+        return self.client.mset(data)
+
     def get(self, key):
         """
         Get a value from Redis.

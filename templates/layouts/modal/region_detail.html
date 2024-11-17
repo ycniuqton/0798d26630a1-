@@ -8,6 +8,7 @@
         const countryId = `${prefix}CountryInput`;
         const confirmButtonId = `${prefix}ConfirmButton`;
         const serverListId = `${prefix}ServerList`;
+        const planListId = `${prefix}PlanList`;
 
         const countryMapping = {
             "US": "United States",
@@ -72,6 +73,22 @@
                                 </thead>
                                 <tbody id="${serverListId}"></tbody>
                             </table>
+
+
+                            <p><strong>Plans:</strong></p>
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Plan</th>
+                                        <th>CPU</th>
+                                        <th>RAM</th>
+                                        <th>Disk</th>
+                                        <th>Price</th>
+                                        <th>Lock <input type="checkbox" id="${prefix}HeaderLockCheckbox2" class="header-plan-group-checkbox"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="${planListId}"></tbody>
+                            </table>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -87,8 +104,38 @@
         document.addEventListener('change', function(event) {
             const isHeaderCheckbox = event.target.classList.contains('header-lock-checkbox');
             const isRowCheckbox = event.target.classList.contains('row-lock-checkbox');
+            const isHeaderPlanGroupCheckbox = event.target.classList.contains('header-plan-group-checkbox');
+            const isRowPlanGroupCheckbox = event.target.classList.contains('row-plan-group-checkbox');
 
-            if (isHeaderCheckbox) {
+          // Handle header checkbox toggle
+          if (isHeaderPlanGroupCheckbox) {
+            const isChecked = event.target.checked;
+
+            // Get all row checkboxes
+            const rowCheckboxes = document.querySelectorAll('.row-plan-group-checkbox');
+
+            // Set the checked state of all row checkboxes
+            rowCheckboxes.forEach(checkbox => {
+              checkbox.checked = isChecked;
+            });
+          }
+          // Handle row checkbox toggle
+          else if (isRowPlanGroupCheckbox) {
+            // Check if any row checkbox is unchecked
+            const rowCheckboxes = document.querySelectorAll('.row-plan-group-checkbox');
+            const headerCheckbox = document.querySelector('.header-plan-group-checkbox');
+
+            // If any row checkbox is unchecked, unset the header checkbox
+            const allChecked = Array.from(rowCheckboxes).every(checkbox => checkbox.checked);
+            if (!allChecked) {
+              headerCheckbox.checked = false;
+            } else {
+              // If all are checked, ensure the header checkbox is checked
+              headerCheckbox.checked = true;
+            }
+          }
+
+         else    if (isHeaderCheckbox) {
                 // Always check the header checkbox and check all row checkboxes
                 event.target.checked = true;
                 const rowCheckboxes = document.querySelectorAll(`#${serverListId} .row-lock-checkbox`);
@@ -119,6 +166,8 @@
             }
         });
 
+
+
         document.getElementById(confirmButtonId).addEventListener('click', function() {
             const regionName = document.getElementById(regionNameId).value;
             const countryCode = document.getElementById(countryId).value;
@@ -133,11 +182,18 @@
                 }
             }
 
+
+             const checkedCheckboxes = document.querySelectorAll('.row-plan-group-checkbox:checked');
+
+            // Extract the plan_id attributes into a list
+            const planIds = Array.from(checkedCheckboxes).map(checkbox => checkbox.getAttribute('plan_id'));
+
             const data = {
                 id: region_id,
                 name: regionName,
                 country: countryCode,
-                lock: lock
+                lock: lock,
+                list_plan: planIds
             };
 
             fetch(`/api/admin/setting/region/`, {
@@ -156,6 +212,10 @@
             .catch(error => {
                 console.error('Error:', error);
             });
+
+
+
+
         });
 
         // New function to set header checkbox programmatically

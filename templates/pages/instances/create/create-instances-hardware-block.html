@@ -31,7 +31,7 @@
     <h5>VPS Plans</h5>
     <div class="row">
         {% for plan in plans %}
-        <div class="col-md-4 plan-card-container" data-cluster-id={{plan.cluster_id}}>
+        <div class="col-md-4 plan-card-container" data-cluster-id={{plan.cluster_id}} plan-id="{{plan.id}}">
             <div class="card plan-card" data-name="{{ plan.name }}" data-vcpu="{{ plan.cpu }}" data-ram="{{ plan.ram }}" data-bandwidth="{{ plan.bandwidth }}" data-storage="{{ plan.disk }}" data-price="{{ plan.price }}"
             plan-id="{{plan.id}}">
                 <div class="card-body ">
@@ -42,7 +42,7 @@
                         <li>{{ plan.bandwidth }} Mbps</li>
                         <li>{{ plan.disk }} GB</li>
                     </ul>
-                    <p>Bắt đầu từ $<strong>{{ plan.price }}</strong> 1 tháng</p>
+                    <p>Start from <strong>$ {{ plan.price }}</strong> per month</p>
                     <p>{{ plan.backup }}</p>
                 </div>
             </div>
@@ -97,6 +97,8 @@
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var planCards = document.querySelectorAll('.plan-card');
+    var mapping_region_plans = {{ mapping_region_plans }}
+
 
     planCards.forEach(function(card) {
         card.addEventListener('click', function() {
@@ -152,13 +154,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('cluster_set').addEventListener('change', function() {
         plan_card_containers = document.querySelectorAll('.plan-card-container');
+        allowed_plan = mapping_region_plans[vpsConfiguration.location.id];
         for (var i = 0; i < plan_card_containers.length; i++) {
             this_plan_card = plan_card_containers[i];
             plan_card_cluster_id = this_plan_card.getAttribute('data-cluster-id');
+            plan_id = this_plan_card.getAttribute('plan-id');
             if (plan_card_cluster_id != vpsConfiguration.location.cluster_id) {
                 this_plan_card.classList.add('d-none');
             } else {
-                this_plan_card.classList.remove('d-none');
+
+                if (allowed_plan.includes(parseInt(plan_id))) {
+                    this_plan_card.classList.remove('d-none');
+                } else {
+                    this_plan_card.classList.add('d-none');
+                }
             }
         }
     });

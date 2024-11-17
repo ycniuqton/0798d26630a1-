@@ -1,6 +1,8 @@
 import requests
 
-from adapters.redis_service.__base__ import CachedResource
+from adapters.kafka_adapter import make_kafka_publisher
+from adapters.redis_service.__base__ import CachedResource, RedisService
+from config import KafkaNotifierConfig
 from core import settings
 
 
@@ -13,6 +15,77 @@ class CachedPlan(CachedResource):
         auth_header = {"x-api-key": settings.VIRTUALIZOR_CONFIG.API_KEY}
         ex = 60 * 60 * 24  # 24 hours
         super().__init__(redis_uri=redis_uri, data_url=data_url, auth_header=auth_header, ex=ex)
+
+
+class AgenSyncObject:
+    sync_type = 'sync_type'
+    event_type = 'agen_sync'
+
+    def __init__(self):
+        self.kafka_config = KafkaNotifierConfig
+
+    def get_sync_data(self):
+        pass
+
+    def sync(self):
+        data = self.get_sync_data()
+        publisher = make_kafka_publisher(KafkaNotifierConfig)
+        publisher.publish(self.event_type, {
+            'data': data,
+            'sync_type': self.sync_type
+        })
+
+
+class CachedObject(RedisService):
+    key_name = "object_key"
+
+    def __init__(self):
+        redis_uri = settings.REDIS_CONFIG.REDIS_URI
+        ex = 60 * 60 * 24  # 24 hours
+        super().__init__(redis_uri=redis_uri, ex=ex)
+
+    def get(self, sub_key=''):
+        key_name = self.key_name
+        if sub_key:
+            key_name = f"{key_name}:{sub_key}"
+
+        value = super().get(key_name)
+        return value
+
+    def set(self, value, sub_key='', ex=None, px=None):
+        key_name = self.key_name
+        if sub_key:
+            key_name = f"{key_name}:{sub_key}"
+
+        super().set(key_name, value, ex, px)
+
+    def get_all(self):
+        pattern = f"{self.key_name}*"
+        cursor = 0
+        all_keys = []
+        while True:
+            cursor, keys = self.client.scan(cursor, match=pattern, count=100)
+            all_keys.extend(keys)
+            if cursor == 0:  # Exit when the scan is complete
+                break
+
+        all_keys = [key for key in all_keys if key == self.key_name or key.startswith(f"{self.key_name}:")]
+
+        all_values = self.client.mget(all_keys)
+        return dict(zip(all_keys, all_values))
+
+    def get_sync_data(self):
+        data = self.get_all()
+        return data
+
+
+class CachedPlanInRegion(CachedObject, AgenSyncObject):
+    key_name = "cached_plans_in_region"
+    sync_type = 'REGION_PLAN'
+
+    def set(self, value, sub_key='', ex=None, px=None):
+        super().set(value, sub_key)
+        self.sync()
 
 
 class CachedOS(CachedResource):

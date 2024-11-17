@@ -2,8 +2,9 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 
-from adapters.redis_service import CachedPlan, CachedOS, CachedServer, CachedServerGroup
+from adapters.redis_service import CachedPlan, CachedOS, CachedServer, CachedServerGroup, CachedPlanInRegion
 from utils import country_mapping, country_short_to_region
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -46,34 +47,38 @@ def create_instances(request):
         {"name": "Toronto", "country": "Canada", "region": "North America", "status": "off", "country_short": "CA"},
         {"name": "Vancouver", "country": "Canada", "region": "North America", "status": "off", "country_short": "CA"},
         {"name": "Frankfurt", "country": "Germany", "region": "Europe", "status": "off", "country_short": "DE"},
-        {"name": "London", "country": "UK", "region": "Europe", "status": "off", "country_short": "GB"},
-        {"name": "Paris", "country": "France", "region": "Europe", "status": "off", "country_short": "FR"},
-        {"name": "Amsterdam", "country": "Netherlands", "region": "Europe", "status": "off", "country_short": "NL"},
-        {"name": "Jakarta", "country": "Indonesia", "region": "Asia", "status": "off", "country_short": "ID"},
-        {"name": "HoChiMinh", "country": "VietNam", "region": "Asia", "status": "off", "country_short": "VN"},
-        {"name": "Singapore", "country": "Singapore", "region": "Asia", "status": "off", "country_short": "SG"},
-        {"name": "Tokyo", "country": "Japan", "region": "Asia", "status": "off", "country_short": "JP"},
-        {"name": "Seoul", "country": "South Korea", "region": "Asia", "status": "off", "country_short": "KR"},
-        {"name": "São Paulo", "country": "Brazil", "region": "South America", "status": "off", "country_short": "BR"},
-        {"name": "Buenos Aires", "country": "Argentina", "region": "South America", "status": "off",
-         "country_short": "AR"},
-        {"name": "Cape Town", "country": "South Africa", "region": "Africa", "status": "off", "country_short": "ZA"},
-        {"name": "Nairobi", "country": "Kenya", "region": "Africa", "status": "off", "country_short": "KE"},
-        {"name": "Sydney", "country": "Australia", "region": "Oceania", "status": "off", "country_short": "AU"},
-        {"name": "Melbourne", "country": "Australia", "region": "Oceania", "status": "off", "country_short": "AU"},
-        {"name": "Dubai", "country": "UAE", "region": "Middle East", "status": "off", "country_short": "AE"},
-        {"name": "Riyadh", "country": "Saudi Arabia", "region": "Middle East", "status": "off", "country_short": "SA"}
+        # {"name": "London", "country": "UK", "region": "Europe", "status": "off", "country_short": "GB"},
+        # {"name": "Paris", "country": "France", "region": "Europe", "status": "off", "country_short": "FR"},
+        # {"name": "Amsterdam", "country": "Netherlands", "region": "Europe", "status": "off", "country_short": "NL"},
+        # {"name": "Jakarta", "country": "Indonesia", "region": "Asia", "status": "off", "country_short": "ID"},
+        # {"name": "HoChiMinh", "country": "VietNam", "region": "Asia", "status": "off", "country_short": "VN"},
+        # {"name": "Singapore", "country": "Singapore", "region": "Asia", "status": "off", "country_short": "SG"},
+        # {"name": "Tokyo", "country": "Japan", "region": "Asia", "status": "off", "country_short": "JP"},
+        # {"name": "Seoul", "country": "South Korea", "region": "Asia", "status": "off", "country_short": "KR"},
+        # {"name": "São Paulo", "country": "Brazil", "region": "South America", "status": "off", "country_short": "BR"},
+        # {"name": "Buenos Aires", "country": "Argentina", "region": "South America", "status": "off",
+        #  "country_short": "AR"},
+        # {"name": "Cape Town", "country": "South Africa", "region": "Africa", "status": "off", "country_short": "ZA"},
+        # {"name": "Nairobi", "country": "Kenya", "region": "Africa", "status": "off", "country_short": "KE"},
+        # {"name": "Sydney", "country": "Australia", "region": "Oceania", "status": "off", "country_short": "AU"},
+        # {"name": "Melbourne", "country": "Australia", "region": "Oceania", "status": "off", "country_short": "AU"},
+        # {"name": "Dubai", "country": "UAE", "region": "Middle East", "status": "off", "country_short": "AE"},
+        # {"name": "Riyadh", "country": "Saudi Arabia", "region": "Middle East", "status": "off", "country_short": "SA"}
     ]
+    mapping_region_plans = {}
     for sg in server_groups:
+        group_id = sg.get("id")
         locations.append({
             "name": sg.get("name"),
             "country": country_mapping.get(sg.get("country").upper()),
             "region": country_short_to_region.get(sg.get("country").upper()),
             "status": "on",
             "country_short": sg.get("country").upper(),
-            "group_id": sg.get("id"),
+            "group_id": group_id,
             "cluster_id": sg.get("cluster_id")
         })
+        mapping_region_plans[group_id] = CachedPlanInRegion().get(group_id) if CachedPlanInRegion().get(
+            group_id) else []
 
     locations = sorted(locations, key=lambda x: x['status'], reverse=True)
 
@@ -137,5 +142,6 @@ def create_instances(request):
         'locations': locations,
         'categories': categories,
         'images': images,
+        'mapping_region_plans': mapping_region_plans,
     }
     return render(request, "pages/instances/create/create-instances.html", context)
