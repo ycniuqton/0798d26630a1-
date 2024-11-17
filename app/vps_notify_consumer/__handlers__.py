@@ -53,7 +53,8 @@ class VPSCreated(BaseHandler):
         vps.status = VpsStatus.ON
         vps.save()
 
-        VPSMailService().send_vps_created_email(vps.user, vps)
+        if settings.APPConfig.APP_ROLE != 'admin':
+            VPSMailService().send_vps_created_email(vps.user, vps)
 
 
 class VPSCreatedError(BaseHandler):
