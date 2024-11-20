@@ -705,7 +705,14 @@ class ChargeInvoice(BaseHandler):
         invoice_repo = InvoiceRepository()
         app_setting = AppSettingRepository()
 
-        return invoice_repo.charge(invoice)
+        if invoice_repo.charge(invoice):
+            auto_un_suspend_when_charge_invoice = True
+            if auto_un_suspend_when_charge_invoice:
+                for line in invoice.lines.all():
+                    if line.vps.status == VpsStatus.SUSPENDED:
+                        publisher.publish('unsuspend_vps', {
+                            'vps_id': line.vps_id
+                        })
 
 
 class RestoreVPS(BaseHandler):
