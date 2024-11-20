@@ -5,6 +5,9 @@ from django.db.models import Q
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
+
+from adapters.kafka_adapter import make_kafka_publisher
+from config import KafkaConfig
 from home.models import Vps, Invoice, Transaction
 from django.http import JsonResponse, HttpResponse
 from services.balance import BalanceRepository
@@ -128,3 +131,23 @@ class TransactionCollectionAPI(APIView):
             'has_next': total > page * page_size,
             'has_previous': page > 1
         })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def charge_invoice(request, invoice_id):
+    user = request.user
+    invoice = Invoice.objects.filter(id=invoice_id)
+    if not user.is_staff:
+        invoice = invoice.filter(user_id=user.id)
+    invoice = invoice.first()
+
+    if not invoice:
+        return JsonResponse({'error': 'Invoice not found'}, status=404)
+
+    publisher = make_kafka_publisher(KafkaConfig)
+    publisher.publish('charge_invoice', payload={
+        'invoice_id': invoice.id
+    })
+
+    return JsonResponse({'message': 'Invoice paid successfully'}, status=200)

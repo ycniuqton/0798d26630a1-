@@ -6,7 +6,7 @@ from .admin import get_group_configs, lock_group, SuspendConfig, VpsConfig, Refu
 from .snapshot import VpsSnapshotAPI, restore_vsp
 from .support import TicketCollectionAPI, TicketAPI, ticket_reply
 from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token, AccountCollectionAPI
-from .invoices import InvoiceCollectionAPI, InvoiceAPI, TransactionCollectionAPI
+from .invoices import InvoiceCollectionAPI, InvoiceAPI, TransactionCollectionAPI, charge_invoice
 from .views import RegisterAPI, LoginAPI, LogoutAPI
 from .vps.archived_vps import archived_vps
 from .vps.change_pass import change_pass_vps
@@ -64,11 +64,11 @@ urlpatterns = [
     path('payment/bank/webhook/', bank_webhook, name='bank_webhook'),
     path('payment/stripe/webhook/', stripe_webhook, name='stripe_webhook'),
 
-
     path('invoice/', InvoiceCollectionAPI.as_view(), name='invoice'),
     path('invoices/', InvoiceCollectionAPI.as_view(), name='api-invoices'),
     path('transactions/', TransactionCollectionAPI.as_view(), name='transactions'),
     path('invoices/<str:invoice_id>', InvoiceAPI.as_view(), name='api-invoice'),
+    path('invoices/<str:invoice_id>/charge/', charge_invoice, name='api-charge-invoice'),
     path('tickets/', TicketCollectionAPI.as_view(), name='tickets_view'),
     path('tickets/<str:ticket_id>/', TicketAPI.as_view(), name='ticket_view'),
     path('tickets/<str:ticket_id>/reply/', ticket_reply, name='ticket_reply'),

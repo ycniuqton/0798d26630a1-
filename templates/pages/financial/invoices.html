@@ -146,6 +146,7 @@
                                 <td>${amount}</td>
                                 <td>
                                     <a href="/invoices/${item.id}" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer">View</a>
+                                    ${ item.status === 'open' ? '<a data-invoice-id='+item.id+' class="btn btn-sm btn-outline-success charge-button" rel="noopener noreferrer">Charge</a>' : '' }
                                 </td>
                             `;
                             tbody.appendChild(row);
@@ -153,13 +154,54 @@
                     }
 
                     renderPagination_1(data.current_page, data.total_pages)
-
+                    document.querySelectorAll('.charge-button').forEach(button => {
+                        button.addEventListener('click', handleButtonClick);
+                    });
 
                     document.getElementById('loader').style.display = 'none';
                 })
                 .catch(error => console.log('Error:', error));
         }
     }
+
+    function handleButtonClick(event) {
+    // Get the button element that was clicked
+    const button = event.target;
+
+    // Retrieve the invoice_id from the button's attributes
+    const invoiceId = button.getAttribute('data-invoice-id');
+    if (!invoiceId) {
+        alert('Error: Invoice ID not found');
+        return;
+    }
+
+    // Define the API URL
+    const apiUrl = `/api/invoices/${invoiceId}/charge/`;
+
+    // Make the API call
+    fetch(apiUrl, {
+        method: 'POST', // Assuming a POST request is needed
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to send charge order');
+        }
+        return response.json();
+    })
+    .then(() => {
+        // On success, show success alert
+        alert('Charge order is sent successfully');
+    })
+    .catch(() => {
+        // On error, show a common error alert
+        alert('An error occurred while sending the charge order. Please try again.');
+    });
+}
+
+
 
     function make_pagination(element_id, pagination_function, load_table_function) {
         temp_function = function(currentPage, totalPages, load_table = false) {

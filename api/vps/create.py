@@ -155,7 +155,8 @@ def create_vps(request):
             'cycle': cycle,
             'from_time': from_time,
             'to_time': to_time,
-            'duration': duration
+            'duration': duration,
+            'is_first_time': True
         })
 
     payload = {

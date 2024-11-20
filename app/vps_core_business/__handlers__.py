@@ -440,17 +440,15 @@ class ExpiredVPS(BaseHandler):
 
         cycle, from_time, to_time = get_billing_cycle(get_now())
 
-        if vps.auto_renew:
-            # send suspend
-            publisher = make_kafka_publisher(KafkaConfig)
+        publisher = make_kafka_publisher(KafkaConfig)
 
-            publisher.publish('gen_invoice', {
-                'user_id': vps.user_id,
-                'items': [vps.id],
-                'cycle': cycle,
-                'from_time': from_time,
-                'to_time': to_time
-            })
+        publisher.publish('gen_invoice', {
+            'user_id': vps.user_id,
+            'items': [vps.id],
+            'cycle': cycle,
+            'from_time': from_time,
+            'to_time': to_time
+        })
 
         VPSLogger().log(vps.user, vps, 'expire', 'expired', f'VPS has expired')
 
@@ -562,6 +560,7 @@ class GenerateInvoice(BaseHandler):
             from_time = fields.DateTime(required=False)
             to_time = fields.DateTime(required=False)
             duration = fields.Integer(required=False, default=1)
+            is_first_time = fields.Boolean(required=False, default=False)
 
             class Meta:
                 unknown = INCLUDE
@@ -578,6 +577,7 @@ class GenerateInvoice(BaseHandler):
         from_time = payload.get('from_time')
         to_time = payload.get('to_time')
         duration = payload.get('duration')
+        is_first_time = payload.get('is_first_time')
 
         if not cycle:
             cycle, from_time, to_time = get_billing_cycle(get_now(), num=duration)
@@ -603,10 +603,11 @@ class GenerateInvoice(BaseHandler):
             vps.end_time = to_time
             vps.save()
 
-        publisher = make_kafka_publisher(KafkaConfig)
-        publisher.publish('charge_invoice', payload={
-            'invoice_id': invoice.id
-        })
+        if is_first_time or all([vps.auto_renew for vps in list_vps]):
+            publisher = make_kafka_publisher(KafkaConfig)
+            publisher.publish('charge_invoice', payload={
+                'invoice_id': invoice.id
+            })
 
 
 class GenerateRefundInvoice(BaseHandler):
@@ -669,11 +670,12 @@ class BalanceToppedUp(BaseHandler):
 
         open_invoices = Invoice.objects.filter(user=user, status='open').all()
 
-        publisher = make_kafka_publisher(KafkaConfig)
-        for invoice in open_invoices:
-            publisher.publish('charge_invoice', payload={
-                'invoice_id': invoice.id
-            })
+        if False:
+            publisher = make_kafka_publisher(KafkaConfig)
+            for invoice in open_invoices:
+                publisher.publish('charge_invoice', payload={
+                    'invoice_id': invoice.id
+                })
 
 
 class ChargeInvoice(BaseHandler):
@@ -703,15 +705,7 @@ class ChargeInvoice(BaseHandler):
         invoice_repo = InvoiceRepository()
         app_setting = AppSettingRepository()
 
-        if not invoice_repo.charge(invoice):
-            if invoice._created + timedelta(days=app_setting.SUFFICIENT_BALANCE_SUSPEND_DAYS) > get_now():
-                return
-            invoice_lines = invoice.lines.all()
-            for line in invoice_lines:
-                payload = {
-                    "vps_id": line.vps_id
-                }
-                publisher.publish('suspend_vps', payload)
+        return invoice_repo.charge(invoice)
 
 
 class RestoreVPS(BaseHandler):
