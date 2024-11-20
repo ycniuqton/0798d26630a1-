@@ -85,6 +85,8 @@ class CheckSuspendVPS(BaseJob):
         publisher = make_kafka_publisher(KafkaConfig)
 
         for invoice in list_invoice:
+            if invoice.is_suspend_triggered():
+                continue
             publisher.publish('check_suspend_vps', {
                 'invoice_id': invoice.id,
             })
