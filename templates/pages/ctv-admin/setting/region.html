@@ -80,17 +80,19 @@
             })
             .catch(error => console.error('Error:', error));
         });
-
-async function fetchAndRenderPlans(table_id, checked_plan_ids) {
+function fetchAndRenderPlans(table_id, checked_plan_ids, cluster_id = -1) {
   try {
-    // Fetch data from the API
-    const response = await fetch('/api/vps/configurations');
-    if (!response.ok) {
-      throw new Error(`Failed to fetch plans: ${response.statusText}`);
+    // Create a synchronous XMLHttpRequest
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', '/api/vps/configurations', false); // `false` makes the request synchronous
+    xhr.send();
+
+    if (xhr.status !== 200) {
+      throw new Error(`Failed to fetch plans: ${xhr.statusText}`);
     }
 
     // Parse the JSON response
-    const data = await response.json();
+    const data = JSON.parse(xhr.responseText);
     const plans = data.plans;
 
     // Select the target element
@@ -105,7 +107,10 @@ async function fetchAndRenderPlans(table_id, checked_plan_ids) {
 
     // Render each plan as a table row
     for (const plan of plans) {
-      // Check if the current plan's ID exists in the checked_plan_ids array
+      if (cluster_id !== -1 && plan.cluster_id !== cluster_id) {
+        continue;
+      }
+
       const isChecked = checked_plan_ids.includes(plan.id);
 
       const row = `
@@ -124,6 +129,7 @@ async function fetchAndRenderPlans(table_id, checked_plan_ids) {
     console.error('Error fetching or rendering plans:', error);
   }
 }
+
 
 
         window.show_region = function show_region(region_id) {
@@ -154,7 +160,7 @@ async function fetchAndRenderPlans(table_id, checked_plan_ids) {
     `).join('');
 
 
-    fetchAndRenderPlans(`${prefix}PlanList`, region_data['list_plan'])
+    fetchAndRenderPlans(`${prefix}PlanList`, region_data['list_plan'], region_data.cluster_id)
 
 
     $(`#${prefix}Modal`).modal('show');
