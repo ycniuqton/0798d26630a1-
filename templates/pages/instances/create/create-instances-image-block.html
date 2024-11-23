@@ -79,57 +79,66 @@ document.addEventListener('DOMContentLoaded', function() {
     var versionSelects = document.querySelectorAll('.version-select');
 
     imageCards.forEach(function(card) {
-        card.addEventListener('click', function(event) {
-            if (vpsConfiguration.location.cluster_id === undefined) {
-                alert('Please select a location first.');
-                return;
-            }
+    card.addEventListener('click', function(event) {
+        if (vpsConfiguration.location.cluster_id === undefined) {
+            alert('Please select a location first.');
+            return;
+        }
 
-            // Prevent the card click from interfering with the dropdown
-            if (event.target.tagName === 'SELECT') {
-                return;
-            }
+        // Prevent the card click from interfering with the dropdown
+        if (event.target.tagName === 'SELECT') {
+            return;
+        }
 
-            // Deselect all other cards
-            imageCards.forEach(function(otherCard) {
-                otherCard.classList.remove('selected');
-                var otherSelect = otherCard.querySelector('.version-select');
-                if (otherSelect) {
-                    otherSelect.style.display = 'none';
-                    otherSelect.selectedIndex = 0;
+        // Deselect all other cards
+        imageCards.forEach(function(otherCard) {
+            otherCard.classList.remove('selected');
+            var otherSelect = otherCard.querySelector('.version-select');
+            if (otherSelect) {
+                otherSelect.style.display = 'none';
+                // Reset to the first visible option
+                const visibleOptions = Array.from(otherSelect.options).filter(option => !option.classList.contains('d-none'));
+                if (visibleOptions.length > 0) {
+                    visibleOptions[0].selected = true;
                 }
-            });
-
-            // Select the clicked card
-            card.classList.add('selected');
-            var select = card.querySelector('.version-select');
-            if (select) {
-                select.style.display = 'block';
             }
-
-            // Update vpsConfiguration
-            var imageName = card.getAttribute('data-name');
-            var imageVersion = select.options[select.selectedIndex].value;
-            vpsConfiguration.image = {
-                name: imageName,
-                version: imageVersion
-            };
-
-
-
-            // update user
-            if ( imageName == 'windows') {
-                document.getElementById('login').value = 'Administrator';
-            } else {
-                document.getElementById('login').value = 'root';
-            }
-            vpsConfiguration.login.username = document.getElementById('login').value;
-
-            // Trigger configuration update
-            document.getElementById('config_updated').value = 'true';
-            document.getElementById('config_updated').dispatchEvent(new Event('change'));
         });
+
+        // Select the clicked card
+        card.classList.add('selected');
+        var select = card.querySelector('.version-select');
+        if (select) {
+            select.style.display = 'block';
+
+            // Reset to the first visible option
+            const visibleOptions = Array.from(select.options).filter(option => !option.classList.contains('d-none'));
+            if (visibleOptions.length > 0) {
+                visibleOptions[0].selected = true;
+            }
+        }
+
+        // Update vpsConfiguration
+        var imageName = card.getAttribute('data-name');
+        var imageVersion = select ? select.options[select.selectedIndex].value : null;
+        vpsConfiguration.image = {
+            name: imageName,
+            version: imageVersion
+        };
+
+        // Update login based on image name
+        if (imageName === 'windows') {
+            document.getElementById('login').value = 'Administrator';
+        } else {
+            document.getElementById('login').value = 'root';
+        }
+        vpsConfiguration.login.username = document.getElementById('login').value;
+
+        // Trigger configuration update
+        document.getElementById('config_updated').value = 'true';
+        document.getElementById('config_updated').dispatchEvent(new Event('change'));
     });
+});
+
 
     document.getElementById('cluster_set').addEventListener('change', function() {
         version_selection = document.getElementsByClassName('image-version');
