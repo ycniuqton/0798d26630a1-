@@ -7,7 +7,8 @@ def get_billing_cycle(from_time=datetime.utcnow, type='monthly', num=1, to_time=
     if not to_time:
         if type == 'monthly':
             if from_time.month + num > 12:
-                to_time = from_time.replace(year=from_time.year + 1, month=(from_time.month + num) % 12)
+                to_time = from_time.replace(year=from_time.year + (from_time.month + num - 1) // 12,
+                                            month=(from_time.month + num) % 12)
             else:
                 to_time = from_time.replace(month=from_time.month + num)
         elif type == 'yearly':

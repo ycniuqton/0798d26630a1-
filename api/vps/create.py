@@ -7,6 +7,7 @@ from drf_spectacular.utils import extend_schema, OpenApiExample
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 
+from api.vps.__constants import LIFETIME
 from home.models import Vps
 
 from django.http import JsonResponse
@@ -115,7 +116,12 @@ def create_vps(request):
     discount_repo = DiscountRepository.get(duration=duration)
     total_fee = plan['price'] * duration
     total_fee, _ = discount_repo.apply(total_fee)
-    cycle, from_time, to_time = get_billing_cycle(from_time=get_now(), type='monthly', num=duration)
+    now = get_now()
+    if duration == LIFETIME:
+        cycle, from_time, to_time = get_billing_cycle(from_time=now,
+                                                      to_time=get_now().replace(year=now.year + 100))
+    else:
+        cycle, from_time, to_time = get_billing_cycle(from_time=get_now(), type='monthly', num=duration)
     if user.balance.amount < total_fee and not user.is_staff:
         return JsonResponse({'error': 'Insufficient balance'}, status=400)
 

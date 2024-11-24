@@ -68,7 +68,7 @@ def get_payment_url(request):
         client = Client.payment(PAYMENT_KEY, MERCHANT_UUID)
 
         payment_data = {
-            'amount': amount,  # Amount in USD
+            'amount': str(amount),  # Amount in USD
             'currency': 'USD',
             'order_id': payment_id,
             'url_return': APPConfig.CRYPTO_RETURN_URL,
