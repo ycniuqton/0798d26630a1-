@@ -8,12 +8,14 @@ class DiscountRepository:
         if duration == 1:
             discount_percent += 0
         elif duration == 3:
-            discount_percent += 5
+            discount_percent += 0
         elif duration == 6:
-            discount_percent += 10
+            discount_percent += 5
         elif duration == 12:
-            discount_percent += 15
+            discount_percent += 10
         elif duration == 24:
+            discount_percent += 15
+        elif duration == 36:
             discount_percent += 20
 
         if discount_percent > 100:

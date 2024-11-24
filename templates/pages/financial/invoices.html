@@ -41,8 +41,8 @@
         <select class="form-control" id="status-filter-select">
             <option value="">All Statuses</option>
             <option value="paid">Paid</option>
-            <option value="unpaid">Unpaid</option>
-            <option value="overdue">Overdue</option>
+            <option value="open">Open</option>
+            <option value="expired">Expired</option>
         </select>
 
         <button class="btn btn-primary" id="search-button">Apply Filters</button>
@@ -116,7 +116,7 @@
                         tbody.innerHTML = '';
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                    <td colspan="6" class="no-records text-center">
+                    <td colspan=6 class="no-records text-center">
                         <img src="/static/assets/images/custom/invoice.png" alt="No Records">
                         <h4>No Invoices</h4>
                     </td>

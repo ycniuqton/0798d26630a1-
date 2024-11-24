@@ -40,7 +40,6 @@ class TicketCollectionAPI(APIView):
         search_fields = ['subject', 'ticket_type', 'description', 'status', 'user__username']
         page = int(request.GET.get('page', 1))
         page_size = int(request.GET.get('page_size', 10))
-        page_size = 5
         sort_by = request.GET.get('sort_by', '-datetime')
         filters = {field: request.GET.get(field) for field in filterable_fields if request.GET.get(field)}
         search_value = request.GET.get('search')
