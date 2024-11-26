@@ -213,7 +213,6 @@ class Invoice(BaseModel):
     end_time = models.DateTimeField(default=timezone.now)
     code = models.CharField(max_length=200, null=True, blank=True)
     cycle = models.CharField(max_length=200, null=True, blank=True)
-    display_text = models.CharField(max_length=200, null=True, blank=True)
     transaction = models.OneToOneField(Transaction, on_delete=models.CASCADE, related_name='invoice', null=True,
                                        blank=True)
 
@@ -238,6 +237,15 @@ class Invoice(BaseModel):
         if event:
             return True
         return False
+
+    def display_text(self):
+        list_ip = []
+        for line in self.lines.all():
+            try:
+                list_ip.append(line.vps.ip)
+            except:
+                pass
+        return ', '.join(list_ip)
 
     class Meta:
         db_table = 'invoice'
