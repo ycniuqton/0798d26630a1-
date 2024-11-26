@@ -36,7 +36,7 @@ class InvoiceRepository:
                 item.price, _ = discount_repo.apply(item.price)
                 item.plan_name = plan.get('name', "")
             try:
-                ips.append(item.vps.ip)
+                ips.append(item.ip)
             except:
                 pass
 
