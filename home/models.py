@@ -238,6 +238,7 @@ class Invoice(BaseModel):
             return True
         return False
 
+    @property
     def display_text(self):
         list_ip = []
         for line in self.lines.all():
