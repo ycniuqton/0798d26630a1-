@@ -24,6 +24,7 @@ class InvoiceRepository:
         plans = CachedPlan().get()
         discount_repo = DiscountRepository.get(duration=duration)
 
+        ips = []
         # apply price
         for item in items:
             plan = next((p for p in plans if p.get('id') == item.plan_id), None)
@@ -34,7 +35,12 @@ class InvoiceRepository:
                 item.price = plan.get('price', 0) * duration
                 item.price, _ = discount_repo.apply(item.price)
                 item.plan_name = plan.get('name', "")
+            try:
+                ips.append(item.vps.ip)
+            except:
+                pass
 
+        display_text = ", ".join(ips)
         total_fee = sum([i.price for i in items])
         now = get_now()
         code = self.gen_code(user.id)
@@ -55,6 +61,7 @@ class InvoiceRepository:
             cycle=cycle,
             start_time=from_time,
             end_time=to_time,
+            display_text=display_text,
         )
 
         for item in items:

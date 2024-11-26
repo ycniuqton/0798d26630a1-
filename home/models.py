@@ -213,6 +213,7 @@ class Invoice(BaseModel):
     end_time = models.DateTimeField(default=timezone.now)
     code = models.CharField(max_length=200, null=True, blank=True)
     cycle = models.CharField(max_length=200, null=True, blank=True)
+    display_text = models.CharField(max_length=200, null=True, blank=True)
     transaction = models.OneToOneField(Transaction, on_delete=models.CASCADE, related_name='invoice', null=True,
                                        blank=True)
 

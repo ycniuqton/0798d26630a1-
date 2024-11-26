@@ -55,6 +55,7 @@
                 {% endif %}
                 <th scope="col" id="th-code">Code</th>
                 <th scope="col" id="th-created">Created</th>
+                <th scope="col" id="th-description">Description</th>
                 <th scope="col" id="th-due-date">Due Date</th>
                 <th scope="col" id="th-status">Status</th>
                 <th scope="col" id="th-total">Total</th>
@@ -134,6 +135,7 @@
                                 {% endif %}
                                 <td>${item.code.toUpperCase()}</td>
                                 <td>${item._created}</td>
+                                <td>${item.display_text}</td>
                                 <td>${item.due_date}</td>
                                 <td>
 
