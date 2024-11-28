@@ -22,7 +22,7 @@ def update_info(request, vps_id):
     data = json.loads(request.body)
     user = request.user
     linked_id = data.get('linked_id')
-    updatable_fields = ['auto_renew', 'hostname']
+    updatable_fields = ['auto_renew']
     new_data = {}
     for field in updatable_fields:
         if field in data:
@@ -44,14 +44,10 @@ def update_info(request, vps_id):
     vps.save()
 
     if 'hostname' in new_data:
-        if settings.APPConfig.APP_ROLE == 'admin':
-            from services.vps import VPSService
-        else:
-            from services.vps import CtvVPSService as VPSService
-
-        base_url = settings.ADMIN_CONFIG.URL
-        api_key = settings.ADMIN_CONFIG.API_KEY
-        VPSService(base_url, api_key).change_hostname(vps.linked_id,
-                                                      {'hostname': new_data['hostname']})
+        publisher = make_kafka_publisher(KafkaConfig)
+        publisher.publish('change_hostname_vps', {
+            'vps_id': vps.id,
+            'hostname': new_data['hostname']
+        })
 
     return JsonResponse('', safe=False)

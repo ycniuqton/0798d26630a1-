@@ -54,7 +54,7 @@ handlers = {
     VirtualizorEvent.VPS_DELETED: VPSDeleted(),
     # VirtualizorEvent.VPS_DELETED_FAILED: VPSDeletedError(),
     VirtualizorEvent.VPS_PASSWORD_CHANGED: VPSChangedPassword(),
-    # VirtualizorEvent.VPS_HOSTNAME_CHANGED: VPSChangedHostname(),
+    VirtualizorEvent.VPS_HOSTNAME_CHANGED: VPSChangedHostname(),
     "cache_cleaned": CacheCleaned(),
     "agen_sync": AgencySync(),
 }
