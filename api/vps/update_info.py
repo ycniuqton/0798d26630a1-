@@ -43,11 +43,11 @@ def update_info(request, vps_id):
 
     vps.save()
 
-    if 'hostname' in new_data:
+    if 'hostname' in data:
         publisher = make_kafka_publisher(KafkaConfig)
         publisher.publish('change_hostname_vps', {
             'vps_id': vps.id,
-            'hostname': new_data['hostname']
+            'hostname': data['hostname']
         })
 
     return JsonResponse('', safe=False)
