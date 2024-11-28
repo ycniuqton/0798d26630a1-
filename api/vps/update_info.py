@@ -21,13 +21,18 @@ from services.balance import BalanceRepository
 def update_info(request, vps_id):
     data = json.loads(request.body)
     user = request.user
+    linked_id = data.get('linked_id')
     updatable_fields = ['auto_renew', 'hostname']
     new_data = {}
     for field in updatable_fields:
         if field in data:
             new_data[field] = data[field]
 
-    vps = Vps.objects.get(id=vps_id)
+    if linked_id:
+        vps = Vps.objects.filter(linked_id=linked_id).first()
+    else:
+        vps = Vps.objects.get(id=vps_id)
+
     if not vps:
         return JsonResponse('Invalid Request', safe=False)
     if not user.is_staff and vps.user_id != user.id:
@@ -46,6 +51,7 @@ def update_info(request, vps_id):
 
         base_url = settings.ADMIN_CONFIG.URL
         api_key = settings.ADMIN_CONFIG.API_KEY
-        VPSService(base_url, api_key).change_hostname(vps.linked_id, {'hostname': new_data['hostname']})
+        VPSService(base_url, api_key).change_hostname(vps.linked_id,
+                                                      {'hostname': new_data['hostname']})
 
     return JsonResponse('', safe=False)
