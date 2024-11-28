@@ -94,9 +94,8 @@ class VPSService:
             response.raise_for_status()
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
-    def change_hostname(self, vps_id, payload):
+    def change_hostnamechange_hostname(self, vps_id, payload):
         url = f"{self.base_url}/system/vpss/{vps_id}/change_hostname"
-        payload['linked_id'] = vps_id
         response = requests.post(url, headers=self.headers, json=payload)
 
         # Check if the request was successful
@@ -312,7 +311,7 @@ class CtvVPSService(VPSService):
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def change_hostname(self, vps_id, payload):
         url = f"{self.base_url}/api/vps/{vps_id}/update_info/"
-
+        payload['linked_id'] = vps_id
         response = requests.post(url, headers=self.headers, json=payload)
 
         # Check if the request was successful
