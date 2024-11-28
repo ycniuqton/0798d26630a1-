@@ -94,6 +94,18 @@ class VPSService:
             response.raise_for_status()
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+    def change_hostname(self, vps_id, payload):
+        url = f"{self.base_url}/system/vpss/{vps_id}/change_hostname"
+        response = requests.post(url, headers=self.headers, json=payload)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            return response.json()
+        else:
+            # Raise an HTTP error for non-200 status codes
+            response.raise_for_status()
+
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
     def unsuspend(self, vps_id):
         url = f"{self.base_url}/system/vpss/{vps_id}/unsuspend"
         response = requests.post(url, headers=self.headers)
@@ -288,6 +300,19 @@ class CtvVPSService(VPSService):
             'linked_ids': [payload.get('linked_id')],
             'password': payload.get('password')
         })
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            return response.json()
+        else:
+            # Raise an HTTP error for non-200 status codes
+            response.raise_for_status()
+
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
+    def change_hostname(self, vps_id, payload):
+        url = f"{self.base_url}/api/vps/{vps_id}/update_info/"
+
+        response = requests.post(url, headers=self.headers, json=payload)
 
         # Check if the request was successful
         if response.status_code == 200:

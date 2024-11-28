@@ -55,7 +55,46 @@
         const newHostname = document.getElementById('hostname-input').value;
         document.getElementById('hostname-text').textContent = newHostname;
         cancelHostnameChange();
-        // Optionally, you can add code here to make an API call to update the hostname on the server
+
+        const vps_id = '{{ instance.id }}' ;
+
+    if (!newHostname) {
+        alert("Please enter a valid hostname.");
+        return;
+    }
+
+    // API endpoint
+    const apiEndpoint = `/api/vps/${vps_id}/update_info/`;
+
+    // Data to send in the request
+    const data = {
+        hostname: newHostname
+    };
+
+    // Make the API request using fetch
+    fetch(apiEndpoint, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(result => {
+        // Handle success
+        alert("Hostname updated successfully!");
+        console.log("Response:", result);
+    })
+    .catch(error => {
+        // Handle error
+        console.error("Error updating hostname:", error);
+        alert("Failed to update hostname. Please try again.");
+    });
     }
 
     function cancelHostnameChange() {
