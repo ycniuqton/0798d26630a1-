@@ -554,3 +554,33 @@ class AgencySync(BaseHandler):
             if sync_type == 'REGION_PLAN':
                 CachedPlanInRegion().set_all(data)
 
+
+class VPSChangedHostname(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            identifier = fields.String(required=False)
+            hostname = fields.String(required=False)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        identifier = payload.get('identifier')
+        hostname = payload.get('hostname')
+        vps = Vps.objects.filter(linked_id=identifier).first()
+        if not vps:
+            raise DBInsertFailed("Missing Order")
+
+        try:
+            vps.hostname = hostname
+            vps.save()
+        except:
+            raise SkippableException("Failed to start VPS")
