@@ -10,7 +10,7 @@ from services.invoice import get_now
 from services.report import TopUpCounter, RefundCounter, InvoicePaidCounter, OrderCounter
 from .__base__ import BaseJob
 from adapters.redis_service import CachedVpsStatRepository
-from home.models import Vps, VpsStatus, Invoice, TriggeredOnceEvent
+from home.models import Vps, VpsStatus, Invoice, TriggeredOnceEvent, Ticket
 
 
 class UpdateVpsStat(BaseJob):
@@ -121,3 +121,21 @@ class CollectReport(BaseJob):
         InvoicePaidCounter().update(get_now())
         OrderCounter().update(get_now())
         RefundCounter().update(get_now())
+
+
+class CheckTicketExpired(BaseJob):
+    def run(self):
+        now = get_now()
+        open_ticket = Ticket.objects.filter(status=Ticket.TicketStatus.OPEN).all()
+        for ticket in open_ticket:
+            last_msg = ticket.messages.last()
+
+            last_action = now
+            if last_msg:
+                last_action = last_msg._created
+            else:
+                last_action = ticket._created
+
+            if last_action + timedelta(days=3) < now:
+                ticket.status = Ticket.TicketStatus.EXPIRED
+                ticket.save()

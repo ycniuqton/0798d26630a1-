@@ -423,11 +423,23 @@ def ticket(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def your_tickets(request):
-    context = {
-        'segment': 'ticket',
-        'tickets': tickets
-    }
-    return render(request, "pages/supports/your_tickets.html", context)
+    if request.user.is_staff:
+        context = {
+            Ticket.TicketStatus.UNREAD: Ticket.objects.filter(status=Ticket.TicketStatus.UNREAD).count(),
+            Ticket.TicketStatus.OPEN: Ticket.objects.filter(status=Ticket.TicketStatus.OPEN).count(),
+            Ticket.TicketStatus.CLOSED: Ticket.objects.filter(status=Ticket.TicketStatus.CLOSED).count(),
+            Ticket.TicketStatus.EXPIRED: Ticket.objects.filter(status=Ticket.TicketStatus.EXPIRED).count(),
+        }
+    else:
+        context = {
+            Ticket.TicketStatus.UNREAD: Ticket.objects.filter(status=Ticket.TicketStatus.UNREAD, user=request.user).count(),
+            Ticket.TicketStatus.OPEN: Ticket.objects.filter(status=Ticket.TicketStatus.OPEN, user=request.user).count(),
+            Ticket.TicketStatus.CLOSED: Ticket.objects.filter(status=Ticket.TicketStatus.CLOSED, user=request.user).count(),
+            Ticket.TicketStatus.EXPIRED: Ticket.objects.filter(status=Ticket.TicketStatus.EXPIRED, user=request.user).count(),
+        }
+
+    context['all'] = sum(context.values())
+    return render(request, "pages/supports/admin_tickets.html", context={'counter': context})
 
 
 @api_view(['GET'])

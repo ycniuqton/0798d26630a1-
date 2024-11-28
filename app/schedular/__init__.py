@@ -9,7 +9,7 @@ django.setup()
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 from app.schedular.jobs import UpdateVpsStat, CheckVPSExpired, CheckInvoiceExpired, CheckSuspendVPS, ArchiveVPS, \
-    CollectReport
+    CollectReport, CheckTicketExpired
 
 
 def main():
@@ -21,6 +21,7 @@ def main():
     check_vps_expired = CheckVPSExpired()
     check_invoice_expired = CheckInvoiceExpired()
     check_vps_suspend = CheckSuspendVPS()
+    check_expired_ticket = CheckTicketExpired()
     archive_vps = ArchiveVPS()
     collect_report = CollectReport()
 
@@ -30,6 +31,7 @@ def main():
     scheduler.add_job(check_vps_suspend.run, 'cron', hour='*', minute='*')
     scheduler.add_job(archive_vps.run, 'cron', hour='*', minute='*')
     scheduler.add_job(collect_report.run, 'cron', hour='*', minute='*')
+    scheduler.add_job(check_expired_ticket.run, 'cron', hour='*', minute='*')
 
     # Start the scheduler
     print("Starting scheduler...")
@@ -42,5 +44,8 @@ if __name__ == '__main__':
 
     # check_vps_expired = CheckVPSExpired()
     # check_vps_expired.run()
+
+    # check_expired_ticket = CheckTicketExpired()
+    # check_expired_ticket.run()
 
     main()

@@ -24,7 +24,6 @@ class TicketCollectionAPI(APIView):
                 ticket_type=data['ticket_type'],
                 description=data['description'],
                 submission_time=datetime.now(),
-                status=Ticket.TicketStatus.OPEN,
                 operation='View',
                 user=request.user
             )
@@ -63,18 +62,6 @@ class TicketCollectionAPI(APIView):
         for obj in objects:
             obj_data = obj.to_readable_dict()
             obj_data.update({'messages': [msg.to_readable_dict() for msg in obj.messages.all()]})
-
-            flag = 'unread'
-
-            last_msg = obj.messages.last()
-            if last_msg:
-                if last_msg._created < now - timedelta(days=3):
-                    flag = 'expired'
-                elif last_msg.user.is_staff:
-                    flag = 'resolved'
-                elif last_msg.user == user:
-                    flag = 'unread'
-            obj_data['flag'] = flag
             data.append(obj_data)
 
         return JsonResponse({
@@ -129,5 +116,23 @@ def ticket_reply(request, ticket_id):
     )
     # ticket.messages.append(tchat)
     # ticket.save()
+
+    return JsonResponse({'success': True})
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def close_ticket(request, ticket_id):
+    user = request.user
+
+    ticket = Ticket.objects.filter(id=ticket_id)
+    if not user.is_staff:
+        ticket = ticket.filter(user_id=user.id)
+    ticket = ticket.first()
+    if not ticket:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
+    ticket.status = Ticket.TicketStatus.CLOSED
+    ticket.save()
 
     return JsonResponse({'success': True})

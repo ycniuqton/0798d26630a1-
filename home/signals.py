@@ -1,7 +1,7 @@
 from django.db.models import Sum
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from .models import Vps, User, Balance, Transaction, Ticket, VPSLog
+from .models import Vps, User, Balance, Transaction, Ticket, VPSLog, TicketChat
 
 
 @receiver(post_save, sender=Vps)
@@ -49,3 +49,13 @@ def update_vps_log_counter(sender, instance, **kwargs):
     vps = instance.vps
     vps.log_count = VPSLog.objects.filter(vps=vps).count()
     vps.save()
+
+
+@receiver(post_save, sender=TicketChat)
+def update_ticket_status(sender, instance, **kwargs):
+    ticket = instance.ticket
+    if instance.user.is_staff:
+        ticket.status = Ticket.TicketStatus.OPEN
+    else:
+        ticket.status = Ticket.TicketStatus.UNREAD
+    ticket.save()

@@ -34,12 +34,85 @@
 }
 
 </style>
+<style>
+    .detail-container {
+        margin-top: 20px;
+    }
+    .section-title {
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    .card-custom {
+        margin-bottom: 20px;
+    }
+    .status-badge {
+        font-size: 0.8rem;
+        padding: 0.5em;
+        margin-left: 1em;
+    }
+    .modal-content {
+        overflow-y: auto;
+        max-height: 70vh;
+    }
+    .navbar-custom {
+        background-color: #333;
+        color: #fff;
+    }
+    .navbar-custom a {
+        color: #fff;
+    }
+
+</style>
 {% endblock extrastyle %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="search-bar mb-4">
-        <input type="text" class="form-control" id="search-input" placeholder="Please enter" aria-label="Search">
+<div class="container mt-4" style="
+    min-width: 90%;
+">
+    <ul class="nav nav-tabs" id="customerTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="all-tab" data-toggle="tab" href="#all" role="tab" aria-controls="all"
+               aria-selected="true">
+                <label class="pointable" >({{counter.all}}) All</label></a>
+        </li>
+        {% if request.user.is_staff %}
+        <li class="nav-item">
+            <a class="nav-link " id="unread-tab" data-toggle="tab" href="#unread" role="tab" aria-controls="unread"
+               aria-selected="true">
+                <label class="pointable" >({{counter.unread}}) Unread</label></a>
+        </li>
+        {% endif %}
+        <li class="nav-item">
+            <a class="nav-link" id="expired-tab" data-toggle="tab" href="#expired" role="tab" aria-controls="expired"
+               aria-selected="false">
+
+                <label class="pointable">({{counter.expired}}) Expired</label>
+
+            </a>
+        </li>
+        {% if request.user.is_staff %}
+        <li class="nav-item">
+            <a class="nav-link" id="active-tab" data-toggle="tab" href="#active" role="tab" aria-controls="active"
+               aria-selected="false">
+
+                <label class="pointable">({{counter.open}}) Active</label>
+
+            </a>
+        </li>
+        {% endif %}
+        <li class="nav-item">
+            <a class="nav-link" id="closed-tab" data-toggle="tab" href="#closed" role="tab" aria-controls="closed"
+               aria-selected="false">
+                <label class="pointable">({{counter.closed}}) Closed</label>
+            </a>
+        </li>
+
+    </ul>
+
+
+    <div class="search-bar mb-4 mt-2">
+        <input type="text" class="form-control" id="search-input" placeholder="Please enter"
+               aria-label="Search">
         <select class="form-control" id="subject-filter-select">
             <option value="">Subject</option>
             <!-- Add more options here if needed -->
@@ -66,6 +139,8 @@
             <!-- Pagination will be loaded here via AJAX -->
         </ul>
     </nav>
+
+
 </div>
 
 <!-- Modal for ticket details -->
@@ -90,7 +165,8 @@
                 </div>
                 <div class="post">
                     <div class="reply-section">
-                        <textarea class="reply-input" id="reply-input" placeholder="Type your message here..."></textarea>
+                        <textarea class="reply-input" id="reply-input"
+                                  placeholder="Type your message here..."></textarea>
                         <button class="reply-button" id="reply-button">Reply</button>
                     </div>
                 </div>
@@ -99,54 +175,101 @@
     </div>
 </div>
 
+
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         let currentPage = 1;
         let currentSort = '-submission_time';
-        let currentFilter = '';
+        let currentFilter = {};
         let ticketsData = [];
 
-        window.loadTickets = function(page = 1, sort = '-submission_time', filter = '') {
-            const searchQuery = document.getElementById('search-input').value;
-            fetch(`/api/tickets/?page=${page}&page_size=10&sort_by=${sort}&${filter}&search=${searchQuery}`)
-                .then(response => response.json())
-                .then(data => {
-                    ticketsData = data.data; // Store ticket data
-                    const tbody = document.getElementById('ticket-list');
-                    tbody.innerHTML = '';
-                    ticketsData.forEach((ticket, index) => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${ticket.id}</td>
-                            <td>${ticket.subject}</td>
-                            <td>${ticket.ticket_type}</td>
-                            <td>${ticket.submission_time}</td>
-                            <td>
+        window.loadTickets = function(page=1, sort='-submission_time', filter=currentFilter) {
+    const searchQuery = document.getElementById('search-input').value;
+    filter_str = Object.keys(filter).map(key => key + "=" + filter[key]).join('&');
+    document.getElementById('loader').style.display = 'Block';
+    fetch(`/api/tickets/?page=${page}&page_size=10&sort_by=${sort}&${filter_str}&search=${searchQuery}`)
+        .then(response => response.json())
+        .then(data => {
+            ticketsData = data.data; // Store ticket data
+            const tbody = document.getElementById('ticket-list');
+            tbody.innerHTML = '';
+            ticketsData.forEach((ticket, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${ticket.id}</td>
+                    <td>${ticket.subject}</td>
+                    <td>${ticket.ticket_type}</td>
+                    <td>${ticket.submission_time}</td>
+                    <td>
+                        <span class="status-circle ${
+                            ticket.status === 'unread' ? 'status-circle-red' :
+                            ticket.status === 'closed' ? 'status-circle-black' :
+                            ticket.status === 'open' ? 'status-circle-green' : 'status-circle-yellow'
+                        }"  title="${ticket.status}" ></span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="showTicketDetails('${ticket.id}')">Details</button>
+                        ${
+                            ticket.status !== 'closed'
+                            ? `<button class="btn btn-sm btn-outline-danger" onclick="closeTicket('${ticket.id}')">Close</button>`
+                            : ''
+                        }
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
 
-        <span class="status-circle ${
-            ticket.flag === 'unread' ? 'status-circle-red' :
-            ticket.flag === 'resolved' ? 'status-circle-green' : 'status-circle-yellow'
-        }"  title="${ticket.flag}" ></span>
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+            for (let i = 1; i <= data.total_pages; i++) {
+                const pageItem = document.createElement('li');
+                pageItem.className = 'page-item' + (i === data.current_page ? ' active' : '');
+                pageItem.innerHTML = `<a class="page-link" onclick="loadTickets(${i}, '${sort}', '${filter}')">${i}</a>`;
+                pagination.appendChild(pageItem);
+            }
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'None';
+            }, 500);
+        })
+        .catch(error => {
+            console.log('Error:', error);
+            setTimeout(() => {
+                document.getElementById('loader').style.display = 'None';
+            }, 500);
+        });
+}
 
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-outline-primary" onclick="showTicketDetails('${ticket.id}')">Details</button>
-                            </td>
-                        `;
-                        tbody.appendChild(row);
-                    });
+        window.closeTicket = function closeTicket(ticketId) {
+    // Show a confirmation dialog
+    const confirmClose = confirm(`Are you sure you want to close this ticket?`);
+    if (!confirmClose) return;
 
-                    const pagination = document.getElementById('pagination');
-                    pagination.innerHTML = '';
-                    for (let i = 1; i <= data.total_pages; i++) {
-                        const pageItem = document.createElement('li');
-                        pageItem.className = 'page-item' + (i === data.current_page ? ' active' : '');
-                        pageItem.innerHTML = `<a class="page-link" onclick="loadTickets(${i}, '${sort}', '${filter}')">${i}</a>`;
-                        pagination.appendChild(pageItem);
-                    }
-                })
-                .catch(error => console.log('Error:', error));
-        }
+    // Show a loading spinner or indicator
+    document.getElementById('loader').style.display = 'Block';
+
+    // Make the API call to close the ticket
+    fetch(`/api/tickets/${ticketId}/close/`, {
+        method: 'POST'
+    })
+    .then(response => {
+
+    })
+    .catch(error => {
+    })
+    .finally(() => {
+        // Hide the loader in any case
+        document.getElementById('loader').style.display = 'None';
+        window.loadTickets(currentPage, currentSort, currentFilter);
+    });
+}
+
+// Utility function to get CSRF token (if your app uses CSRF protection)
+function getCSRFToken() {
+    const csrfMatch = document.cookie.match(/csrftoken=([\w-]+)/);
+    return csrfMatch ? csrfMatch[1] : null;
+}
+
 
         window.showTicketDetails = function(ticket_id) {
             console.log('showTicketDetails', ticket_id);
@@ -194,6 +317,33 @@
 
             $('#ticketModal').modal('show');
         }
+
+        const statusMapping = {
+    "unread-tab": "unread",
+    "active-tab": "open",
+    "expired-tab": "expired",
+    "closed-tab": "closed"
+};
+
+// Bind the click event for the tabs
+document.querySelectorAll('#customerTabs .nav-link').forEach(tab => {
+    tab.addEventListener('click', function () {
+        // Get the id of the clicked tab
+        const tabId = this.id;
+
+        if (statusMapping[tabId]) {
+            currentFilter["status"] = statusMapping[tabId];
+        }
+        if (tabId === 'all-tab') {
+            currentFilter = {};
+        }
+        console.log('currentFilter', currentFilter);
+        // Call the loadTickets function
+        loadTickets();
+
+    });
+});
+
 
         document.getElementById('reply-button').addEventListener('click', () => {
             const ticket_id = document.getElementById('reply-button').getAttribute('data-ticket-id');

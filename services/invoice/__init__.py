@@ -116,4 +116,8 @@ class InvoiceRepository:
         invoice.transaction = transaction
         invoice.save()
 
+        for line in invoice.lines.all():
+            line.status = InvoiceLine.Status.PAID
+            line.save()
+
         return True

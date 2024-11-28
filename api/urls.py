@@ -4,7 +4,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from .admin import get_group_configs, lock_group, SuspendConfig, VpsConfig, RefundRequestAPI, approve_refund_request, \
     reject_refund_request, admin_clear_cache, ClusterResource, GroupResource, test_cluster
 from .snapshot import VpsSnapshotAPI, restore_vsp
-from .support import TicketCollectionAPI, TicketAPI, ticket_reply
+from .support import TicketCollectionAPI, TicketAPI, ticket_reply, close_ticket
 from .account import AccountAPI, AccountBalanceAPI, UserTokenAPI, delete_token, AccountCollectionAPI
 from .invoices import InvoiceCollectionAPI, InvoiceAPI, TransactionCollectionAPI, charge_invoice
 from .views import RegisterAPI, LoginAPI, LogoutAPI
@@ -71,6 +71,7 @@ urlpatterns = [
     path('invoices/<str:invoice_id>/charge/', charge_invoice, name='api-charge-invoice'),
     path('tickets/', TicketCollectionAPI.as_view(), name='tickets_view'),
     path('tickets/<str:ticket_id>/', TicketAPI.as_view(), name='ticket_view'),
+    path('tickets/<str:ticket_id>/close/', close_ticket, name='close_ticket'),
     path('tickets/<str:ticket_id>/reply/', ticket_reply, name='ticket_reply'),
 
     path('tokens/', UserTokenAPI.as_view(), name='user-tokens'),

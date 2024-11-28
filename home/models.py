@@ -146,6 +146,13 @@ class Vps(BaseModel):
     class Meta:
         db_table = 'vps'
 
+    @property
+    def is_unpaid(self):
+        unpaid_invoice_line = self.invoice_lines.filter(status=InvoiceLine.Status.OPEN).first()
+        if unpaid_invoice_line:
+            return True
+        return False
+
 
 class VPSLog(BaseModel):
     action = models.CharField(max_length=200)
@@ -242,8 +249,11 @@ class Invoice(BaseModel):
     def display_text(self):
         list_ip = []
         for line in self.lines.all():
+            ip = line.vps.ip
+            if ip is None:
+                continue
             try:
-                list_ip.append(line.vps.ip)
+                list_ip.append(ip)
             except:
                 pass
         return ', '.join(list_ip)
@@ -253,11 +263,17 @@ class Invoice(BaseModel):
 
 
 class InvoiceLine(BaseModel):
+    class Status(models.TextChoices):
+        OPEN = 'open', 'Open'
+        PAID = 'paid', 'Paid'
+        CANCELED = 'canceled', 'Canceled'
+        EXPIRED = 'expired', 'Expired'
+
     invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE, related_name='lines')
     description = models.TextField()
     amount = models.FloatField()
-    status = models.CharField(max_length=200)
-    vps = models.ForeignKey(Vps, on_delete=models.CASCADE)
+    status = models.CharField(max_length=200, default=Status.OPEN)
+    vps = models.ForeignKey(Vps, on_delete=models.CASCADE, related_name='invoice_lines')
     start_time = models.DateTimeField(default=timezone.now)
     end_time = models.DateTimeField(default=timezone.now)
     cycle = models.CharField(max_length=200, null=True, blank=True)
@@ -273,12 +289,14 @@ class Ticket(BaseModel):
     class TicketStatus(models.TextChoices):
         OPEN = 'open', 'Open'
         CLOSED = 'closed', 'Closed'
+        EXPIRED = 'expired', 'Expired'
+        UNREAD = 'unread', 'Unread'
 
     subject = models.CharField(max_length=200)
     ticket_type = models.CharField(max_length=200)
     description = models.TextField()
     submission_time = models.DateTimeField(default=timezone.now)
-    status = models.CharField(max_length=200)
+    status = models.CharField(max_length=200, choices=TicketStatus.choices, default=TicketStatus.UNREAD)
     operation = models.CharField(max_length=200)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 
