@@ -94,7 +94,7 @@ class VPSService:
             response.raise_for_status()
 
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))
-    def change_hostnamechange_hostname(self, vps_id, payload):
+    def change_hostname(self, vps_id, payload):
         url = f"{self.base_url}/system/vpss/{vps_id}/change_hostname"
         response = requests.post(url, headers=self.headers, json=payload)
 
