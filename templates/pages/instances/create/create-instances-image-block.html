@@ -41,14 +41,18 @@
             <div class="row">
                 {% for image in images %}
                 {% if category == 'ALL' or image.category == category %}
-                <div class="col-6 col-md-4 col-lg-3 mb-3 image-card-container" data-cluster-hash="{{image.cluster_hash}}">
-                    <div class="card image-card" data-name="{{ image.name }}" >
+                <div class="col-6 col-md-4 col-lg-3 mb-3 image-card-container"
+                     data-cluster-hash="{{image.cluster_hash}}">
+                    <div class="card image-card" data-name="{{ image.name }}">
                         <div class="card-body text-center">
-                            <img src="/api/static/os_icon/{{ image.image_url }}" alt="{{ image.name }}" class="mb-2  image-os-icon">
+                            <img src="/api/static/os_icon/{{ image.image_url }}" alt="{{ image.name }}"
+                                 class="mb-2  image-os-icon">
                             <h6>{{ image.name }}</h6>
                             <select class="form-control version-select" data-image="{{ image.name }}">
                                 {% for version in image.versions %}
-                                <option class="image-version" value="{{ version.name }}" data-cluster-id={{version.cluster_id}} >{{ version.name }}</option>
+                                <option class="image-version" value="{{ version.name }}"
+                                        data-cluster-id={{version.cluster_id}}>{{ version.name }}
+                                </option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -64,135 +68,148 @@
 
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var triggerTabList = [].slice.call(document.querySelectorAll('#imageTab a'));
-    triggerTabList.forEach(function (triggerEl) {
-        triggerEl.addEventListener('click', function (event) {
-            event.preventDefault();
-            var tabTrigger = new bootstrap.Tab(triggerEl);
-            tabTrigger.show();
+    document.addEventListener('DOMContentLoaded', function() {
+        var triggerTabList = [].slice.call(document.querySelectorAll('#imageTab a'));
+        triggerTabList.forEach(function (triggerEl) {
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault();
+                var tabTrigger = new bootstrap.Tab(triggerEl);
+                tabTrigger.show();
+            });
         });
-    });
 
-    // Handle card selection and version selection
-    var imageCards = document.querySelectorAll('.image-card');
-    var versionSelects = document.querySelectorAll('.version-select');
+        // Handle card selection and version selection
+        var imageCards = document.querySelectorAll('.image-card');
+        var versionSelects = document.querySelectorAll('.version-select');
 
-    imageCards.forEach(function(card) {
-    card.addEventListener('click', function(event) {
-        if (vpsConfiguration.location.cluster_id === undefined) {
-            alert('Please select a location first.');
-            return;
-        }
+        imageCards.forEach(function(card) {
+        card.addEventListener('click', function(event) {
+            if (vpsConfiguration.location.cluster_id === undefined) {
+                alert('Please select a location first.');
+                return;
+            }
 
-        // Prevent the card click from interfering with the dropdown
-        if (event.target.tagName === 'SELECT') {
-            return;
-        }
+            // Prevent the card click from interfering with the dropdown
+            if (event.target.tagName === 'SELECT') {
+                return;
+            }
 
-        // Deselect all other cards
-        imageCards.forEach(function(otherCard) {
-            otherCard.classList.remove('selected');
-            var otherSelect = otherCard.querySelector('.version-select');
-            if (otherSelect) {
-                otherSelect.style.display = 'none';
+            // Deselect all other cards
+            imageCards.forEach(function(otherCard) {
+                otherCard.classList.remove('selected');
+                var otherSelect = otherCard.querySelector('.version-select');
+                if (otherSelect) {
+                    otherSelect.style.display = 'none';
+                    // Reset to the first visible option
+                    const visibleOptions = Array.from(otherSelect.options).filter(option => !option.classList.contains('d-none'));
+                    if (visibleOptions.length > 0) {
+                        visibleOptions[0].selected = true;
+                    }
+                }
+            });
+
+            // Select the clicked card
+            card.classList.add('selected');
+            var select = card.querySelector('.version-select');
+            if (select) {
+                select.style.display = 'block';
+
                 // Reset to the first visible option
-                const visibleOptions = Array.from(otherSelect.options).filter(option => !option.classList.contains('d-none'));
+                const visibleOptions = Array.from(select.options).filter(option => !option.classList.contains('d-none'));
                 if (visibleOptions.length > 0) {
                     visibleOptions[0].selected = true;
                 }
             }
+
+            // Update vpsConfiguration
+            var imageName = card.getAttribute('data-name');
+            var imageVersion = select ? select.options[select.selectedIndex].value : null;
+            vpsConfiguration.image = {
+                name: imageName,
+                version: imageVersion
+            };
+
+            // Update login based on image name
+            if (imageName === 'windows') {
+                document.getElementById('login').value = 'Administrator';
+            } else {
+                document.getElementById('login').value = 'root';
+            }
+            vpsConfiguration.login.username = document.getElementById('login').value;
+
+            // Trigger configuration update
+            document.getElementById('config_updated').value = 'true';
+            document.getElementById('config_updated').dispatchEvent(new Event('change'));
+        });
+    });
+
+
+        document.getElementById('cluster_set').addEventListener('change', function() {
+                var imageCards = document.querySelectorAll('.image-card');
+                imageCards.forEach(function(otherCard) {
+                    otherCard.classList.remove('selected');
+                    var otherSelect = otherCard.querySelector('.version-select');
+                if (otherSelect) {
+                    otherSelect.style.display = 'none';
+                    // Reset to the first visible option
+                    const visibleOptions = Array.from(otherSelect.options).filter(option => !option.classList.contains('d-none'));
+                    if (visibleOptions.length > 0) {
+                        visibleOptions[0].selected = true;
+                    }
+                }
+                    })
+            version_selection = document.getElementsByClassName('image-version');
+            for (var i = 0; i < version_selection.length; i++) {
+                item = version_selection[i]
+                if (item.getAttribute('data-cluster-id') != vpsConfiguration.location.cluster_id) {
+                    item.classList.add('d-none');
+                } else {
+                    item.classList.remove('d-none');
+                }
+            };
+
+            image_card = document.getElementsByClassName('image-card-container');
+            for (var i = 0; i < image_card.length; i++) {
+                item = image_card[i]
+                var cluster_hash = item.getAttribute('data-cluster-hash');
+                var cluster_key = ":"+vpsConfiguration.location.cluster_id+":";
+                if ( cluster_hash.includes(cluster_key) ) {
+                    item.classList.remove('d-none');
+                } else {
+                    item.classList.add('d-none');
+                }
+            };
+
+
+
         });
 
-        // Select the clicked card
-        card.classList.add('selected');
-        var select = card.querySelector('.version-select');
-        if (select) {
-            select.style.display = 'block';
 
-            // Reset to the first visible option
-            const visibleOptions = Array.from(select.options).filter(option => !option.classList.contains('d-none'));
-            if (visibleOptions.length > 0) {
-                visibleOptions[0].selected = true;
-            }
-        }
+        // Ensure only one version is selected at a time
+        versionSelects.forEach(function(select) {
+            select.addEventListener('change', function() {
+                versionSelects.forEach(function(otherSelect) {
+                    if (otherSelect !== select) {
+                        otherSelect.selectedIndex = 0;
+                    }
+                });
 
-        // Update vpsConfiguration
-        var imageName = card.getAttribute('data-name');
-        var imageVersion = select ? select.options[select.selectedIndex].value : null;
-        vpsConfiguration.image = {
-            name: imageName,
-            version: imageVersion
-        };
+                // Update vpsConfiguration with selected version
+                var selectedCard = document.querySelector('.image-card.selected');
+                if (selectedCard) {
+                    var imageName = selectedCard.getAttribute('data-name');
+                    var imageVersion = select.options[select.selectedIndex].value;
+                    vpsConfiguration.image = {
+                        name: imageName,
+                        version: imageVersion
+                    };
 
-        // Update login based on image name
-        if (imageName === 'windows') {
-            document.getElementById('login').value = 'Administrator';
-        } else {
-            document.getElementById('login').value = 'root';
-        }
-        vpsConfiguration.login.username = document.getElementById('login').value;
-
-        // Trigger configuration update
-        document.getElementById('config_updated').value = 'true';
-        document.getElementById('config_updated').dispatchEvent(new Event('change'));
-    });
-});
-
-
-    document.getElementById('cluster_set').addEventListener('change', function() {
-        version_selection = document.getElementsByClassName('image-version');
-        for (var i = 0; i < version_selection.length; i++) {
-            item = version_selection[i]
-            if (item.getAttribute('data-cluster-id') != vpsConfiguration.location.cluster_id) {
-                item.classList.add('d-none');
-            } else {
-                item.classList.remove('d-none');
-            }
-        };
-
-        image_card = document.getElementsByClassName('image-card-container');
-        for (var i = 0; i < image_card.length; i++) {
-            item = image_card[i]
-            var cluster_hash = item.getAttribute('data-cluster-hash');
-            var cluster_key = ":"+vpsConfiguration.location.cluster_id+":";
-            if ( cluster_hash.includes(cluster_key) ) {
-                item.classList.remove('d-none');
-            } else {
-                item.classList.add('d-none');
-            }
-        };
-
-
-
-    });
-
-
-    // Ensure only one version is selected at a time
-    versionSelects.forEach(function(select) {
-        select.addEventListener('change', function() {
-            versionSelects.forEach(function(otherSelect) {
-                if (otherSelect !== select) {
-                    otherSelect.selectedIndex = 0;
+                    // Trigger configuration update
+                    document.getElementById('config_updated').value = 'true';
+                    document.getElementById('config_updated').dispatchEvent(new Event('change'));
                 }
             });
-
-            // Update vpsConfiguration with selected version
-            var selectedCard = document.querySelector('.image-card.selected');
-            if (selectedCard) {
-                var imageName = selectedCard.getAttribute('data-name');
-                var imageVersion = select.options[select.selectedIndex].value;
-                vpsConfiguration.image = {
-                    name: imageName,
-                    version: imageVersion
-                };
-
-                // Trigger configuration update
-                document.getElementById('config_updated').value = 'true';
-                document.getElementById('config_updated').dispatchEvent(new Event('change'));
-            }
         });
     });
-});
 </script>
 

@@ -153,6 +153,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     document.getElementById('cluster_set').addEventListener('change', function() {
+            var planCards = document.querySelectorAll('.plan-card');
+
+            planCards.forEach(function(otherCard) {
+                otherCard.classList.remove('selected');
+            });
+
         plan_card_containers = document.querySelectorAll('.plan-card-container');
         allowed_plan = mapping_region_plans[vpsConfiguration.location.id];
         for (var i = 0; i < plan_card_containers.length; i++) {

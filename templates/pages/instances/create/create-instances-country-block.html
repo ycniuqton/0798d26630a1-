@@ -187,5 +187,32 @@
 
             });
         });
+
+        // Auto-select the first card in the list with a 1-second delay
+if (countryCards.length > 0) {
+    setTimeout(function() {
+        const firstCard = countryCards[0];
+        firstCard.classList.add('selected');
+
+        // Update vpsConfiguration for the first card
+        vpsConfiguration.location = {
+            name: firstCard.getAttribute('data-name'),
+            country: firstCard.getAttribute('data-country'),
+            id: firstCard.getAttribute('group-id'),
+            cluster_id: firstCard.getAttribute('data-cluster-id')
+        };
+
+        // Trigger configuration update for the first card
+        document.getElementById('config_updated').value = 'true';
+        document.getElementById('config_updated').dispatchEvent(new Event('change'));
+
+        document.getElementById('cluster_set').value = 'true';
+        document.getElementById('cluster_set').dispatchEvent(new Event('change'));
+
+        console.log(firstCard.getAttribute('data-cluster-id'));
+    }, 1000); // 1-second delay
+}
+
     });
+
 </script>

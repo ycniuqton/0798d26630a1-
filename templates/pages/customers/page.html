@@ -67,7 +67,7 @@
 {% endblock extrastyle %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4" style="min-width: 90%;">
     <div class="d-flex justify-content-between align-items-center">
         <h2>Customers</h2>
         <div>
@@ -172,6 +172,23 @@
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize Choices.js on the user email select field
         const emailSelectElement = document.getElementById('user-email-select');
+
+        const choices = new Choices(emailSelectElement, {
+            removeItemButton: true, // Allows clearing of selections
+            placeholder: true,
+            placeholderValue: 'Select or paste an email',
+            paste: true, // Allows pasting emails
+            duplicateItemsAllowed: false, // Prevent duplicate email entries
+            searchEnabled: true, // Enables searching within the dropdown
+            addItems: true, // Allows adding new items by typing or pasting
+        });
+
+        // You can now paste and search for emails in the select field
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Choices.js on the user email select field
+        const emailSelectElement = document.getElementById('reclaim-user-email-select');
 
         const choices = new Choices(emailSelectElement, {
             removeItemButton: true, // Allows clearing of selections

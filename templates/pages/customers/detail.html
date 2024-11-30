@@ -4,6 +4,7 @@
 {% block breadcrumbs %}{% endblock breadcrumbs %}
 
 {% block extrastyle %}
+
 <style>
     .detail-container {
         margin-top: 20px;
@@ -37,25 +38,45 @@
 
 {% block content %}
 
+{% include 'layouts/modal/topup.html' %}
+{% include 'layouts/modal/reclaim.html' %}
+
 <script>
 
-        var customer_id = '{{ customer.id }}';
+    var customer_id = '{{ customer.id }}';
+
+    top_up_modal_prefix = 'top_up';
+    top_up_modal_id = createTopUpModal(top_up_modal_prefix);
+
+    reclaim_modal_prefix = 'reclaim';
+    reclaim_modal_id = createReclaimModal(reclaim_modal_prefix);
+
 </script>
 
-<div class="container detail-container" style="min-width:90%">
-    <h2 style="display:flex;align-items: center;">{{customer.email|upper}} <span class="badge badge-success status-badge"></span>
-    </h2>
 
+
+<div class="container detail-container" style="min-width:90%">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2 style="display:flex;align-items: center;">{{customer.email|upper}} <span
+                class="badge badge-success status-badge"></span>
+        </h2>
+        <div>
+            <button class="btn btn-primary" id="open-topup-modal" onclick="show_toup_modal()">Topup</button>
+            <button class="btn btn-danger" id="open-reclaim-modal" onclick="show_reclaim_modal()">Reclaim</button>
+        </div>
+    </div>
 
 
     <!-- Tabs Navigation -->
     <ul class="nav nav-tabs" id="customerTabs" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info" aria-selected="true">
+            <a class="nav-link active" id="info-tab" data-toggle="tab" href="#info" role="tab" aria-controls="info"
+               aria-selected="true">
                 <label> Customer Info</label></a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="invoices-tab" data-toggle="tab" href="#invoices" role="tab" aria-controls="invoices" aria-selected="false">
+            <a class="nav-link" id="invoices-tab" data-toggle="tab" href="#invoices" role="tab" aria-controls="invoices"
+               aria-selected="false">
                 {% if customer.vps_len > 0 %}
                 <label> Invoices ({{customer.vps_len}})</label>
                 {% else %}
@@ -64,7 +85,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="vps-tab" data-toggle="tab" href="#vps" role="tab" aria-controls="vps" aria-selected="false">
+            <a class="nav-link" id="vps-tab" data-toggle="tab" href="#vps" role="tab" aria-controls="vps"
+               aria-selected="false">
                 {% if customer.vps_len > 0 %}
                 <label> Vps ({{customer.vps_len}})</label>
                 {% else %}
@@ -73,7 +95,8 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="ticket-tab" data-toggle="tab" href="#ticket" role="tab" aria-controls="ticket" aria-selected="false">
+            <a class="nav-link" id="ticket-tab" data-toggle="tab" href="#ticket" role="tab" aria-controls="ticket"
+               aria-selected="false">
                 {% if customer.vps_len > 0 %}
                 <label> Ticket ({{customer.open_ticket}})</label>
                 {% else %}
@@ -109,7 +132,8 @@
 
     </div>
 
-    <a class="action-button mt-4" data-color="#154BFF" href="{% url 'instances' %}" class="btn btn-primary mt-4">Back to Instances</a>
+    <a class="action-button mt-4" data-color="#154BFF" href="{% url 'instances' %}" class="btn btn-primary mt-4">Back to
+        Instances</a>
 </div>
 
 
@@ -143,6 +167,36 @@
             showTabFromHash();
         });
     });
+</script>
+
+<script>
+ function show_toup_modal(){
+    $(`#`+top_up_modal_id).modal('show');
+    const emailSelectId = `${top_up_modal_prefix}UserEmailSelect`;
+
+    const selectedOption = document.createElement("option");
+    selectedOption.value = '{{customer.email}}';
+    selectedOption.textContent = '{{customer.email}}'
+    selectedOption.selected = true; // Mark this option as selected
+
+    // Append the new option to the select element
+    document.getElementById(emailSelectId).appendChild(selectedOption);
+    }
+
+    function show_reclaim_modal(){
+    $(`#`+reclaim_modal_id).modal('show');
+    const emailSelectId = `${reclaim_modal_prefix}UserEmailSelect`;
+
+    const selectedOption = document.createElement("option");
+    selectedOption.value = '{{customer.email}}';
+    selectedOption.textContent = '{{customer.email}}'
+    selectedOption.selected = true; // Mark this option as selected
+
+    // Append the new option to the select element
+    document.getElementById(emailSelectId).appendChild(selectedOption);
+    }
+
+
 </script>
 
 

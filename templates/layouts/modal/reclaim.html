@@ -1,0 +1,93 @@
+<script>
+function createReclaimModal(prefix) {
+    // Unique IDs using the prefix
+    const modalId = `${prefix}ReclaimModal`;
+    const modalLabelId = `${prefix}ReclaimModalLabel`;
+    const modalTitleId = `${prefix}ReclaimModalTitle`;
+    const modalBodyId = `${prefix}ReclaimModalBody`;
+    const emailSelectId = `${prefix}UserEmailSelect`;
+    const amountInputId = `${prefix}ReclaimAmountInput`;
+    const noteInputId = `${prefix}ReclaimNoteInput`;
+    const cancelButtonId = `${prefix}CancelReclaimButton`;
+    const confirmButtonId = `${prefix}ConfirmReclaimButton`;
+
+    // Modal template with prefixed IDs
+    const modalTemplate = `
+        <div class="modal fade" id="${modalId}" tabindex="-1" role="dialog" aria-labelledby="${modalLabelId}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">Reclaim</div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="${emailSelectId}">Select User by Email</label>
+                            <select class="form-control" id="${emailSelectId}">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="${amountInputId}">Reclaim Amount</label>
+                            <input type="number" class="form-control" id="${amountInputId}" placeholder="Enter reclaim amount">
+                        </div>
+                        <div class="form-group">
+                            <label for="${noteInputId}">Note</label>
+                            <input type="text" class="form-control" id="${noteInputId}" placeholder="Enter a note">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" id="${cancelButtonId}">Cancel</button>
+                        <button class="btn btn-primary" id="${confirmButtonId}">Reclaim</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Append modal to the body
+    document.body.insertAdjacentHTML('beforeend', modalTemplate);
+
+    // Modal handling
+    const reclaimModal = document.getElementById(modalId);
+    const cancelReclaim = document.getElementById(cancelButtonId);
+    const confirmReclaim = document.getElementById(confirmButtonId);
+
+    cancelReclaim.onclick = function() {
+        $(`#${modalId}`).modal('hide');
+    }
+
+    confirmReclaim.onclick = function() {
+        const email = document.getElementById(emailSelectId).value;
+        const amount = document.getElementById(amountInputId).value;
+        const note = document.getElementById(noteInputId).value;
+
+        if (!email || !amount) {
+            alert("Please fill in all fields");
+            return;
+        }
+
+        // Send the reclaim request via AJAX
+        fetch('/api/account/balance/reclaim/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                amount: Number(amount),
+                note: note,
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            window.location.reload();
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    window.onclick = function(event) {
+        if (event.target == reclaimModal) {
+            $(`#${modalId}`).modal('hide');
+        }
+    }
+
+    return modalId;
+}
+</script>

@@ -1,0 +1,92 @@
+<script>
+function createTopUpModal(prefix) {
+    // Unique IDs using the prefix
+    const modalId = `${prefix}SetPriceModal`;
+    const modalLabelId = `${prefix}SetPriceModalLabel`;
+    const modalTitleId = `${prefix}SetPriceModalTitle`;
+    const modalBodyId = `${prefix}SetPriceModalBody`;
+    const emailSelectId = `${prefix}UserEmailSelect`;
+    const amountInputId = `${prefix}TopupAmountInput`;
+    const noteInputId = `${prefix}TopupNoteInput`;
+    const cancelButtonId = `${prefix}CancelTopupButton`;
+    const confirmButtonId = `${prefix}ConfirmTopupButton`;
+
+    // Modal template with prefixed IDs
+    const modalTemplate = `
+        <div class="modal fade" id="${modalId}" tabindex="-1" role="dialog" aria-labelledby="${modalLabelId}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">Topup</div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="${emailSelectId}">Select User by Email</label>
+                            <select class="form-control" id="${emailSelectId}">
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="${amountInputId}">Topup Amount</label>
+                            <input type="number" class="form-control" id="${amountInputId}" placeholder="Enter topup amount">
+                        </div>
+                        <div class="form-group">
+                            <label for="${noteInputId}">Note</label>
+                            <input type="text" class="form-control" id="${noteInputId}" placeholder="Enter a note">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" id="${cancelButtonId}">Cancel</button>
+                        <button class="btn btn-primary" id="${confirmButtonId}">Topup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Append modal to the body
+    document.body.insertAdjacentHTML('beforeend', modalTemplate);
+
+    // Modal handling
+    const topupModal = document.getElementById(modalId);
+    const cancelTopup = document.getElementById(cancelButtonId);
+    const confirmTopup = document.getElementById(confirmButtonId);
+
+    cancelTopup.onclick = function() {
+        $(`#${modalId}`).modal('hide');
+    }
+
+    confirmTopup.onclick = function() {
+        const email = document.getElementById(emailSelectId).value;
+        const amount = document.getElementById(amountInputId).value;
+        const note = document.getElementById(noteInputId).value;
+
+        if (!email || !amount) {
+            alert("Please fill in all fields");
+            return;
+        }
+
+        // Send the topup request via AJAX
+        fetch('/api/account/balance/topup/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email: email,
+                amount: Number(amount),
+                note: note,
+            })
+        })
+        .then(response => {
+            $(`#${modalId}`).modal('hide');
+            window.location.reload();
+        }).catch(error => console.error('Error:', error));
+    }
+
+    window.onclick = function(event) {
+        if (event.target == topupModal) {
+            $(`#${modalId}`).modal('hide');
+        }
+    }
+
+    return modalId;
+}
+</script>
