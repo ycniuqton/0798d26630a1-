@@ -115,7 +115,7 @@
                 <label for="reclaim-user-email-select">Select User by Email</label>
                 <select class="form-control" id="reclaim-user-email-select">
                     <option value="" disabled selected>Select a user</option>
-                    {% for email in list_email %}
+                    {% for email in ALL_EMAIL %}
                     <option value="{{ email }}">{{ email }}</option>
                     {% endfor %}
                 </select>

@@ -42,13 +42,14 @@
     <h2>VPS Action Logs</h2>
     <div class="search-bar">
         {% if request.user.is_staff %}
-        <select class="form-control width-auto mr-1" id="username_fitler">
-            <option selected>All user</option>
-            {% for username in list_user %}
-            <option>{{ username }}</option>
-            {% endfor %}
-
-        </select>
+        <div class="input-group-append" style="margin-right:10px ; width:200px; display:block">
+            <select class="form-control" id="username_fitler">
+                    <option selected>All user</option>
+                    {% for username in ALL_USERNAME %}
+                    <option value="{{ username }}">{{ username }}</option>
+                    {% endfor %}
+                </select>
+        </div>
         {% endif %}
         <select class="form-control width-auto mr-1" id="action-filter-select">
             <option value="">All Actions</option>
@@ -92,6 +93,20 @@
         </ul>
     </nav>
 </div>
+
+<script>
+    const emailSelectElement = document.getElementById('username_fitler');
+
+        const choices = new Choices(emailSelectElement, {
+            removeItemButton: true, // Allows clearing of selections
+            placeholder: true,
+            placeholderValue: 'Select or paste an email',
+            paste: true, // Allows pasting emails
+            duplicateItemsAllowed: false, // Prevent duplicate email entries
+            searchEnabled: true, // Enables searching within the dropdown
+            addItems: true, // Allows adding new items by typing or pasting
+        });
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {

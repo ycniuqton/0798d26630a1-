@@ -1,5 +1,8 @@
 <!-- Modal -->
-<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel"
+     aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -10,9 +13,15 @@
             </div>
             <div class="modal-body">
                 <p id="confirmationMessage">Are you sure you want to perform this action on the following instances?</p>
-                <div id="giveUserInput" class="d-none">
+
+                <div class="form-group" id="giveUserInput" class="d-none">
                     <p>Enter the email of the user to give these instances to:</p>
-                    <input type="email" id="userEmail" class="form-control" placeholder="user@example.com">
+                    <select class="form-control" id="user-email-select">
+                        <option value="" disabled selected>Select a user</option>
+                        {% for email in ALL_EMAIL %}
+                        <option value="{{ email }}">{{ email }}</option>
+                        {% endfor %}
+                    </select>
                 </div>
                 <div id="deleteConfirmationInput" class="d-none">
                     <p>Please type "Delete" to confirm deletion:</p>
@@ -27,6 +36,8 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
 <script>
     function handleAction(action) {
@@ -49,7 +60,7 @@
 
         // Show confirmation modal
         var confirmationMessage = `Are you sure you want to ${action.toLowerCase()} the selected instances?`;
-        document.getElementById('confirmationModalLabel').textContent = `${action} Confirmation`;
+        document.getElementById('confirmationModalLabel').textContent = `${action.charAt(0).toUpperCase()}${action.slice(1)} Confirmation`;
         document.getElementById('confirmationMessage').textContent = confirmationMessage;
 
         // Populate selected instances in modal
@@ -98,7 +109,7 @@
 
             var body = { vps_ids: selectedInstanceIds };
             if (action.toLowerCase() === 'give') {
-                body.user_email = document.getElementById('userEmail').value;
+                body.user_email = document.getElementById('user-email-select').value;
             }
 
             // Make API call
@@ -121,4 +132,22 @@
             .catch(error => console.log('Error:', error));
         };
     }
+
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Choices.js on the user email select field
+        const emailSelectElement = document.getElementById('user-email-select');
+
+        const choices = new Choices(emailSelectElement, {
+            removeItemButton: true, // Allows clearing of selections
+            placeholder: true,
+            placeholderValue: 'Select or paste an email',
+            paste: true, // Allows pasting emails
+            duplicateItemsAllowed: false, // Prevent duplicate email entries
+            searchEnabled: true, // Enables searching within the dropdown
+            addItems: true, // Allows adding new items by typing or pasting
+        });
+
+        // You can now paste and search for emails in the select field
+    });
 </script>

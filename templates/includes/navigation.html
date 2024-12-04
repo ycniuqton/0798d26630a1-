@@ -44,12 +44,16 @@
             <!--      </li>-->
         </ul>
         <ul class="navbar-nav ml-auto">
-<!--            <li>-->
-<!--                <label>-->
-<!--                    <i class="icon feather icon-sun" id="theme-indicator"></i>-->
-<!--                    <input type="checkbox" id="theme-switch" class="d-none">-->
-<!--                </label>-->
-<!--            </li>-->
+            <li>
+                <label>
+                    <div class="input-group mb-3" style="max-width: 300px;">
+
+  <input type="text" class="form-control" value="{{user.balance |floatformat:2 }}" id="customerBalance" readonly aria-label="Customer Balance" style="width: 120px;">
+                        <span class="input-group-text">$</span>
+</div>
+
+                </label>
+            </li>
 <!--            <li>-->
 <!--                <div class="dropdown">-->
 <!--                    <a class="dropdown-toggle" href="javascript:" data-toggle="dropdown"><i-->
@@ -155,3 +159,17 @@
         </ul>
     </div>
 </header>
+
+<script>
+      const inputField = document.getElementById('customerBalance');
+
+  // Function to dynamically adjust the width
+  function adjustWidth() {
+    const valueLength = inputField.value.length; // Get the number of characters
+    const width = 25 + valueLength * 8; // Calculate width: characters * 10px
+    inputField.style.width = `${width}px`; // Apply the new width
+  }
+
+  // Adjust width on page load
+  adjustWidth();
+</script>

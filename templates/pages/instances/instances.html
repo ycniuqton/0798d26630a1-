@@ -14,7 +14,7 @@
     .no-instances button { background-color: #007bff; color: white; }
     .top-bar { display: flex; justify-content: space-between; align-items: center; }
     .btn-add { background-color: #007bff; color: white; }
-    .modal-content { overflow-y: auto; max-height: 70vh; }
+    .modal-content { overflow-y: auto; height: 85vh; }
     .float-right-buttons { float: right; }
         .status-circle {
             width: 20px;
@@ -77,18 +77,17 @@
     </div>
     <div class="input-group mb-3">
         {% if request.user.is_staff %}
-        <div class="input-group-append" style="margin-right:10px">
-            <select class="custom-select" id="username_fitler">
-                <option selected>All user</option>
-                {% for username in list_user %}
-                <option>{{ username }}</option>
-                {% endfor %}
-
-            </select>
+        <div class="input-group-append" style="margin-right:10px ; width:200px; display:block">
+            <select class="form-control" id="username_fitler">
+                    <option selected>All user</option>
+                    {% for username in ALL_USERNAME %}
+                    <option value="{{ username }}">{{ username }}</option>
+                    {% endfor %}
+                </select>
         </div>
         {% endif %}
         <input  type="text" class="form-control" placeholder="Please enter" aria-label="Server Name" id="search-input"
-               aria-describedby="basic-addon2">
+               aria-describedby="basic-addon2" style="height:auto">
         <div  class="input-group-append">
             <button  class="btn btn-outline-secondary" type="button" id="search-button"><i class="fas fa-search"></i>
             </button>
@@ -208,6 +207,17 @@
     }
 }
 
+    const emailSelectElement = document.getElementById('username_fitler');
+
+        const choices = new Choices(emailSelectElement, {
+            removeItemButton: true, // Allows clearing of selections
+            placeholder: true,
+            placeholderValue: 'Select or paste an email',
+            paste: true, // Allows pasting emails
+            duplicateItemsAllowed: false, // Prevent duplicate email entries
+            searchEnabled: true, // Enables searching within the dropdown
+            addItems: true, // Allows adding new items by typing or pasting
+        });
 
 </script>
 
