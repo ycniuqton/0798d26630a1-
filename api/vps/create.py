@@ -269,6 +269,9 @@ def re_create(request, vps_id):
 
     if vps.status != VpsStatus.ERROR:
         return JsonResponse({'error': 'Cannot re-create this VPS'}, status=403)
+    else:
+        vps.status = VpsStatus.CREATING
+        vps.save()
 
     publisher = make_kafka_publisher(KafkaConfig)
     if vps.creation_data:
