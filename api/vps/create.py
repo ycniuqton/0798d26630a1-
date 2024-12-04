@@ -8,7 +8,7 @@ from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 
 from api.vps.__constants import LIFETIME
-from home.models import Vps
+from home.models import Vps, VpsStatus
 
 from django.http import JsonResponse
 from adapters.redis_service import CachedPlan, CachedOS, CachedServer, CachedServerGroup
@@ -165,7 +165,7 @@ def create_vps(request):
             'is_first_time': True
         })
 
-    payload = {
+    creating_payload = {
         "hostname": hostname,
         "password": password,
         # "serid": serid,
@@ -178,7 +178,7 @@ def create_vps(request):
         "cluster_id": server_group['cluster_id']
     }
 
-    publisher.publish('create_vps', payload)
+    publisher.publish('create_vps', creating_payload)
     response_data = {
         'status': 'success',
         'message': 'VPS created successfully'
@@ -255,5 +255,27 @@ def vps_configurations(request):
         'plans': plans,
         'locations': server_groups,
         'images': oses
+    }
+    return JsonResponse(response_data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def re_create(request, vps_id):
+    user = request.user
+    vps = Vps.objects.get(id=vps_id)
+    if vps.user_id != user.id and not user.is_staff:
+        return JsonResponse({'error': 'Permission denied'}, status=403)
+
+    if vps.status != VpsStatus.ERROR:
+        return JsonResponse({'error': 'Cannot re-create this VPS'}, status=403)
+
+    publisher = make_kafka_publisher(KafkaConfig)
+    if vps.creation_data:
+        publisher.publish('create_vps', vps.creation_data)
+
+    response_data = {
+        'status': 'success',
+        'message': 'VPS re-created successfully'
     }
     return JsonResponse(response_data)

@@ -117,6 +117,7 @@ class Vps(BaseModel):
     log_count = models.IntegerField(default=0)
     backup_count = models.IntegerField(default=0)
     region = JSONField(null=True, blank=True)
+    creation_data = JSONField(null=True, blank=True)
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
 

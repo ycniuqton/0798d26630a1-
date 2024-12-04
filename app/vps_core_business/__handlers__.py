@@ -53,6 +53,9 @@ class CreateVPS(BaseHandler):
         vps = Vps.objects.filter(id=payload['vps_id']).first()
         if not vps:
             raise DBInsertFailed("Missing Order")
+        else:
+            vps.creation_data = payload
+            vps.save()
 
         base_url = settings.ADMIN_CONFIG.URL
         api_key = settings.ADMIN_CONFIG.API_KEY

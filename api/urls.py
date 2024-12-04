@@ -10,7 +10,7 @@ from .invoices import InvoiceCollectionAPI, InvoiceAPI, TransactionCollectionAPI
 from .views import RegisterAPI, LoginAPI, LogoutAPI
 from .vps.archived_vps import archived_vps
 from .vps.change_pass import change_pass_vps
-from .vps.create import create_vps, vps_configurations
+from .vps.create import create_vps, vps_configurations, re_create
 from .vps import VPSAPI, start_vps, stop_vps, restart_vps, suspend_vps, unsuspend_vps, give_vps, change_vps_plan, \
     update_info
 from .vps.delete import delete_vps
@@ -28,6 +28,7 @@ urlpatterns = [
     path('login/', LoginAPI.as_view(), name='login'),
     path('logout/', LogoutAPI.as_view(), name='logout'),
     path('vps/create', create_vps, name='create-vps'),
+    path('vps/<str:vps_id>/re_create/', re_create, name='re-create-vps'),
     path('vps/configurations', vps_configurations, name='vps_configurations'),
     path('vps/get_archived_vps', archived_vps, name='archived_vps'),
     path('vps/start/', start_vps, name='start-vps'),

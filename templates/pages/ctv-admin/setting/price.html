@@ -149,10 +149,10 @@
                             row.innerHTML = `
                                 <td>${item.name}</td>
                                 <td>${item.cluster_name}</td>
-                                <td>${item.cpu}</td>
-                                <td>${ Math.round(item.ram/1024)}</td>
-                                <td>${item.disk}</td>
-                                <td>${item.price}</td>
+                                <td>${item.cpu} Core</td>
+                                <td>${ Math.round(item.ram/1024)} GB</td>
+                                <td>${item.disk} GB</td>
+                                <td>${item.price} $</td>
                                 <td><a class="btn btn-sm btn-outline-primary" target="_blank" onclick='show_set_price(${item.id})' rel="noopener noreferrer">Manage</a></td>
                             `;
                             tbody.appendChild(row);
