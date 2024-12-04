@@ -432,10 +432,13 @@ def your_tickets(request):
         }
     else:
         context = {
-            Ticket.TicketStatus.UNREAD: Ticket.objects.filter(status=Ticket.TicketStatus.UNREAD, user=request.user).count(),
+            Ticket.TicketStatus.UNREAD: Ticket.objects.filter(status=Ticket.TicketStatus.UNREAD,
+                                                              user=request.user).count(),
             Ticket.TicketStatus.OPEN: Ticket.objects.filter(status=Ticket.TicketStatus.OPEN, user=request.user).count(),
-            Ticket.TicketStatus.CLOSED: Ticket.objects.filter(status=Ticket.TicketStatus.CLOSED, user=request.user).count(),
-            Ticket.TicketStatus.EXPIRED: Ticket.objects.filter(status=Ticket.TicketStatus.EXPIRED, user=request.user).count(),
+            Ticket.TicketStatus.CLOSED: Ticket.objects.filter(status=Ticket.TicketStatus.CLOSED,
+                                                              user=request.user).count(),
+            Ticket.TicketStatus.EXPIRED: Ticket.objects.filter(status=Ticket.TicketStatus.EXPIRED,
+                                                               user=request.user).count(),
         }
 
     context['all'] = sum(context.values())
@@ -606,8 +609,15 @@ def profile(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def authentication(request):
+    user = request.user
+    list_user = []
+    if user.is_staff:
+        list_user = Vps.objects.values('user__username').distinct()
+        list_user = [user['user__username'] for user in list_user]
     context = {
-        'segment': 'authentication'
+        'segment': 'authentication',
+        'list_user': list_user
+
     }
     return render(request, "pages/authentication.html", context)
 

@@ -103,7 +103,6 @@
             document.getElementById(price_modal_prefix+ 'PlanCpu').value = plan.cpu || '';
             document.getElementById(price_modal_prefix+ 'PlanDisk').value = plan.disk || '';
             document.getElementById(price_modal_prefix+ 'PlanRam').value = plan.ram || '';
-            document.getElementById(price_modal_prefix+ 'PlanRam').value = plan.ram || '';
             document.getElementById(price_modal_prefix+ 'SetPriceInput').value = plan.price || '0';
 
             // Set the modal's data attribute for plan ID to use it in the price update function
@@ -151,7 +150,7 @@
                                 <td>${item.name}</td>
                                 <td>${item.cluster_name}</td>
                                 <td>${item.cpu}</td>
-                                <td>${item.ram}</td>
+                                <td>${ Math.round(item.ram/1024)}</td>
                                 <td>${item.disk}</td>
                                 <td>${item.price}</td>
                                 <td><a class="btn btn-sm btn-outline-primary" target="_blank" onclick='show_set_price(${item.id})' rel="noopener noreferrer">Manage</a></td>

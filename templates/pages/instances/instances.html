@@ -177,31 +177,37 @@
 </script>
 
 <script>
-    function call_refund(vps_id) {
+   function call_refund(vps_id) {
     const url = `/api/vps/${vps_id}/refund/`;
 
-    // Perform a GET request using fetch
-    fetch(url, {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            // Add any additional headers, e.g., authorization token if needed
-            // 'Authorization': 'Bearer your-token'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            alert('There was a problem with the fetch operation. Please try again later.');
-        }
-        return response.json(); // Parse the JSON from the response
-    })
-    .then(data => {
-        alert("Refund request has been sent successfully");
-    })
-    .catch(error => {
-        console.error('There was a problem with the fetch operation:', error);
-    });
+    // Display a confirmation dialog
+    const userConfirmed = confirm("Are you sure you want to request a refund for this VPS?");
+
+    if (userConfirmed) {
+        // Perform a GET request using fetch
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                // Add any additional headers, e.g., authorization token if needed
+                // 'Authorization': 'Bearer your-token'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                alert('There was a problem with the fetch operation. Please try again later.');
+            }
+            return response.json(); // Parse the JSON from the response
+        })
+        .then(data => {
+            alert("Refund request has been sent successfully");
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+    }
 }
+
 
 </script>
 
@@ -278,7 +284,7 @@
                     <img src="https://img.icons8.com/color/48/000000/${mapping_os_icon[item.os]}.png" alt="${item.os}" class="server-icon mr-2">
                     <div>
                         <span class="d-block">${ item.hostname }</span>
-                        <small class="text-muted">${item.cpu} vCPU ${item.ram} GB</small>
+                        <small class="text-muted">${item.cpu} vCPU ${item.ram} MB</small>
                     </div>
                 </td>
 
