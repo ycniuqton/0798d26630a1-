@@ -39,6 +39,8 @@ def list_plan(request):
     if cluster_name:
         plans = [plan for plan in plans if plan.get('cluster_name') == cluster_name]
 
+    plans = sorted(plans, key=lambda x: (x.get('cluster_id'), x.get('price')))
+
     return JsonResponse({
         'meta_data': {
             'list_cluster': unique_cluster_name
@@ -72,6 +74,35 @@ def set_price(request):
 
     virtualizor_manager = VirtualizorManager()
     virtualizor_manager.set_price(plan_id, price)
+
+    CachedPlan().delete()
+
+    return JsonResponse('Price set successfully', safe=False)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def config_plan(request):
+    user = request.user
+    if not user.is_staff:
+        return JsonResponse('Permission denied', safe=False)
+
+    data = request.data
+    plan_id = int(data.get('plan_id'))
+    price = data.get('price')
+    limit_per_user = data.get('limit_per_user')
+
+    if not plan_id or not price:
+        return JsonResponse('Invalid data', safe=False)
+
+    plans = CachedPlan().get()
+    plan = [plan for plan in plans if plan.get('id') == plan_id]
+    if not plan:
+        return JsonResponse('Plan not found', safe=False)
+
+    virtualizor_manager = VirtualizorManager()
+    virtualizor_manager.set_price(plan_id, price)
+    virtualizor_manager.config_plan(plan_id, {'limit_per_user': limit_per_user})
 
     CachedPlan().delete()
 

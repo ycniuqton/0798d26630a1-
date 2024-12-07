@@ -39,3 +39,20 @@ class VirtualizorManager:
                 print(f"Error fetching data from API: {e}")
             retry_count -= 1
         return False
+
+    def config_plan(self, plan_id, config):
+        url = f"{self.url}/system/plans"
+        data = {
+            "id": plan_id
+        }
+        data.update(config)
+        retry_count = 3
+        while retry_count > 0:
+            try:
+                response = requests.put(url, headers=self.headers, json=data)
+                if response.status_code == 200:
+                    return True
+            except Exception as e:
+                print(f"Error fetching data from API: {e}")
+            retry_count -= 1
+        return False

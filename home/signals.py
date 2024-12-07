@@ -1,14 +1,20 @@
 from django.db.models import Sum
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+
+from adapters.kafka_adapter import make_kafka_publisher
+from config import NotificationGatewayConfig
 from .models import Vps, User, Balance, Transaction, Ticket, VPSLog, TicketChat
 
 
 @receiver(post_save, sender=Vps)
 def update_vps_len_on_save(sender, instance, **kwargs):
-    user = instance.user  # Assuming there is a ForeignKey from VPS to User
-    user.vps_len = Vps.objects.filter(user=user).count()  # Count user's VPS instances
-    user.save()
+    # user = instance.user  # Assuming there is a ForeignKey from VPS to User
+    # user.vps_len = Vps.objects.filter(user=user).count()  # Count user's VPS instances
+    # user.save()
+
+    publisher = make_kafka_publisher(NotificationGatewayConfig)
+    publisher.publish('vps_created', {'vps_id': instance.id})
 
 
 @receiver(post_delete, sender=Vps)

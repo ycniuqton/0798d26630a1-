@@ -14,7 +14,7 @@ from .vps.create import create_vps, vps_configurations, re_create
 from .vps import VPSAPI, start_vps, stop_vps, restart_vps, suspend_vps, unsuspend_vps, give_vps, change_vps_plan, \
     update_info
 from .vps.delete import delete_vps
-from .vps.plan import list_plan, set_price
+from .vps.plan import list_plan, set_price, config_plan
 from .vps.rebuild import rebuild_vps
 from .vps.refund import refund_vps
 from .vps_log import get_vps_logs
@@ -45,6 +45,7 @@ urlpatterns = [
     path('vps/<str:vps_id>/update_info/', update_info, name='update_info'),
     path('vps/plan/', list_plan, name='list_plan'),
     path('vps/plan/set_price/', set_price, name='set_price'),
+    path('vps/plan/config/', config_plan, name='config_plan'),
 
     path('vps/calculator', vps_calculator, name='vps_calculator'),
     path('vps/logs/', get_vps_logs, name='get_vps_logs'),

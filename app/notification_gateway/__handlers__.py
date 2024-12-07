@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.db import transaction, close_old_connections
+from django.db.models import Q
 from django.template.loader import render_to_string
 
 from adapters.kafka_adapter import make_kafka_publisher
@@ -11,6 +12,7 @@ from tenacity import RetryError
 
 from adapters.mail import EmailSender
 from config import KafkaConfig, APPConfig, MailSenderConfig
+from home.models import Vps, SystemCounter
 from .exception import DBInsertFailed
 
 
@@ -67,4 +69,40 @@ class SendMail(BaseHandler):
                              MailSenderConfig.MAIL_USERNAME, MailSenderConfig.MAIL_PASSWORD)
 
         sender.send(MailSenderConfig.MAIL_USERNAME, receiver, subject, html_content, is_html=True)
+        return True
+
+
+class InVPSCreated(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            vps_id = fields.String(required=True)
+
+        return MySchema()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        close_old_connections()
+
+        vps_id = payload.get('vps_id')
+        vps = Vps.objects.filter(id=vps_id).first()
+        if not vps:
+            return False
+
+        user = vps.user
+        user.vps_len = Vps.objects.filter(user=user).count()  # Count user's VPS instances
+        user.save()
+
+        counter = SystemCounter.objects.filter(user=user, type=SystemCounter.CounterType.VPS).first()
+        if not counter:
+            counter = SystemCounter()
+            counter.user = user
+            counter.type = SystemCounter.CounterType.VPS
+            counter.save()
+
+        count_plan = Vps.objects.filter(user=user, plan_id=vps.plan_id).filter(~Q(_deleted=True)).count()
+        counter.data[SystemCounter.KEYGEN.vps(plan_id=vps.plan_id)] = count_plan
+        counter.save()
+
         return True

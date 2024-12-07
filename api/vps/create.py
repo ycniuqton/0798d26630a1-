@@ -8,7 +8,7 @@ from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 
 from api.vps.__constants import LIFETIME
-from home.models import Vps, VpsStatus
+from home.models import Vps, VpsStatus, SystemCounter
 
 from django.http import JsonResponse
 from adapters.redis_service import CachedPlan, CachedOS, CachedServer, CachedServerGroup
@@ -122,8 +122,12 @@ def create_vps(request):
                                                       to_time=get_now().replace(year=now.year + 100))
     else:
         cycle, from_time, to_time = get_billing_cycle(from_time=get_now(), type='monthly', num=duration)
+
     if user.balance.amount < total_fee and not user.is_staff:
         return JsonResponse({'error': 'Insufficient balance'}, status=400)
+    counter = SystemCounter.get_vps_counter(user, plan['id'])
+    if plan['limit_per_user'] and counter >= plan['limit_per_user'] and not user.is_staff:
+        return JsonResponse({'error': 'Exceeded limit'}, status=400)
 
     vps = Vps(
         cpu=plan['cpu'],

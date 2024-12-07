@@ -532,3 +532,28 @@ class RefundReport(BaseModel):
 
     class Meta:
         db_table = 'refund_report'
+
+
+class SystemCounter(BaseModel):
+    class CounterType(models.TextChoices):
+        VPS = 'VPS', 'VPS'
+
+    class KEYGEN:
+        @staticmethod
+        def vps(obj=None, plan_id=None):
+            if obj:
+                return f"vps_id:{obj.id}"
+            if plan_id:
+                return f"plan_id:{plan_id}"
+            raise ValueError("Invalid arguments")
+
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, null=True, blank=True)
+    data = JSONField(default=dict)
+    type = models.CharField(max_length=200, choices=CounterType.choices, default=CounterType.VPS)
+
+    @staticmethod
+    def get_vps_counter(user, plan_id):
+        counter = SystemCounter.objects.filter(user=user, type=SystemCounter.CounterType.VPS).first()
+        if not counter:
+            return 0
+        return counter.data.get(SystemCounter.KEYGEN.vps(plan_id=plan_id), 0)

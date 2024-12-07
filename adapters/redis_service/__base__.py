@@ -100,7 +100,10 @@ class CachedResource(RedisService):
         if value is None:
             value = self._fetch_from_api(retry_count=self.retry_count, sub_key=sub_key)
             if value is not None:
-                self.set(key_name, value)
+                self.set(key_name, self._pre_set(value))
+        return value
+
+    def _pre_set(self, value):
         return value
 
     def set(self, key_name, value, ex=None, px=None):

@@ -77,8 +77,9 @@ def create_instances(request):
             "group_id": group_id,
             "cluster_id": sg.get("cluster_id")
         })
-        mapping_region_plans[group_id] = CachedPlanInRegion().get(group_id) if CachedPlanInRegion().get(
+        list_plan = CachedPlanInRegion().get(group_id) if CachedPlanInRegion().get(
             group_id) else []
+        mapping_region_plans[group_id] = list_plan
 
     locations = sorted(locations, key=lambda x: x['status'], reverse=True)
 

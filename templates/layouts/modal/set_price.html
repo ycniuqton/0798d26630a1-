@@ -6,6 +6,7 @@ function createSetPriceModal(prefix) {
     const modalTitleId = `${prefix}SetPriceModalTitle`;
     const modalBodyId = `${prefix}SetPriceModalBody`;
     const priceInputId = `${prefix}SetPriceInput`;
+    const limitInputId = `${prefix}SetLimitInput`;
     const updateButtonId = `${prefix}SetPriceUpdateButton`;
 
     // Modal template with a form where only the price input is editable
@@ -45,6 +46,10 @@ function createSetPriceModal(prefix) {
                             <label for="${priceInputId}">Price:</label>
                             <input type="number" id="${priceInputId}" class="form-control" placeholder="Enter new price">
                         </div>
+                        <div class="form-group">
+                            <label for="${limitInputId}">Limit per User:</label>
+                            <input type="number" id="${limitInputId}" class="form-control" placeholder="Enter limit instance by user">
+                        </div>
                     </form>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -61,16 +66,17 @@ function createSetPriceModal(prefix) {
     // Set up the Update button callback
     document.getElementById(updateButtonId).addEventListener('click', async () => {
         const newPrice = document.getElementById(priceInputId).value;
+        const newLimit = document.getElementById(limitInputId).value;
         const planId = document.getElementById(modalId).getAttribute('data-plan-id');
 
         try {
             // Call the API to update the price
-            const response = await fetch('/api/vps/plan/set_price/', {
+            const response = await fetch('/api/vps/plan/config/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ plan_id: planId, price: newPrice })
+                body: JSON.stringify({ plan_id: planId, price: newPrice, limit_per_user: newLimit }),
             });
 
             if (response.ok) {

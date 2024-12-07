@@ -1,10 +1,11 @@
 from config import NotificationGatewayConfig
-from .__handlers__ import SendMail
+from .__handlers__ import SendMail, InVPSCreated
 from adapters.kafka_adapter import HandlerFactory
 from adapters.kafka_adapter.consumer import KafkaListener
 
 handlers = {
     'send_mail': SendMail(),
+    'vps_created': InVPSCreated(),
 }
 
 

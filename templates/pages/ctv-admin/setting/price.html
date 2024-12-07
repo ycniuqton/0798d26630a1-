@@ -36,6 +36,7 @@
             <th scope="col">Ram</th>
             <th scope="col">Disk</th>
             <th scope="col">Price</th>
+            <th scope="col">Limit per User</th>
             <th scope="col">Operation</th>
         </tr>
         </thead>
@@ -153,6 +154,7 @@
                                 <td>${ Math.round(item.ram/1024)} GB</td>
                                 <td>${item.disk} GB</td>
                                 <td>${item.price} $</td>
+                                <td>${item.limit_per_user !== null ? item.limit_per_user : ''}</td>
                                 <td><a class="btn btn-sm btn-outline-primary" target="_blank" onclick='show_set_price(${item.id})' rel="noopener noreferrer">Manage</a></td>
                             `;
                             tbody.appendChild(row);
