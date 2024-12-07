@@ -1,4 +1,6 @@
 from django.db import transaction, close_old_connections
+from django.db.models import Q
+
 from adapters.kafka_adapter._base import BaseHandler
 from marshmallow import Schema, fields, INCLUDE
 from typing import Dict, Any
@@ -44,7 +46,7 @@ class VPSCreated(BaseHandler):
         if not identifier:
             return False
 
-        vps = Vps.objects.filter(identifier=identifier).first()
+        vps = Vps.objects.filter(identifier=identifier).filter(~Q(_deleted=True)).first()
         if not vps:
             return False
 
