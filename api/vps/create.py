@@ -13,7 +13,7 @@ from home.models import Vps, VpsStatus, SystemCounter
 from django.http import JsonResponse
 from adapters.redis_service import CachedPlan, CachedOS, CachedServer, CachedServerGroup
 from adapters.kafka_adapter import make_kafka_publisher
-from config import KafkaConfig
+from config import KafkaConfig, APPConfig
 from services.discount import DiscountRepository
 from services.invoice import InvoiceRepository, get_billing_cycle
 from services.invoice.utils import get_now
@@ -126,7 +126,8 @@ def create_vps(request):
     if user.balance.amount < total_fee and not user.is_staff:
         return JsonResponse({'error': 'Insufficient balance'}, status=400)
     counter = SystemCounter.get_vps_counter(user, plan['id'])
-    if plan['limit_per_user'] and counter >= plan['limit_per_user'] and not user.is_staff:
+    if (plan['limit_per_user'] and counter >= plan['limit_per_user'] and
+            not user.is_staff and APPConfig.APP_ROLE != 'admin'):
         return JsonResponse({'error': 'Exceeded limit'}, status=400)
 
     vps = Vps(
