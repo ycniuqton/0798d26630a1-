@@ -115,7 +115,7 @@ class CheckPendingCreationVPS(BaseJob):
     """
 
     def run(self):
-        print("Archiving VPS")
+        print("Check pending creation VPS")
         pivot = get_now() - timedelta(minutes=5)
         list_vps = Vps.objects.filter(status=VpsStatus.CREATING, _created__lt=pivot).all()
 
