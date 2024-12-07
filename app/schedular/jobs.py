@@ -108,6 +108,22 @@ class ArchiveVPS(BaseJob):
             vps.save()
 
 
+class CheckPendingCreationVPS(BaseJob):
+    """
+    Example of a job that inherits from BaseJob.
+    This job prints a message when run.
+    """
+
+    def run(self):
+        print("Archiving VPS")
+        pivot = get_now() - timedelta(minutes=5)
+        list_vps = Vps.objects.filter(status=VpsStatus.CREATING, _created__lt=pivot).all()
+
+        for vps in list_vps:
+            vps.status = VpsStatus.ERROR
+            vps.save()
+
+
 class CollectReport(BaseJob):
     """
     Example of a job that inherits from BaseJob.
