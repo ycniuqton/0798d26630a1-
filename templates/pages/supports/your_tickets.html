@@ -117,7 +117,7 @@
                     ticketsData.forEach((ticket, index) => {
                         const row = document.createElement('tr');
                         row.innerHTML = `
-                            <td>${ticket.id}</td>
+                            <td>${ticket.id.slice(-12)}</td>
                             <td>${ticket.subject}</td>
                             <td>${ticket.ticket_type}</td>
                             <td>${ticket.submission_time}</td>
@@ -168,7 +168,7 @@
                         </div>
                     `;
 
-                    document.getElementById('ticketModalLabel').innerHTML = `${data.subject} - Ticket ID: ${data.id}`;
+                    document.getElementById('ticketModalLabel').innerHTML = `${data.subject} - Ticket ID: ${data.id.slice(-12)}`;
                     data.messages.forEach(reply => {
                         ticketDetailsContent.innerHTML += `
                             <div class="post">

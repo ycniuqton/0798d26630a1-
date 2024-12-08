@@ -149,7 +149,7 @@
     <div class="modal-dialog" role="document" style="
     min-width: 60% !important;
 ">
-        <div class="modal-content">
+        <div class="modal-content" style="overflow-y:none; max-height:none">
             <div class="modal-header">
                 <h5 class="modal-title" id="ticketModalLabel">Ticket Details</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -163,14 +163,18 @@
 ">
                     <!-- Ticket details will be loaded here via AJAX -->
                 </div>
-                <div class="post">
+
+            </div>
+            <div class="modal-footer">
+                <div class="post" style="
+    width: 100%;
+">
                     <div class="reply-section">
                         <textarea class="reply-input" id="reply-input"
                                   placeholder="Type your message here..."></textarea>
                         <button class="reply-button" id="reply-button">Reply</button>
                     </div>
                 </div>
-            </div>
         </div>
     </div>
 </div>
@@ -197,7 +201,7 @@
             ticketsData.forEach((ticket, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${ticket.id}</td>
+                    <td>${ticket.id.slice(-12)}</td>
                     <td>${ticket.subject}</td>
                     <td>${ticket.ticket_type}</td>
                     <td>${ticket.submission_time}</td>
@@ -291,7 +295,7 @@ function getCSRFToken() {
                         </div>
                     `;
 
-                    document.getElementById('ticketModalLabel').innerHTML = `${data.subject} - Ticket ID: ${data.id}`;
+                    document.getElementById('ticketModalLabel').innerHTML = `${data.subject} - Ticket ID: ${data.id.slice(-12)}`;
                     data.messages.forEach(reply => {
                         ticketDetailsContent.innerHTML += `
                             <div class="post">
