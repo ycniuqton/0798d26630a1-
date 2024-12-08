@@ -190,6 +190,9 @@ USE_I18N = True
 
 USE_TZ = True
 
+handler404 = 'home.views.common.404.custom_404'
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
