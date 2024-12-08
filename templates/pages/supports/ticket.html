@@ -26,7 +26,11 @@
         <form id="ticket-form">
             <div class="form-group">
                 <label for="ticket-subject">Subject</label>
-                <input type="text" class="form-control" id="ticket-subject" required>
+                <input type="text" class="form-control" id="ticket-subject" placeholder="Type your issue..." required>
+                <ul id="suggestions" class="list-group mt-2" style="
+    display: block;
+    position: fixed;
+"></ul>
             </div>
             <div class="form-group">
                 <label for="ticket-type">Ticket Type</label>
@@ -44,7 +48,82 @@
         </form>
     </div>
 </div>
-<div class="container mt-4">
+
+<script>
+    const technicalTitles = [
+        "How do I access my VPS via SSH?",
+        "What is the default username and password for my VPS?",
+        "How can I reinstall the operating system on my VPS?",
+        "Why is my VPS running slow, and how can I optimize it?",
+        "How do I configure a firewall for my VPS?",
+        "How do I set up a reverse DNS for my VPS?",
+        "Can I upgrade the RAM and CPU of my VPS?",
+        "How do I enable backups for my VPS?",
+        "Why is my VPS IP address blocked, and how do I unblock it?",
+        "How do I secure my VPS against brute-force attacks?"
+    ];
+
+    const billingTitles = [
+        "What payment methods do you accept?",
+        "Can I get a refund if I cancel my VPS subscription?",
+        "How do I update my billing information?",
+        "What happens if I miss a payment for my VPS?",
+        "Are there any discounts for annual VPS plans?"
+    ];
+
+    const generalTitles = [
+        "What is a VPS, and how does it work?",
+        "How do I choose the right VPS plan for my needs?",
+        "What operating systems are supported on your VPS?",
+        "Can I upgrade from shared hosting to a VPS?",
+        "How long does it take to set up my VPS?"
+    ];
+
+    const suggestionsElement = document.getElementById("suggestions");
+    const ticketSubjectInput = document.getElementById("ticket-subject");
+    const ticketTypeSelect = document.getElementById("ticket-type");
+
+    // Display suggestions when typing
+    ticketSubjectInput.addEventListener("input", function () {
+        const query = ticketSubjectInput.value.toLowerCase();
+        const ticketType = ticketTypeSelect.value;
+
+        let titles = [];
+        if (ticketType === "Technical") titles = technicalTitles;
+        else if (ticketType === "Billing") titles = billingTitles;
+        else if (ticketType === "General") titles = generalTitles;
+
+        const matches = titles.filter((title) => title.toLowerCase().includes(query));
+        suggestionsElement.innerHTML = matches
+            .map((match) => `<li class="list-group-item suggestion-item">${match}</li>`)
+            .join("");
+
+        suggestionsElement.style.display = matches.length > 0 ? "block" : "none";
+    });
+
+    // Apply clicked suggestion to input
+    suggestionsElement.addEventListener("click", function (e) {
+        if (e.target.classList.contains("suggestion-item")) {
+            ticketSubjectInput.value = e.target.textContent;
+            suggestionsElement.style.display = "none";
+        }
+    });
+
+    // Hide suggestions when clicking outside
+    document.addEventListener("click", function (e) {
+        if (!e.target.closest(".form-group")) {
+            suggestionsElement.style.display = "none";
+        }
+    });
+
+    // Show suggestions when focusing the input
+    ticketSubjectInput.addEventListener("focus", function () {
+        const query = ticketSubjectInput.value.toLowerCase();
+        if (query) suggestionsElement.style.display = "block";
+    });
+</script>
+
+<div class="container mt-4" hidden>
     <h2>Frequently Asked Questions</h2>
     <div id="faq-accordion">
         <!-- FAQ items will be inserted here -->
