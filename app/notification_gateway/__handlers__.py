@@ -30,7 +30,7 @@ class TemplateMapping:
 COMMON_DATA = {
     'app_name': APPConfig.APP_NAME,
     'app_domain': APPConfig.APP_DOMAIN,
-    'platform_name': f'{APPConfig.APP_NAME} VPS Services'
+    'platform_name': f'{APPConfig.APP_NAME} Services'
 }
 
 
