@@ -300,6 +300,8 @@ class Ticket(BaseModel):
     status = models.CharField(max_length=200, choices=TicketStatus.choices, default=TicketStatus.UNREAD)
     operation = models.CharField(max_length=200)
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    attached_vps = JSONField(null=True, blank=True)
+    attached_invoice = JSONField(null=True, blank=True)
 
     def __str__(self):
         return self.subject

@@ -281,6 +281,30 @@ function getCSRFToken() {
                 .then(response => response.json())
                 .then(data => {
                     const ticketDetailsContent = document.getElementById('ticket-details-content');
+                    // Generate invoice links
+let attached_invoice =  ""
+data.attached_invoice.forEach((item) => {
+    attached_invoice += `<a href="https://{{APP_DOMAIN}}/invoices/${item.id}" target="_blank">INVOICE: ${item.display_text} - ${item.status}</a>\n`;
+});
+
+// Generate VPS links
+let attached_vps = ""
+data.attached_vps.forEach((item) => {
+    attached_vps += `<a href="https://{{APP_DOMAIN}}/instance/${item.id}" target="_blank">VPS: ${item.hostname}</a>\n`;
+});
+
+let attachments = (attached_invoice + attached_vps) ? `
+                            <div class="content mt-4">
+
+                                <p>Attachments:</p>
+                                <p>${attached_invoice}</p>
+                                <p>${attached_vps}</p>
+
+                            </div>` :  '';
+
+
+
+
                     ticketDetailsContent.innerHTML = `
                         <div class="post">
                             <div class="user">
@@ -292,6 +316,9 @@ function getCSRFToken() {
                                 <span class="date">${data.submission_time}</span>
                                 <p>${data.description}</p>
                             </div>
+
+                            ${attachments}
+
                         </div>
                     `;
 

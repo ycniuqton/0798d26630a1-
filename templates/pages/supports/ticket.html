@@ -15,11 +15,34 @@
     .no-records h4 { margin-top: 20px; }
     .ticket-form { margin-bottom: 20px; }
     .ticket-form textarea { resize: none; }
+    .attached-items  .dropdown {
+        position: inherit !important;
+    }
+    .attached-items select.form-control {
+    display: block !important;
+    height: 45px;
+
+    width: auto;
+    border-radius: 0px 3px 3px 0px;
+    border-left: none;
+}
+    .attached-items button {
+    display: block;
+    float: left;
+    border-right-width: 0px;
+    margin-right: 0px;
+    height: 42px !important;
+    border-right: none;
+    position: none !important;
+    border-radius: 3px 0px 0px 3px;
+
+}
 
 </style>
 {% endblock extrastyle %}
 
 {% block content %}
+
 <div class="container mt-4">
     <h2>Support Tickets</h2>
     <div class="ticket-form mb-4">
@@ -27,10 +50,7 @@
             <div class="form-group">
                 <label for="ticket-subject">Subject</label>
                 <input type="text" class="form-control" id="ticket-subject" placeholder="Type your issue..." required>
-                <ul id="suggestions" class="list-group mt-2" style="
-    display: block;
-    position: fixed;
-"></ul>
+                <ul id="suggestions" class="list-group mt-2" style="display: block; position: fixed;"></ul>
             </div>
             <div class="form-group">
                 <label for="ticket-type">Ticket Type</label>
@@ -44,10 +64,138 @@
                 <label for="ticket-description">Description</label>
                 <textarea class="form-control" id="ticket-description" rows="5" required></textarea>
             </div>
-            <button type="submit" class="btn btn-primary">Submit Ticket</button>
+            <div class="form-group">
+                <div class="attached-items-container d-flex flex-wrap" style="gap: 10px;">
+                    <div class="attached-items d-flex flex-wrap" style="gap: 10px;"></div>
+                    <button type="button" id="attach-button" class="btn btn-primary">Attachments
+                    </button>
+                </div>
+                <div id="attach-options" class="list-group" style="position: absolute; display: none;">
+                    <button type="button" class="list-group-item list-group-item-action" id="attach-vps">VPS</button>
+                    <button type="button" class="list-group-item list-group-item-action" id="attach-invoice">Invoice
+                    </button>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="
+    float: right;
+">Submit Ticket</button>
         </form>
     </div>
 </div>
+
+<script>
+    // Mock API Data
+    const vpsOptions = [
+        { value: "vps_1", displayText: "VPS 1" },
+        { value: "vps_2", displayText: "VPS 2" },
+        { value: "vps_3", displayText: "VPS 3" }
+    ];
+    const invoiceOptions = [
+        { value: "invoice_1", displayText: "Invoice 1" },
+        { value: "invoice_2", displayText: "Invoice 2" },
+        { value: "invoice_3", displayText: "Invoice 3" }
+    ];
+
+    const attachButton = document.getElementById("attach-button");
+    const attachOptions = document.getElementById("attach-options");
+    const attachedItemsContainer = document.querySelector(".attached-items");
+
+    // Show options on Attach button click
+    attachButton.addEventListener("click", (e) => {
+        attachOptions.style.display = "block";
+        attachOptions.style.top = `${e.target.offsetTop + e.target.offsetHeight}px`;
+        attachOptions.style.left = `${e.target.offsetLeft}px`;
+    });
+
+    // Hide options when clicking outside
+    document.addEventListener("click", (e) => {
+        if (!attachOptions.contains(e.target) && e.target !== attachButton) {
+            attachOptions.style.display = "none";
+        }
+    });
+
+    // Add an item to the attached items area
+    function addAttachedItem(type, options) {
+        const dropdown = document.createElement("div");
+        dropdown.className = "dropdown float-left";
+
+        const select = document.createElement("select");
+        select.setAttribute("attachment-type", type);
+        select.className = "form-control";
+
+        options.forEach((option) => {
+            const opt = document.createElement("option");
+            opt.value = option.value;
+            opt.textContent = option.displayText;
+            select.appendChild(opt);
+        });
+
+        const removeButton = document.createElement("button");
+        removeButton.className = "btn btn-danger btn-sm ml-2";
+        removeButton.textContent = "x";
+        removeButton.addEventListener("click", () => {
+            attachedItemsContainer.removeChild(dropdown);
+        });
+
+        dropdown.appendChild(removeButton);
+        dropdown.appendChild(select);
+
+        // Add the new dropdown before the attach button
+        attachedItemsContainer.appendChild(dropdown);
+    }
+
+    // Handle VPS attachment
+    document.getElementById("attach-vps").addEventListener("click", async () => {
+    try {
+        // Fetch data from the API
+        const response = await fetch('/api/vps/?page=1&page_size=999999');
+        const result = await response.json();
+
+        // Transform the response data to the desired format
+        const vpsOptions = result.data.map(item => ({
+            value: item.id,
+            displayText: item.hostname,
+        }));
+
+        // Add the attached item
+        addAttachedItem("vps", vpsOptions);
+
+        // Hide the options dropdown
+        attachOptions.style.display = "none";
+    } catch (error) {
+        console.error("Error fetching VPS options:", error);
+        alert("Failed to load VPS options. Please try again.");
+    }
+});
+
+
+    document.getElementById("attach-invoice").addEventListener("click", async () => {
+    try {
+        // Fetch data from the API
+        const response = await fetch('/api/invoices/?page=1&page_size=999999');
+        const result = await response.json();
+
+        // Transform the response data to the desired format
+        const invoiceOptions = result.data.map(item => ({
+            value: item.id,
+            displayText: `${item.display_text} - ${item.status}`,
+        }));
+
+        // Add the attached item
+        addAttachedItem("invoice", invoiceOptions);
+
+        // Hide the options dropdown
+        attachOptions.style.display = "none";
+    } catch (error) {
+        console.error("Error fetching invoice options:", error);
+        alert("Failed to load invoice options. Please try again.");
+    }
+});
+
+
+</script>
+
+
 
 <script>
     const technicalTitles = [
@@ -142,7 +290,25 @@
     function submitTicket() {
         const subject = document.getElementById('ticket-subject').value;
         const ticketType = document.getElementById('ticket-type').value;
-        const description = document.getElementById('ticket-description').value;
+        var description = document.getElementById('ticket-description').value;
+        const attachedItemsContainer = document.querySelector(".attached-items");
+        const attachedItems = Array.from(attachedItemsContainer.querySelectorAll("select")).map(
+    (select) => ({
+        type: select.getAttribute('attachment-type'),
+        value: select.value
+    })
+);
+        console.log("Attached Items:", attachedItems);
+        var attached_vps = [];
+        var attached_invoice = [];
+        attachedItems.forEach((item) => {
+            if (item.type === "vps") {
+                attached_vps.push(item.value);
+            } else if (item.type === "invoice") {
+                attached_invoice.push(item.value);
+            }
+        });
+
 
         fetch('/api/tickets/', {
             method: 'POST',
@@ -150,7 +316,7 @@
                 'Content-Type': 'application/json',
                 'X-CSRFToken': '{{ csrf_token }}'
             },
-            body: JSON.stringify({ subject, ticket_type: ticketType, description })
+            body: JSON.stringify({ subject, ticket_type: ticketType, description, attached_vps, attached_invoice })
         })
         .then(response => response.json())
         .then(data => {
@@ -211,7 +377,6 @@
         .catch(error => console.log('Error:', error));
     }
     fetchFaqs();
-
 
 
 </script>

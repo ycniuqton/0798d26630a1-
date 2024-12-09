@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 
-from home.models import Ticket, TicketChat
+from home.models import Ticket, TicketChat, Vps, Invoice
 from services.invoice import get_now
 
 
@@ -25,7 +25,9 @@ class TicketCollectionAPI(APIView):
                 description=data['description'],
                 submission_time=datetime.now(),
                 operation='View',
-                user=request.user
+                user=request.user,
+                attached_vps=data.get('attached_vps'),
+                attached_invoice=data.get('attached_invoice'),
             )
             ticket = ticket.to_readable_dict()
             return JsonResponse({'success': True, 'ticket': ticket})
@@ -88,8 +90,17 @@ class TicketAPI(APIView):
             msg_data = msg.to_readable_dict()
             msg_data.update({'user_role': "admin" if msg.user.is_staff else "user"})
             messages.append(msg_data)
+        attached_vps = []
+        attached_invoice = []
+        if ticket.attached_vps:
+            attached_vps = Vps.objects.filter(id__in=ticket.attached_vps).all()
+            attached_vps = [vps.to_readable_dict() for vps in attached_vps]
+        if ticket.attached_invoice:
+            attached_invoice = Invoice.objects.filter(id__in=ticket.attached_invoice).all()
+            attached_invoice = [invoice.to_readable_dict() for invoice in attached_invoice]
 
         ticket = ticket.to_readable_dict()
+        ticket.update({'messages': messages, 'attached_vps': attached_vps, 'attached_invoice': attached_invoice})
         ticket.update({'messages': messages})
 
         return JsonResponse(ticket)
