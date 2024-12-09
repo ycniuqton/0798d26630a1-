@@ -69,7 +69,7 @@
     </div>
     <div class="email-body">
         <h2>Hello, {{ recipient_name }}!</h2>
-        <p>Thank you for registering at {{ platform_name }}. Please verify your email address by clicking the button below:</p>
+        <p>Thank you for registering at {{ common_information.platform_name }}. Please verify your email address by clicking the button below:</p>
         <p style="text-align: center;">
             <a href="{{ verification_link }}" target="_blank">Verify Email</a>
         </p>
@@ -79,7 +79,7 @@
     </div>
     <div class="email-footer">
         <p>&copy; {{ current_year }} {{ platform_name }}. All rights reserved.</p>
-        <p><a href="https://worldsever.com">worldsever.com</a></p>
+        <p><a href="https://{{common_information.app_domain}}">{{common_information.app_domain}}</a></p>
     </div>
 </div>
 

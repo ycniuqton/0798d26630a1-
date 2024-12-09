@@ -27,6 +27,13 @@ class TemplateMapping:
     CREATE_VPS = 'mail/create_vps.html'
 
 
+COMMON_DATA = {
+    'app_name': APPConfig.APP_NAME,
+    'app_domain': APPConfig.APP_DOMAIN,
+    'platform_name': f'{APPConfig.APP_NAME} VPS Services'
+}
+
+
 class SendMail(BaseHandler):
     def __init__(self) -> None:
         super().__init__()
@@ -53,6 +60,7 @@ class SendMail(BaseHandler):
         data = payload.get('data', {})
         receiver = payload.get('receiver')
         subject = data.get('subject')
+        data['common_information'] = COMMON_DATA
 
         if not template_name:
             try:

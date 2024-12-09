@@ -65,13 +65,13 @@
     </div>
     <div class="email-body">
         <h2>Hello, {{ recipient_name }}!</h2>
-        <p>We are delighted to welcome you to {{ platform_name }}. We hope you have a wonderful experience using our platform. If you have any questions, feel free to reach out to us at any time.</p>
-        <p>To get started, visit our website: <a href="https://worldsever.com">worldsever.com</a></p>
+        <p>We are delighted to welcome you to {{ common_information.platform_name }}. We hope you have a wonderful experience using our platform. If you have any questions, feel free to reach out to us at any time.</p>
+        <p>To get started, visit our website: <a href="https://{{common_information.app_domain}}">{{common_information.domain}}</a></p>
         <p>Thank you for joining us!</p>
     </div>
     <div class="email-footer">
         <p>&copy; {{ current_year }} {{ platform_name }}. All rights reserved.</p>
-        <p><a href="https://worldsever.com">worldsever.com</a></p>
+        <p><a href="https://{{common_information.app_domain}}">{{common_information.app_domain}}</a></p>
     </div>
 </div>
 

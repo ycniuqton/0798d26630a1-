@@ -1,5 +1,7 @@
+from django.apps import AppConfig
+
 from adapters.kafka_adapter import make_kafka_publisher
-from config import NotificationGatewayConfig
+from config import NotificationGatewayConfig, APPConfig
 from services.invoice import get_now
 
 
@@ -13,9 +15,8 @@ class VPSMailService:
             'type': 'REGISTER',
             'receiver': user.email,
             'data': {
-                "subject": "Welcome to World Sever",
+                "subject": f"Welcome to {APPConfig.APP_NAME}",
                 'recipient_name': user.username,
-                'platform_name': 'World Sever',
                 'current_year': now.year
             }
         })
@@ -26,10 +27,9 @@ class VPSMailService:
             'type': 'VERIFY_EMAIL',
             'receiver': user.email,
             'data': {
-                "subject": "World Sever - Verify Your Email Address",
+                "subject": f"{APPConfig.APP_NAME} - Verify Your Email Address",
                 'recipient_name': user.username,
-                'platform_name': 'World Sever',
-                'verification_link': f'https://worldsever.com/verify?token={token}',
+                'verification_link': f'https://{APPConfig.APP_DOMAIN}/verify?token={token}',
                 'current_year': now.year
             }
         })
@@ -47,7 +47,6 @@ class VPSMailService:
                 'vps_os': vps.os,
                 'vps_username': vps.username,
                 'vps_password': vps.password,
-                'current_year': now.year,
-                'platform_name': 'WorldSever VPS Services'
+                'current_year': now.year
             }
         })
