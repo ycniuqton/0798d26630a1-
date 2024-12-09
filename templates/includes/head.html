@@ -11,8 +11,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
 <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-<meta name="description"
-      content="Free Datta Able Admin Template come up with latest Bootstrap 4 framework with basic components, form elements and lots of pre-made layout options"/>
+<meta name="description" content="{{APP_DOMAIN | upper}} offers reliable and high-performance VPS solutions for businesses and individuals. Choose from a range of customizable plans to meet your hosting needs. Fast, secure, and affordable virtual private servers worldwide." />
+
 <meta name="keywords"
       content="admin templates, bootstrap admin templates, bootstrap 4, dashboard, dashboard templets, sass admin templets, html admin templates, responsive, bootstrap admin templates free download,premium bootstrap admin templates, datta able, datta able bootstrap admin template, free admin theme, free dashboard template"/>
 <meta name="author" content="CodedThemes"/>
@@ -39,3 +39,30 @@
 <!--<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>-->
 <!--&lt;!&ndash; Include FontAwesome for icons &ndash;&gt;-->
 <!--<script src="https://kit.fontawesome.com/a076d05399.js"></script>-->
+
+
+<script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebHostingService",
+        "name": "{{APP_DOMAIN}}",
+        "url": "https://{{APP_DOMAIN}}",
+        "description": "Reliable and high-performance VPS hosting solutions with worldwide availability and customizable plans.",
+        "offers": {
+            "@type": "Offer",
+            "price": "5.00",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "url": "https://{{APP_DOMAIN}}/instances/create/",
+            "itemOffered": {
+                "@type": "Service",
+                "name": "Virtual Private Server (VPS)"
+            }
+        },
+        "provider": {
+            "@type": "Organization",
+            "name": "{{APP_NAME}}",
+            "url": "https://{{APP_DOMAIN}}"
+        }
+    }
+    </script>
