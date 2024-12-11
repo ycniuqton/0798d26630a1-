@@ -8,13 +8,10 @@ from .models import Vps, User, Balance, Transaction, Ticket, VPSLog, TicketChat
 
 
 @receiver(post_save, sender=Vps)
-def update_vps_len_on_save(sender, instance, **kwargs):
-    # user = instance.user  # Assuming there is a ForeignKey from VPS to User
-    # user.vps_len = Vps.objects.filter(user=user).count()  # Count user's VPS instances
-    # user.save()
-
-    publisher = make_kafka_publisher(NotificationGatewayConfig)
-    publisher.publish('vps_created', {'vps_id': instance.id})
+def trigger_when_vps_created(sender, instance, created, **kwargs):
+    if created:  # Only publish when the instance is created
+        publisher = make_kafka_publisher(NotificationGatewayConfig)
+        publisher.publish('vps_created', {'vps_id': instance.id})
 
 
 @receiver(post_delete, sender=Vps)
