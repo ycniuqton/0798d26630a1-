@@ -9,7 +9,7 @@ from home.models import Vps, VpsStatus
 from django.http import JsonResponse
 from adapters.redis_service import CachedPlan, CachedOS, CachedServer, CachedCluster
 from adapters.kafka_adapter import make_kafka_publisher
-from config import KafkaConfig
+from config import KafkaConfig, KafkaNotifierConfig
 from services.invoice import InvoiceRepository
 from services.virtualizor_manager import VirtualizorManager
 from services.vps_log import VPSLogger
@@ -105,5 +105,8 @@ def config_plan(request):
     virtualizor_manager.config_plan(plan_id, {'limit_per_user': limit_per_user})
 
     CachedPlan().delete()
+    # send clear cache message
+    publisher = make_kafka_publisher(KafkaNotifierConfig)
+    publisher.publish('cache_cleaned', {})
 
     return JsonResponse('Price set successfully', safe=False)

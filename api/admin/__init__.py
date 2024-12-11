@@ -305,6 +305,10 @@ class GroupResource(APIView):
             list_plan = [int(i) for i in list_plan]
             CachedPlanInRegion().set(list_plan, group_id)
 
+        # send clear cache message
+        publisher = make_kafka_publisher(KafkaNotifierConfig)
+        publisher.publish('cache_cleaned', {})
+
         return JsonResponse(res, safe=False)
 
 
