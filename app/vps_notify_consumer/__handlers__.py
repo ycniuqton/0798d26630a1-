@@ -607,7 +607,7 @@ class VPSUpdated(BaseHandler):
     def _handle(self, payload: Dict[str, Any]) -> None:
         identifier = payload.get('identifier')
         data = payload.get('data')
-        status = data.get('status')
+        stat = data.get('status')
 
         if not identifier:
             return False
@@ -616,5 +616,12 @@ class VPSUpdated(BaseHandler):
         if not vps:
             return False
 
-        cvr = CachedVpsStatRepository()
-        cvr.set(vps.linked_id, status)
+        status = stat.get('status')
+        if status == 1:
+            vps.status = VpsStatus.ON
+        elif status == 0:
+            vps.status = VpsStatus.OFF
+        elif status == 2:
+            vps.status = VpsStatus.SUSPENDED
+        CachedVpsStatRepository().set(vps.linked_id, stat)
+        vps.save()
