@@ -32,8 +32,6 @@ def unsuspend_vps(request):
         list_vps = Vps.objects.filter(linked_id__in=vps_linked_ids)
     list_vps = list(list_vps)
 
-    apply_vps_status(list_vps)
-
     publisher = make_kafka_publisher(KafkaConfig)
     for vps in list_vps:
         # if vps.status != VpsStatus.ON:

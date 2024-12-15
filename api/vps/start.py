@@ -62,8 +62,6 @@ def start_vps(request):
 
     publisher = make_kafka_publisher(KafkaConfig)
 
-    apply_vps_status(list_vps)
-
     for vps in list_vps:
         if vps.status not in [VpsStatus.OFF, VpsStatus.ERROR, VpsStatus.STOPPING]:
             continue

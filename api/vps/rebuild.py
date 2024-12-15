@@ -73,8 +73,6 @@ def rebuild_vps(request):
 
     publisher = make_kafka_publisher(KafkaConfig)
 
-    apply_vps_status([vps])
-
     vps.status = VpsStatus.REBUILDING
     vps.password = password
     vps.username = username

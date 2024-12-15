@@ -58,8 +58,6 @@ def stop_vps(request):
         list_vps.filter(user_id=user.id)
     list_vps = list(list_vps)
 
-    apply_vps_status(list_vps)
-
     publisher = make_kafka_publisher(KafkaConfig)
     for vps in list_vps:
         if vps.status not in [VpsStatus.ON, VpsStatus.STARTING, VpsStatus.ERROR]:
