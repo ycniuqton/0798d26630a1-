@@ -6,7 +6,7 @@ from marshmallow import Schema, fields, INCLUDE
 from typing import Dict, Any
 from tenacity import RetryError
 
-from adapters.redis_service import clear_cache, CachedPlanInRegion
+from adapters.redis_service import clear_cache, CachedPlanInRegion, CachedVpsStatRepository
 from config import APPConfig
 from home.models import Vps, VpsStatus, User
 from adapters.kafka_adapter._exceptions import SkippableException
@@ -52,7 +52,6 @@ class VPSCreated(BaseHandler):
 
         vps.ip = data.get('ip')
         vps.linked_id = data.get('linked_id')
-        vps.status = VpsStatus.ON
         vps.save()
 
         if settings.APPConfig.APP_ROLE != 'admin':
@@ -586,3 +585,36 @@ class VPSChangedHostname(BaseHandler):
             vps.save()
         except:
             raise SkippableException("Failed to start VPS")
+
+
+class VPSUpdated(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            identifier = fields.String(required=False)
+            data = fields.Dict(required=False)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        identifier = payload.get('identifier')
+        data = payload.get('data')
+        status = data.get('status')
+
+        if not identifier:
+            return False
+
+        vps = Vps.objects.filter(identifier=identifier).filter(~Q(_deleted=True)).first()
+        if not vps:
+            return False
+
+        cvr = CachedVpsStatRepository()
+        cvr.set(vps.linked_id, status)

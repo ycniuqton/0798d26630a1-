@@ -32,12 +32,13 @@ class VirtualizorEvent:
     VPS_PASSWORD_CHANGED = 'vps_password_changed'
     VPS_HOSTNAME_CHANGED = 'vps_hostname_changed'
     VPS_HOSTNAME_CHANGED_FAILED = 'vps_hostname_changed_failed'
-
+    VPS_UPDATED = 'vps_updated'
 
 
 
 handlers = {
     VirtualizorEvent.VPS_CREATED: VPSCreated(),
+    VirtualizorEvent.VPS_UPDATED: VPSUpdated(),
     VirtualizorEvent.VPS_CREATED_FAILED: VPSCreatedError(),
     VirtualizorEvent.VPS_TURNED_ON: VPSStarted(),
     VirtualizorEvent.VPN_TURNED_ON_FAILED: VPSStartedError(),
