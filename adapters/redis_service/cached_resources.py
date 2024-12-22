@@ -20,7 +20,7 @@ class CachedPlan(CachedResource):
 
     def _pre_set(self, value):
         for plan in value:
-            plan['ram_display'] = int(round(1024 / 1024))
+            plan['ram_display'] = int(round(plan['ram'] / 1024))
         return sorted(value, key=lambda x: (x.get('cluster_id'), x.get('price')))
 
 
