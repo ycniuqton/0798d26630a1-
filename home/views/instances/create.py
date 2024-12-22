@@ -81,7 +81,7 @@ def create_instances(request):
             group_id) else []
         mapping_region_plans[group_id] = list_plan
 
-    locations = sorted(locations, key=lambda x: x['status'], reverse=True)
+    locations = sorted(locations, key=lambda x: (x['status'], x['cluster_id'], x['id']), reverse=True)
 
     # Fetch flags using restcountries.com API
     # for location in locations:
