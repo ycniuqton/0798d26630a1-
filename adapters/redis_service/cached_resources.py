@@ -19,6 +19,8 @@ class CachedPlan(CachedResource):
         super().__init__(redis_uri=redis_uri, data_url=data_url, auth_header=auth_header, ex=ex)
 
     def _pre_set(self, value):
+        for plan in value:
+            plan['ram_display'] = int(round(1024 / 1024))
         return sorted(value, key=lambda x: (x.get('cluster_id'), x.get('price')))
 
 
