@@ -17,6 +17,7 @@ from config import KafkaConfig, APPConfig
 from services.discount import DiscountRepository
 from services.invoice import InvoiceRepository, get_billing_cycle
 from services.invoice.utils import get_now
+from services.purchase_estimator import PurchaseEstimator
 from services.vps_log import VPSLogger
 from services.balance import BalanceRepository
 
@@ -113,9 +114,6 @@ def create_vps(request):
 
     if not osid or not plan or not server_group:
         return JsonResponse({'error': 'Invalid request'}, status=400)
-    discount_repo = DiscountRepository.get(duration=duration)
-    total_fee = plan['price'] * duration
-    total_fee, _ = discount_repo.apply(total_fee)
     now = get_now()
     if duration == LIFETIME:
         cycle, from_time, to_time = get_billing_cycle(from_time=now,
@@ -123,12 +121,12 @@ def create_vps(request):
     else:
         cycle, from_time, to_time = get_billing_cycle(from_time=get_now(), type='monthly', num=duration)
 
-    if user.balance.amount < total_fee and not user.is_staff:
-        return JsonResponse({'error': 'Insufficient balance'}, status=400)
-    counter = SystemCounter.get_vps_counter(user, plan['id'])
-    if (plan['limit_per_user'] and counter >= plan['limit_per_user'] and
-            not user.is_staff and APPConfig.APP_ROLE != 'admin'):
-        return JsonResponse({'error': 'Exceeded limit'}, status=400)
+    purchase_estimator = PurchaseEstimator(request.user)
+    is_valid, message, discounted_fee, discount_amount, total_fee = purchase_estimator.estimate(plan, os, duration)
+
+    if not is_valid:
+        return JsonResponse({'error': message}, status=400)
+
 
     vps = Vps(
         cpu=plan['cpu'],
