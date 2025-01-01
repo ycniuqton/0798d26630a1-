@@ -65,7 +65,7 @@ def rebuild_vps(request):
     osid = None
     oses = CachedOS().get()
     for os in oses:
-        if os['name'] == image_version and os['cluster_id'] == vps.cluster_id:
+        if os['name'] == image_version and os['cluster_id'] == vps.region.get('cluster_id'):
             osid = os['id']
             break
     if not osid:
