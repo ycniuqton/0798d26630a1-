@@ -50,23 +50,28 @@ def rebuild_vps(request):
     image_version = data.get('image_version')
     password = data.get('password')
 
+    if vps_id:
+        vps = Vps.objects.filter(id=vps_id)
+    else:
+        vps = Vps.objects.filter(linked_id=vps_linked_id)
+
+    if not user.is_staff:
+        vps.filter(user_id=user.id)
+    vps = vps.first()
+
+    if not vps:
+        return JsonResponse({'error': 'Invalid VPS'}, status=400)
+
     osid = None
     oses = CachedOS().get()
     for os in oses:
-        if os['name'] == image_version:
+        if os['name'] == image_version and os['cluster_id'] == vps.cluster_id:
             osid = os['id']
             break
     if not osid:
         return JsonResponse({'error': 'Invalid image version'}, status=400)
 
     username = "Administrator" if os.get('distro') == 'windows' else 'root'
-    if vps_id:
-        vps = Vps.objects.filter(id=vps_id)
-    else:
-        vps = Vps.objects.filter(linked_id=vps_linked_id)
-    if not user.is_staff:
-        vps.filter(user_id=user.id)
-    vps = vps.first()
 
     if not vps or not osid:
         return JsonResponse({'error': 'Invalid request'}, status=400)
