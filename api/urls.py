@@ -17,6 +17,7 @@ from .vps.delete import delete_vps
 from .vps.plan import list_plan, set_price, config_plan
 from .vps.rebuild import rebuild_vps
 from .vps.refund import refund_vps
+from .vps.update_end_time import update_vps_end_time
 from .vps_log import get_vps_logs
 from .balances import topup, reclaim
 from .vps.calculator import vps_calculator
@@ -32,6 +33,7 @@ urlpatterns = [
     path('vps/configurations', vps_configurations, name='vps_configurations'),
     path('vps/get_archived_vps', archived_vps, name='archived_vps'),
     path('vps/start/', start_vps, name='start-vps'),
+    path('vps/update_vps_end_time/', update_vps_end_time, name='update_vps_end_time'),
     path('vps/stop/', stop_vps, name='stop-vps'),
     path('vps/restart/', restart_vps, name='restart-vps'),
     path('vps/delete/', delete_vps, name='delete-vps'),

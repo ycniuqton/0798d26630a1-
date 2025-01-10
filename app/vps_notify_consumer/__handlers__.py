@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import transaction, close_old_connections
 from django.db.models import Q
 
@@ -378,6 +380,41 @@ class VPSSuspended(BaseHandler):
             vps.save()
         except:
             raise SkippableException("Failed to start VPS")
+
+
+class VPSUpdateEndTime(BaseHandler):
+    def __init__(self) -> None:
+        super().__init__()
+
+    def _get_schema(self) -> Schema:
+        class MySchema(Schema):
+            identifier = fields.Integer(required=False)
+            end_time = fields.String(required=False)
+
+            class Meta:
+                unknown = INCLUDE
+
+        return MySchema()
+
+    def __make_connection(self):
+        close_old_connections()
+
+    def _handle(self, payload: Dict[str, Any]) -> None:
+        identifier = payload.get('identifier')
+        end_time = payload.get('end_time')
+
+        end_time = datetime.strptime(end_time, "%Y-%m-%d")
+        end_time = end_time.replace(hour=16, minute=59, second=59, microsecond=999999)
+
+        vps = Vps.objects.filter(linked_id=identifier).first()
+        if not vps:
+            raise DBInsertFailed("Missing Order")
+
+        try:
+            vps.end_time = end_time
+            vps.save()
+        except:
+            raise SkippableException("Failed to update end time")
 
 
 class VPSSuspendedError(BaseHandler):

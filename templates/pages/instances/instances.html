@@ -37,6 +37,12 @@
     .status-changing {
         background: radial-gradient(circle, #64B5F6, #1976D2); /* Blue gradient */
     }
+    .custom-li-dropdown {
+    list-style-type: none;
+    width: fit-content;
+    float: left;
+    }
+
 </style>
 {% endblock extrastyle %}
 
@@ -79,17 +85,17 @@
         {% if request.user.is_staff %}
         <div class="input-group-append" style="margin-right:10px ; width:200px; display:block">
             <select class="form-control" id="username_fitler">
-                    <option selected>All user</option>
-                    {% for username in ALL_USERNAME %}
-                    <option value="{{ username }}">{{ username }}</option>
-                    {% endfor %}
-                </select>
+                <option selected>All user</option>
+                {% for username in ALL_USERNAME %}
+                <option value="{{ username }}">{{ username }}</option>
+                {% endfor %}
+            </select>
         </div>
         {% endif %}
-        <input  type="text" class="form-control" placeholder="Please enter" aria-label="Server Name" id="search-input"
+        <input type="text" class="form-control" placeholder="Please enter" aria-label="Server Name" id="search-input"
                aria-describedby="basic-addon2" style="height:auto">
-        <div  class="input-group-append">
-            <button  class="btn btn-outline-secondary" type="button" id="search-button"><i class="fas fa-search"></i>
+        <div class="input-group-append">
+            <button class="btn btn-outline-secondary" type="button" id="search-button"><i class="fas fa-search"></i>
             </button>
             <select hidden class="custom-select">
                 <option selected>Server Name</option>
@@ -147,6 +153,7 @@
         };
 
     });
+
 </script>
 
 <script>
@@ -171,6 +178,7 @@
             console.error('Could not copy text: ', err);
         });
     }
+
 
 
 </script>
@@ -218,6 +226,7 @@
             searchEnabled: true, // Enables searching within the dropdown
             addItems: true, // Allows adding new items by typing or pasting
         });
+
 
 </script>
 
@@ -285,6 +294,16 @@
                             else {
                                 operation_button = `<a href="/instance/${item.id}" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer" >Manage</a>`;
                             }
+
+                            {% if request.user.is_superuser %}
+                            operation_button += `<li class="dropdown custom-li-dropdown">
+        <a class="btn btn-sm btn-outline-primary dropdown-toggle" target="_blank"  data-toggle="dropdown" rel="noopener noreferrer" >Setting</a>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" onclick="show_update_end_date_modal('${item.id}', '${item.end_time}')">Change End Date</a></li>
+        </ul>
+      </li>`;
+                            {% endif %}
+
                             const row = document.createElement('tr');
                             row.innerHTML = `
                                 <td><input type="checkbox" class="instance-checkbox" data-instance-id="${item.id}"></td>
@@ -421,6 +440,30 @@
 
 
     });
+
+</script>
+
+{% include 'layouts/modal/update_vps_end_date.html' %}
+
+<script>
+<!--    setup Setting -->
+
+    update_end_date_modal_prefix = 'update_end_date_modal';
+    endDatePickerId = `${update_end_date_modal_prefix}EndDatePicker`;
+    update_end_date_modal_id = createUpdateEndDateModal(update_end_date_modal_prefix);
+    update_end_date_modal_vps_id = `${update_end_date_modal_prefix}VpsIdHiddenField`;
+
+
+
+    function show_update_end_date_modal(vps_id, end_date) {
+    const [day, month, year] = end_date.split('/');
+    const formattedDate = `${year}-${month}-${day}`;
+    document.getElementById(endDatePickerId).value = formattedDate;
+    document.getElementById(update_end_date_modal_vps_id).value = vps_id;
+
+    $(`#`+update_end_date_modal_id).modal('show');
+    }
+
 </script>
 
 <script>
@@ -454,6 +497,7 @@
         alert("Failed to re-create the VPS. Please try again later.");
     });
 }
+
 
 </script>
 

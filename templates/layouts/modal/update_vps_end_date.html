@@ -1,0 +1,86 @@
+<script>
+function createUpdateEndDateModal(prefix) {
+    // Unique IDs using the prefix
+    const modalId = `${prefix}UpdateEndDateModal`;
+    const modalLabelId = `${prefix}UpdateEndDateModalLabel`;
+    const endDatePickerId = `${prefix}EndDatePicker`;
+    const cancelButtonId = `${prefix}CancelUpdateButton`;
+    const confirmButtonId = `${prefix}ConfirmUpdateButton`;
+    const vpsIdHiddenFieldId = `${prefix}VpsIdHiddenField`;
+
+    // Modal template with prefixed IDs
+    const modalTemplate = `
+        <div class="modal fade" id="${modalId}" tabindex="-1" role="dialog" aria-labelledby="${modalLabelId}" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" style="height: auto;">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="${modalLabelId}">Update End Date</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="${vpsIdHiddenFieldId}">
+                        <div class="form-group">
+                            <label for="${endDatePickerId}">End Date</label>
+                            <input type="date" class="form-control" id="${endDatePickerId}">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" id="${cancelButtonId}">Cancel</button>
+                        <button class="btn btn-primary" id="${confirmButtonId}">Update</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Append modal to the body
+    document.body.insertAdjacentHTML('beforeend', modalTemplate);
+
+    // Modal handling
+    const updateEndDateModal = document.getElementById(modalId);
+    const cancelUpdate = document.getElementById(cancelButtonId);
+    const confirmUpdate = document.getElementById(confirmButtonId);
+
+    cancelUpdate.onclick = function() {
+        $(`#${modalId}`).modal('hide');
+    }
+
+    confirmUpdate.onclick = function() {
+        const endDate = document.getElementById(endDatePickerId).value;
+        const vpsId = document.getElementById(vpsIdHiddenFieldId).value;
+
+        if (!endDate) {
+            alert("Please select a date");
+            return;
+        }
+
+        // Send the update request via AJAX
+        fetch('/api/vps/update_vps_end_time/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                vps_id: vpsId,
+                end_time: endDate,
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            window.location.reload();
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    window.onclick = function(event) {
+        if (event.target == updateEndDateModal) {
+            $(`#${modalId}`).modal('hide');
+        }
+    }
+
+    return modalId;
+}
+</script>

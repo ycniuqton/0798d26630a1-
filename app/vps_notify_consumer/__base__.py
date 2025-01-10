@@ -57,6 +57,7 @@ handlers = {
     VirtualizorEvent.VPS_PASSWORD_CHANGED: VPSChangedPassword(),
     VirtualizorEvent.VPS_HOSTNAME_CHANGED: VPSChangedHostname(),
     "cache_cleaned": CacheCleaned(),
+    "set_vps_end_time": VPSUpdateEndTime(),
     "agen_sync": AgencySync(),
 }
 
