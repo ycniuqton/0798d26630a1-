@@ -43,6 +43,13 @@
     float: left;
     }
 
+    .hostname-display  {
+    color: #007bff;
+    font-weight: 400;
+    font-size: large;
+    text-decoration: underline;
+}
+
 </style>
 {% endblock extrastyle %}
 
@@ -276,6 +283,7 @@
                         tbody.innerHTML = '';
                         data.data.forEach(item => {
                             refund_button = ''
+                            operation_button = ''
                             {% if request.user.is_staff %}
                             if(item.is_refundable){
                                 refund_button = `<a onclick="call_refund('${item.id}')" class="btn btn-sm btn-outline-warning" >Refund</a>`;
@@ -283,7 +291,8 @@
                             {% endif %}
 
                             if (item.status == 'error') {
-                                operation_button = `<a href="/instance/${item.id}" class="btn btn-sm btn-outline-primary" >Manage</a>`;
+                                    operation_button = '';
+<!--                                operation_button = `<a href="/instance/${item.id}" class="btn btn-sm btn-outline-primary" >Manage</a>`;-->
                                 {% if request.user.is_staff %}
                                     operation_button += `<a  href="#" class="btn btn-sm btn-outline-danger" data-error-message="${htmlEncode(item.error_message)}" onclick="copyErrorMessage(this); event.preventDefault();">Copy Error</a>`;
                                     operation_button += `<a  href="#" class="btn btn-sm btn-outline-info"  onclick="re_create_vps('${item.id}'); event.preventDefault();">Retry</a>`;
@@ -291,15 +300,16 @@
 
 
                             }
-                            else {
-                                operation_button = `<a href="/instance/${item.id}" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer" >Manage</a>`;
-                            }
+<!--                            else {-->
+<!--                                operation_button = `<a href="/instance/${item.id}" class="btn btn-sm btn-outline-primary" target="_blank" rel="noopener noreferrer" >Manage</a>`;-->
+<!--                            }-->
 
                             {% if request.user.is_superuser %}
                             operation_button += `<li class="dropdown custom-li-dropdown">
-        <a class="btn btn-sm btn-outline-primary dropdown-toggle" target="_blank"  data-toggle="dropdown" rel="noopener noreferrer" >Setting</a>
+        <a class="btn btn-sm btn-outline-primary dropdown-toggle" target="_blank"  data-toggle="dropdown" rel="noopener noreferrer" >Option</a>
         <ul class="dropdown-menu">
           <li><a class="dropdown-item" onclick="show_update_end_date_modal('${item.id}', '${item.end_time}')">Change End Date</a></li>
+          <li><a class="dropdown-item" href="/instance/${item.id}" class="btn btn-sm btn-outline-primary" >Manage</a></li>
         </ul>
       </li>`;
                             {% endif %}
@@ -311,11 +321,14 @@
                                 <td>${ item.user }</td>
                                 {% endif %}
                                 <td class="d-flex align-items-center">
+
                     <img src="https://img.icons8.com/color/48/000000/${mapping_os_icon[item.os]}.png" alt="${item.os}" class="server-icon mr-2">
-                    <div>
-                        <span class="d-block">${ item.hostname }</span>
+                    <a href="/instance/${item.id}" target="_blank" style="text-decoration: none; color: inherit;">
+                    <div >
+                        <span class="d-block hostname-display">${ item.hostname }</span>
                         <small class="text-muted">${item.cpu} vCPU ${item.ram} MB</small>
                     </div>
+                    </a>
                 </td>
 
                                 <td>
