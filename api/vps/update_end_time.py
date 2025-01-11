@@ -39,7 +39,9 @@ def update_vps_end_time(request):
 
     if settings.APPConfig.APP_ROLE != 'admin':
         from services.vps import CtvVPSService
-        vps_service = CtvVPSService()
+        base_url = settings.ADMIN_CONFIG.URL
+        api_key = settings.ADMIN_CONFIG.API_KEY
+        vps_service = CtvVPSService(base_url, api_key)
         vps_service.update_vps_end_time(vps.linked_id, end_time)
     else:
         publisher = make_kafka_publisher(KafkaNotifierConfig)
