@@ -34,7 +34,7 @@ def update_vps_end_time(request):
     else:
         vps = Vps.objects.filter(linked_id=vps_linked_id).first()
 
-    if not user.is_superuser:
+    if not user.is_superuser and settings.APPConfig.APP_ROLE != 'admin':
         return JsonResponse({'error': 'Permission denied'}, status=403)
 
     if settings.APPConfig.APP_ROLE != 'admin':
