@@ -31,8 +31,12 @@ class PurchaseEstimator:
             is_valid = False
             message = 'Exceeded limit'
 
-        if os.get('distro') == 'windows' and os.get('name', '').find('-2022') > -1 and plan['ram_display'] < 2:
+        if os.get('distro') == 'windows' and os.get('name', '').find('-2022') > -1 and plan['ram_display'] < 4:
             is_valid = False
-            message = 'Requires minimum 2 GB of RAM'
+            message = 'Requires minimum 4 GB of RAM'
+
+        if os.get('distro') == 'windows' and os.get('name', '').find('windows-10') > -1 and plan['ram_display'] < 4:
+            is_valid = False
+            message = 'Requires minimum 4 GB of RAM'
 
         return is_valid, message, discounted_fee, discount_amount, total_fee
