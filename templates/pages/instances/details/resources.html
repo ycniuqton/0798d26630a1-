@@ -9,7 +9,6 @@
                 <td>
                     <span id="instance-text">{{ instance.plan_name }}</span>
 <!--                    <i class="fas fa-edit " id="change-instance-icon" style="cursor: pointer;" onclick="showInstanceDropdown()"></i>-->
-                    <i class="fas fa-edit " id="change-instance-icon" style="cursor: pointer;" onclick=""></i>
                     <select id="instance-dropdown" class="form-control d-none mb-2" onchange="updateInstanceDetails()">
                         {% for instance_type in instance_types %}
                         <option value="{{ instance_type.name }}" data-vcpu="{{ instance_type.cpu }}" data-ram="{{ instance_type.ram }}">
