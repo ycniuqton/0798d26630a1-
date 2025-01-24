@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  postgres-ctv:
+    image: postgres:latest  # Consider specifying a fixed version for production use
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: "ctv"  # Set your database name
+      POSTGRES_USER: "ctv"  # Set your PostgreSQL user
+      POSTGRES_PASSWORD: "password_here"  # Set your PostgreSQL password
+    volumes:
+      - postgres-storage-2:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    container_name: redis_service
+    environment:
+      - REDIS_PASSWORD=password_here
+    command: redis-server --requirepass password_here
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+    
+  zookeeper:
+    image: confluentinc/cp-zookeeper:6.0.1
+    hostname: zookeeper
+    networks:
+      - small_network
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:6.0.1
+    hostname: kafka
+    networks:
+      - small_network
+    ports:
+      - "9092:9092"
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://ip_here:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_DELETE_TOPIC_ENABLE: "true"
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+      KAFKA_LOG_RETENTION_HOURS: 24
+      KAFKA_LOG_RETENTION_BYTES: 1073741824
+      KAFKA_LOG_SEGMENT_BYTES: 1073741824
+      KAFKA_LOG_CLEANUP_POLICY: delete
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  kowl:
+      image: quay.io/cloudhut/kowl:v1.3.1
+      container_name: kowl
+      restart: always
+      networks:
+        - small_network
+      ports:
+        - "8080:8080"
+      depends_on:
+        - kafka
+      environment:
+        - KAFKA_BROKERS=kafka:9092
+        - KOWL_PRODUCER_ENABLED:true
+        - KOWL_PRODUCER_ALLOW_CREATE_TOPICS:true
+        
+networks:
+  small_network:
+
+volumes:
+  postgres-storage-2:
+    driver: local
+  redis_data:

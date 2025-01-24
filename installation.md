@@ -1,55 +1,73 @@
-# Installation guide
+# Installation Guide
 
+## 1. System Prerequisites
 
-```commandline
+### Update System
+```bash
 apt update && apt upgrade
 ```
 
+### Pull code
+```bash
+git clone git@github.com:ycniuqton/0798d26630a1-.git  vps-web
+cd vps-web
+```
 
-```commandline
-pip3 install pipenv
+### Install Python Environment
+```bash
+pip install pipenv --force
 apt install pipenv
 ```
 
-
-Vào pipenv shell
-```commandline
+### Setup Virtual Environment
+```bash
 pipenv shell
+git checkout dev/user
 pip install -r requirements.txt
 
 ```
 
-Cài đặt docker
-```commandline
-apt install docker.io
-apt install docker-compose
+## 2. Docker Setup
+
+### Install Docker
+```bash
+apt install docker.io install docker-compose -y
 
 ```
 
-Sửa lại file docker-compose.yml
-- update ip cho kafka
+### VPS docker-requirements
+create vps folder then copy  vps.yaml to vps folder
 
-Run docker-compose
-```commandline
-docker-compose up -d
+```bash
+mkdir vps
+cp vps.yaml vps/
+
+docker-compose up --build
 ```
 
 
-Cài đặt nginx
-```commandline
-apt install nginx -y
-sudo apt install certbot python3-certbot-nginx -y
+## 3. Nginx and SSL Setup
 
-sudo certbot --nginx -d example.com
+### Install Nginx and Certbot
+```bash
+apt install nginx certbot python3-certbot-nginx -y
+
+```
+
+### Configure SSL
+```bash
+sudo certbot --nginx -d resellvps.net
 sudo certbot renew --dry-run
 
 ```
 
-Cài đặt các tham số env.yaml
-- key của tài khoản tương ưng trong resellvps
-- ip của kafka update virtualizor event
-- ip db
-.. 
+## 4. Environment Configuration
+
+Configure parameters in `env.yaml`:
+- Set ResellVPS account keys
+- Update Kafka IP for virtualizor events
+- Configure database IP
+- Other necessary parameters
 
 
 
@@ -60,7 +78,9 @@ Cài đặt các tham số env.yaml
 
 ```bash
 $ python manage.py createsuperuser # create the admin
-$ python manage.py runserver       # start the project
+$ python manage.py makemigrations   # Prepare database migrations
+$ python manage.py migrate          # Apply migrations
+$ python manage.py runserver        # start the project
 ```
 
 At this point, the app runs at `http://127.0.0.1:8000/`.
@@ -93,11 +113,3 @@ The project is coded using a simple and intuitive structure presented below:
    |-- manage.py                          # Start the app - Django default start script
    |
    |-- ************************************************************************
-```
-
-<br />
-
-```commandline
-python manage.py makemigrations
-python manage.py migrate
-```
