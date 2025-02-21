@@ -131,3 +131,10 @@ class CustomInfo:
     COMPANY_ADDRESS = _data.get("COMPANY_ADDRESS", "Hanoi, Vietnam")
     COMPANY_PHONE = _data.get("COMPANY_PHONE", "0123456789")
     APP_DOMAIN = _data.get("APP_DOMAIN", "https://yourdomain.com")
+
+
+class VNCConfig:
+    _data = config_data.get("VNC_CONFIG", {})
+    DOMAIN_URL = _data.get("DOMAIN_URL", "localhost")
+    PORT = _data.get("PORT", 6081)
+    SESSION_DURATION = _data.get("SESSION_DURATION", 30)  # Default 6 hours

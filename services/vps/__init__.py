@@ -188,6 +188,17 @@ class VPSService:
         else:
             return {}
 
+    def get_vnc(self, vps_id):
+        url = f"{VIRTUALIZOR_CONFIG.MANAGER_URL}/system/vpss/{vps_id}/vnc"
+        response = requests.get(url, headers=self.headers)
+
+        # Check if the request was successful
+        if response.status_code == 200:
+            vnc_info = response.json().get('info')
+            return vnc_info
+        else:
+            return {}
+
 
 class CtvVPSService(VPSService):
     @retry(stop=stop_after_attempt(3), wait=wait_fixed(2))

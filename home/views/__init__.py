@@ -741,17 +741,6 @@ invoices_data = [
 ]
 
 
-def get_vnc_link(request, instance_id):
-    # Fetch the instance to ensure it exists
-
-    # Sample data for VNC link (you should replace this with actual logic)
-    vnc_link = {
-        "link": f"https://vnc.example.com/{instance_id}"
-    }
-
-    return JsonResponse(vnc_link)
-
-
 def get_snapshots(request, instance_id):
     # Fetch the instance to ensure it exists
 

@@ -559,3 +559,25 @@ class SystemCounter(BaseModel):
         if not counter:
             return 0
         return counter.data.get(SystemCounter.KEYGEN.vps(plan_id=plan_id), 0)
+
+
+class VNCSession(models.Model):
+    vps = models.ForeignKey(Vps, on_delete=models.CASCADE, related_name='vnc_sessions', unique=True)
+    password = models.CharField(max_length=200)
+    port = models.CharField(max_length=200, null=True, blank=True)
+    host = models.CharField(max_length=200, null=True, blank=True)
+    session_key = models.CharField(max_length=200, unique=True)
+    vnc_link = models.CharField(max_length=500, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    expired_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'vnc_session'
+
+    def __str__(self):
+        return f"VNC Session for VPS {self.vps.hostname} - Port: {self.port}"
+
+    def is_expired(self):
+        from django.utils import timezone
+        return timezone.now() < self.expired_at

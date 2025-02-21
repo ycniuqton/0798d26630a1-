@@ -23,6 +23,7 @@ from .balances import topup, reclaim
 from .vps.calculator import vps_calculator
 from .payment import get_payment_url, paypal_success_callback, paypal_cancel_callback, paypal_webhook, \
     bank_webhook, generate_qr_code, crypto_success_callback, crypto_webhook, stripe_webhook
+from .vps.vnc import get_vnc_link
 
 urlpatterns = [
     path('register/', RegisterAPI.as_view(), name='register'),
@@ -45,6 +46,8 @@ urlpatterns = [
     path('vps/<str:vps_id>/change_plan', change_vps_plan, name='change_vps_plan'),
     path('vps/<str:vps_id>/refund/', refund_vps, name='refund_vps'),
     path('vps/<str:vps_id>/update_info/', update_info, name='update_info'),
+    path('vps/<str:vps_id>/vnc/', get_vnc_link, name='get_vnc_link'),
+    
     path('vps/plan/', list_plan, name='list_plan'),
     path('vps/plan/set_price/', set_price, name='set_price'),
     path('vps/plan/config/', config_plan, name='config_plan'),

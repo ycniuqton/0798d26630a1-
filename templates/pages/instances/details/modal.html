@@ -157,16 +157,43 @@ toggleIcon.classList.add('fa-eye-slash');
         document.getElementById('confirmAction').textContent = 'Confirm';
 
         if (action === 'vnc') {
+            // Disable connect button and show loading state
+            const connectButton = document.getElementById('openVncAction');
+            connectButton.disabled = true;
+            connectButton.textContent = 'Connecting...';
+
             // Call API to get VNC link
-            fetch(`/api/vps/${instance.id}/vnc-link/`)
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('vncLinkHref').href = data.link;
+            fetch(`/api/vps/${instance_id}/vnc/`, {
+                method: 'GET',
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success' && data.vnc_link) {
+                    // Store VNC link
+                    document.getElementById('vncLinkHref').href = data.vnc_link;
                     document.getElementById('vncLink').classList.remove('d-none');
                     document.getElementById('openVncAction').classList.remove('d-none');
                     document.getElementById('confirmAction').classList.add('d-none');
-                });
-
+                    
+                    // Re-enable connect button and restore text
+                    connectButton.disabled = false;
+                    connectButton.textContent = 'Connect to VNC';
+                } else {
+                    throw new Error(data.message || 'Failed to get VNC link');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                // Re-enable connect button and restore text
+                connectButton.disabled = false;
+                connectButton.textContent = 'Connect to VNC';
+                alert(error.message || 'Failed to get VNC access. Please try again.');
+            });
         } else if (action === 'restore') {
             // Call API to get snapshots
             fetch(`/api/vps/${instance.id}/snapshots/`)
