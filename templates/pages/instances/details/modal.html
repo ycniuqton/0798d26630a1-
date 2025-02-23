@@ -157,10 +157,14 @@ toggleIcon.classList.add('fa-eye-slash');
         document.getElementById('confirmAction').textContent = 'Confirm';
 
         if (action === 'vnc') {
-            // Disable connect button and show loading state
-            const connectButton = document.getElementById('openVncAction');
-            connectButton.disabled = true;
-            connectButton.textContent = 'Connecting...';
+            document.getElementById('confirmationMessage').innerHTML = `
+                <div class="text-center">
+                    <div class="spinner-border text-primary mb-2" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div>Connecting to VNC...</div>
+                </div>`;
+            document.getElementById('confirmAction').disabled = true;
 
             // Call API to get VNC link
             fetch(`/api/vps/${instance_id}/vnc/`, {
@@ -175,6 +179,8 @@ toggleIcon.classList.add('fa-eye-slash');
             .then(data => {
                 if (data.status === 'success' && data.vnc_link) {
                     // Store VNC link
+                    document.getElementById('confirmationMessage').textContent = '';
+                    document.getElementById('confirmAction').disabled = false;
                     document.getElementById('vncLinkHref').href = data.vnc_link;
                     document.getElementById('vncLink').classList.remove('d-none');
                     document.getElementById('openVncAction').classList.remove('d-none');
