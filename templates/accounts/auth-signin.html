@@ -1,95 +1,33 @@
-{% extends "layouts/base-auth.html" %}
+{% extends "accounts/base-auth-form.html" %}
 {% load static %}
 
-{% block extrastyle %}
-<style>
-.auth-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background: #f6f7fb;
-}
-.auth-content {
-    max-width: 400px;
-    width: 90%;
-    padding: 30px;
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-}
-.btn-google {
-    color: #545454;
-    background-color: #ffffff;
-    border: 1px solid #dadce0;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 10px;
-    text-decoration: none;
-}
-.btn-google:hover {
-    background-color: #f8f9fa;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.12);
-    color: #545454;
-    text-decoration: none;
-}
-.divider {
-    text-align: center;
-    margin: 20px 0;
-    position: relative;
-}
-.divider::before,
-.divider::after {
-    content: "";
-    position: absolute;
-    top: 50%;
-    width: 45%;
-    height: 1px;
-    background: #ddd;
-}
-.divider::before { left: 0; }
-.divider::after { right: 0; }
-</style>
-{% endblock extrastyle %}
+{% block auth_title %}Welcome Back!{% endblock %}
+{% block auth_subtitle %}Sign in to your account to continue{% endblock %}
 
-{% block content %}
-<div class="auth-wrapper">
-    <div class="auth-content">
-        <div class="text-center mb-4">
-            <h4>Sign In</h4>
-            <p>Welcome back! Please sign in to continue.</p>
-        </div>
+{% block auth_content %}
+<!-- Google OAuth2 Sign In -->
+<a href="{% url 'oauth2_init' %}" class="btn btn-google mb-3">
+    <img src="https://www.google.com/favicon.ico" alt="Google" width="20" height="20">
+    Sign in with Google
+</a>
 
-        <!-- Google OAuth2 Sign In -->
-        <a href="{% url 'oauth2_init' %}" class="btn btn-google mb-3">
-            <img src="https://www.google.com/favicon.ico" alt="Google" width="20" height="20">
-            Sign in with Google
-        </a>
+<div class="divider">or</div>
 
-        <div class="divider">or</div>
-
-        <!-- Regular Login Form -->
-        <form method="post">
-            {% csrf_token %}
-            <div class="form-group mb-3">
-                <label for="username">Username</label>
-                <input type="text" class="form-control" name="username" id="username" required>
-            </div>
-            <div class="form-group mb-3">
-                <label for="password">Password</label>
-                <input type="password" class="form-control" name="password" id="password" required>
-            </div>
-            <button type="submit" class="btn btn-primary w-100">Sign In</button>
-        </form>
-
-        <div class="text-center mt-4">
-            <p>Don't have an account? <a href="{% url 'register' %}">Sign Up</a></p>
-        </div>
+<!-- Regular Login Form -->
+<form method="post">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" class="form-control" name="username" id="username" required>
     </div>
-</div>
-{% endblock content %}
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" name="password" id="password" required>
+    </div>
+    <button type="submit" class="btn btn-primary w-100">Sign In</button>
+</form>
+{% endblock %}
+
+{% block auth_footer %}
+Don't have an account? <a href="{% url 'register' %}">Sign Up</a>
+{% endblock %}

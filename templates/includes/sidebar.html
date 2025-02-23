@@ -34,9 +34,9 @@
     <div class="navbar-wrapper">
         <div class="navbar-brand header-logo">
             <a href="{% url 'index' %}" class="b-brand">
-                <div class="b-bg">
-                    <i class="feather icon-trending-up"></i>
-                </div>
+                <img style="
+                height: 60px;
+            " src="{% static '/assets/images/Logo.svg' %}" alt="Logo">
                 {% if APP_ROLE == 'ctv' %}
                 <span class="b-title">{{ APP_NAME  }}</span>
                 {% else %}

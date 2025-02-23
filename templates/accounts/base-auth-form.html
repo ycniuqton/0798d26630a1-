@@ -1,0 +1,286 @@
+{% extends "layouts/base-auth.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block extrastyle %}
+<style>
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.auth-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation: gradient 60s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    position: relative;
+}
+
+.auth-wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+}
+
+.auth-content {
+    max-width: 450px;
+    width: 90%;
+    padding: 30px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    position: relative;
+    z-index: 1;
+}
+
+.back-to-site {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.back-to-site:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.auth-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2.5rem;
+    gap: 16px;
+}
+
+.auth-logo img {
+    height: 45px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+.auth-logo-text {
+    text-align: left;
+    flex: 1;
+}
+
+.auth-logo-text h4 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #344767;
+    line-height: 1.2;
+}
+
+.auth-logo-text p {
+    margin: 4px 0 0 0;
+    color: #67748e;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.btn-google {
+    color: #545454;
+    background-color: #ffffff;
+    border: 1px solid #dadce0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px;
+    text-decoration: none;
+    border-radius: 8px;
+}
+
+.btn-google:hover {
+    background-color: #f8f9fa;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    color: #545454;
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+.divider {
+    text-align: center;
+    margin: 20px 0;
+    position: relative;
+    color: #6c757d;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 45%;
+    height: 1px;
+    background: rgba(0,0,0,0.1);
+}
+
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+
+.form-group {
+    margin-bottom: 1.2rem;
+}
+
+.form-control {
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 3px rgba(94,114,228,0.1);
+    border-color: #5E72E4;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.btn-primary {
+    background: #5E72E4;
+    border-color: #5E72E4;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    border-radius: 8px;
+}
+
+.btn-primary:hover {
+    background: #324cdd;
+    border-color: #324cdd;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(94,114,228,0.2);
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #6c757d;
+}
+
+.auth-footer a {
+    color: #5E72E4;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
+}
+
+.auth-footer a:hover {
+    color: #324cdd;
+    text-decoration: none;
+}
+
+/* Floating labels animation */
+.form-group {
+    position: relative;
+}
+
+.form-group label {
+    transition: all 0.3s;
+    pointer-events: none;
+    color: #6c757d;
+}
+
+.form-control:focus + label,
+.form-control:not(:placeholder-shown) + label {
+    transform: translateY(-1.5rem) scale(0.85);
+    color: #5E72E4;
+}
+</style>
+{% endblock extrastyle %}
+
+{% block content %}
+<div class="auth-wrapper">
+    <a href="https://{{APP_DOMAIN}}" class="back-to-site">
+        <i class="fas fa-arrow-left"></i>
+        Back to Website
+    </a>
+
+    <div class="auth-content">
+        <div class="auth-logo">
+            <img src="{% static '/assets/images/Logo.svg' %}" alt="Logo">
+            <div class="auth-logo-text">
+                <h4>{% block auth_title %}{% endblock %}</h4>
+                <p class="text-muted">{% block auth_subtitle %}{% endblock %}</p>
+            </div>
+        </div>
+
+        {% block auth_content %}{% endblock %}
+
+        <div class="auth-footer">
+            {% block auth_footer %}{% endblock %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.form-control[type="password"]').forEach(input => {
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'relative';
+    input.parentNode.insertBefore(wrapper, input);
+    wrapper.appendChild(input);
+
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'btn btn-link';
+    toggle.style.cssText = 'position: absolute; right: 0; top: 50%; transform: translateY(-50%); border: none; color: #6c757d;';
+    toggle.innerHTML = '<i class="fas fa-eye"></i>';
+    
+    toggle.addEventListener('click', () => {
+        if (input.type === 'password') {
+            input.type = 'text';
+            toggle.innerHTML = '<i class="fas fa-eye-slash"></i>';
+        } else {
+            input.type = 'password';
+            toggle.innerHTML = '<i class="fas fa-eye"></i>';
+        }
+    });
+    
+    wrapper.appendChild(toggle);
+});
+</script>
+{% endblock extra_js %}
