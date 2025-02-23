@@ -50,3 +50,17 @@ class VPSMailService:
                 'current_year': now.year
             }
         })
+
+    def send_confirmation_email(self, email, username, confirmation_url, expires_at):
+        now = get_now()
+        self.publisher.publish('send_mail', {
+            'type': 'CONFIRM_REGISTRATION',
+            'receiver': email,
+            'data': {
+                'subject': f"{APPConfig.APP_NAME} - Confirm Your Registration",
+                'recipient_name': username,
+                'confirmation_url': confirmation_url,
+                'expires_at': expires_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'current_year': now.year
+            }
+        })

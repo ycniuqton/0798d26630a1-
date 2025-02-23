@@ -18,16 +18,30 @@
     {% csrf_token %}
     <div class="form-group">
         <label for="username">Username</label>
-        <input type="text" class="form-control" name="username" id="username" required>
+        <input type="text" class="form-control {% if form.errors.username %}is-invalid{% endif %}" 
+               name="username" id="username" required>
+        {% if form.errors.username %}
+        <div class="invalid-feedback">
+            {{ form.errors.username.0 }}
+        </div>
+        {% endif %}
     </div>
     <div class="form-group">
         <label for="password">Password</label>
-        <input type="password" class="form-control" name="password" id="password" required>
+        <input type="password" class="form-control {% if form.errors.password %}is-invalid{% endif %}" 
+               name="password" id="password" required>
+        {% if form.errors.password %}
+        <div class="invalid-feedback">
+            {{ form.errors.password.0 }}
+        </div>
+        {% endif %}
     </div>
     <button type="submit" class="btn btn-primary w-100">Sign In</button>
 </form>
 {% endblock %}
 
 {% block auth_footer %}
-Don't have an account? <a href="{% url 'register' %}">Sign Up</a>
+<div class="mt-3">
+    Don't have an account? <a href="{% url 'register' %}" class="text-primary">Sign Up</a>
+</div>
 {% endblock %}

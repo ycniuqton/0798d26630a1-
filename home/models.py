@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.db.models import JSONField
 from django.db import models
@@ -581,3 +581,61 @@ class VNCSession(models.Model):
     def is_expired(self):
         from django.utils import timezone
         return timezone.now() < self.expired_at
+
+
+class PendingRegistration(models.Model):
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=150, unique=True)
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    password = models.CharField(max_length=128)  # Will store hashed password
+    confirmation_token = models.UUIDField(default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_confirmed = models.BooleanField(default=False)
+    resend_count = models.IntegerField(default=0)
+    last_resend_at = models.DateTimeField(null=True, blank=True)
+    failed_attempts = models.IntegerField(default=0)
+    last_failed_at = models.DateTimeField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            # Set expiration to 24 hours from creation
+            self.expires_at = timezone.now() + timedelta(hours=24)
+        super().save(*args, **kwargs)
+
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+    def can_resend_email(self):
+        """Check if confirmation email can be resent based on rate limits"""
+        if self.resend_count >= 5:  # Max 5 resends total
+            return False
+            
+        if self.last_resend_at:
+            # Must wait 2 minutes between resends
+            min_interval = timedelta(minutes=2)
+            if timezone.now() - self.last_resend_at < min_interval:
+                return False
+                
+        return True
+
+    def increment_failed_attempts(self):
+        """Track failed confirmation attempts"""
+        self.failed_attempts += 1
+        self.last_failed_at = timezone.now()
+        self.save()
+
+    def is_blocked(self):
+        """Check if registration is blocked due to too many failed attempts"""
+        if self.failed_attempts >= 5:  # Max 5 failed attempts
+            if self.last_failed_at:
+                # Block for 30 minutes after 5 failed attempts
+                block_duration = timedelta(minutes=30)
+                if timezone.now() - self.last_failed_at < block_duration:
+                    return True
+            return False
+        return False
+
+    class Meta:
+        db_table = 'pending_registrations'

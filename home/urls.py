@@ -6,7 +6,8 @@ from .views import set_introducer, \
     current_introducer, faqs_view
 from home.views.instances import instances, create_instances, instance_detail, vps_history, archived_instances, vnc_view
 from home.views.statics import FlagAPI, OSIconAPI
-from home.views.accounts import CustomUserLoginView, UserRegistrationView, logout_view, OAuth2CallbackView, GoogleOAuth2InitView
+from home.views.accounts import (CustomUserLoginView, UserRegistrationView, logout_view, OAuth2CallbackView,
+                                 GoogleOAuth2InitView, ConfirmRegistrationView, ResendConfirmationView)
 from home.views.financial import invoices_view, financial_view, payment_view, billing_view, resource_record, \
     transaction_history, invoice_view
 from home.views.ctv_admin import ctv_financial, ctv_settings, admin_invoices, refund_requests
@@ -26,6 +27,8 @@ urlpatterns = [
 
     path('accounts/login/', CustomUserLoginView.as_view(), name='login'),
     path('accounts/register/', UserRegistrationView.as_view(), name='register'),
+    path('accounts/confirm/<uuid:token>/', ConfirmRegistrationView.as_view(), name='confirm_registration'),
+    path('accounts/resend-confirmation/', ResendConfirmationView.as_view(), name='resend_confirmation'),
     path('accounts/logout/', logout_view, name='logout'),
     path('admin/logout/', logout_view, name='admin_logout'),
 

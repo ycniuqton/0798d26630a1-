@@ -1,0 +1,45 @@
+{% extends "accounts/base-auth-form.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block auth_title %}Registration Successful!{% endblock %}
+{% block auth_subtitle %}Your account has been confirmed{% endblock %}
+
+{% block auth_content %}
+<div class="text-center mb-4">
+    <div class="mb-4">
+        <i class="fas fa-check-circle" style="font-size: 48px; color: #2dce89;"></i>
+    </div>
+    <h5 class="mb-3">Welcome aboard!</h5>
+    <p class="text-muted">
+        Your email has been confirmed and your account is now active.
+        You will be redirected to the login page in <span id="countdown">5</span> seconds.
+    </p>
+</div>
+
+<div class="mt-4">
+    <div class="d-flex justify-content-center">
+        <a href="{% url 'login' %}" class="btn btn-primary">
+            Login Now
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Countdown timer
+    let seconds = 5;
+    const countdownElement = document.getElementById('countdown');
+    
+    const countdown = setInterval(() => {
+        seconds--;
+        countdownElement.textContent = seconds;
+        
+        if (seconds <= 0) {
+            clearInterval(countdown);
+            window.location.href = "{% url 'login' %}";
+        }
+    }, 1000);
+</script>
+{% endblock %}
