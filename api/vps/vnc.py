@@ -82,7 +82,7 @@ def get_vnc_link(request, vps_id):
     
     # Generate new VNC session
     try:
-        vps_service = VPSService(settings.ADMIN_CONFIG.URL, settings.ADMIN_CONFIG.API_KEY)
+        vps_service = VPSService(settings.VIRTUALIZOR_CONFIG.MANAGER_URL, settings.VIRTUALIZOR_CONFIG.API_KEY)
         vnc_info = vps_service.get_vnc(vps.linked_id)
         
         if not vnc_info:
