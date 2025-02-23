@@ -8,7 +8,7 @@
 {% block auth_content %}
 <!-- Google OAuth2 Sign In -->
 <a href="{% url 'oauth2_init' %}?mode=register" class="btn btn-google mb-3">
-    <img src="https://www.google.com/favicon.ico" alt="Google" width="20" height="20">
+    <img src="{% static '/assets/images/gg_favicon.ico' %}" alt="Google" width="20" height="20">
     Sign up with Google
 </a>
 
