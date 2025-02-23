@@ -5,10 +5,24 @@ from django.views.decorators.csrf import csrf_exempt
 from rest_framework.authtoken.models import Token
 from datetime import datetime, timedelta
 from django.views.generic import CreateView
+from django.views import View
+from django.contrib.auth import get_user_model, login
+from django.conf import settings
+from google.oauth2 import id_token
+from google.auth.transport import requests
+from django.http import JsonResponse
+import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 from core import settings
 from services.account import AccountRepository
 from services.mail_service import VPSMailService
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import Flow
+import os
+import secrets
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -113,7 +127,104 @@ class UserRegistrationView(CreateView):
         if response.status_code == 302:
             user = get_user_model().objects.get(username=request.POST['username'])
             ar = AccountRepository()
-            ar.create_account(user.id)
-            if settings.APPConfig.APP_ROLE != 'admin':
-                VPSMailService().send_register_email(user)
+            ar.setup_new_user(user)
         return response
+
+
+class OAuth2CallbackView(View):
+    def get(self, request):
+        try:
+            # Get the flow from session
+            flow = Flow.from_client_secrets_file(
+                settings.GoogleOAuthConfig.CLIENT_SECRETS_FILE,
+                scopes=['openid', 'https://www.googleapis.com/auth/userinfo.email',
+                        'https://www.googleapis.com/auth/userinfo.profile'],
+                state=request.GET.get('state')
+            )
+            flow.redirect_uri = request.build_absolute_uri('/oauth2/callback')
+
+            # Exchange code for tokens
+            flow.fetch_token(
+                authorization_response=request.build_absolute_uri(),
+                code=request.GET.get('code')
+            )
+
+            # Get credentials and user info
+            credentials = flow.credentials
+            session = flow.authorized_session()
+            user_info = session.get('https://www.googleapis.com/oauth2/v2/userinfo').json()
+
+            # Get or create user
+            User = get_user_model()
+            ar = AccountRepository()
+            
+            try:
+                user = User.objects.get(email=user_info['email'])
+            except User.DoesNotExist:
+                # Create new user with OAuth data
+                user = ar.create_user_from_oauth(
+                    email=user_info['email'],
+                    first_name=user_info.get('given_name', ''),
+                    last_name=user_info.get('family_name', '')
+                )
+
+            # Store email in session for future logins
+            request.session['last_google_email'] = user_info['email']
+            
+            # Login user
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+
+            # Create auth token
+            token, _ = Token.objects.get_or_create(user=user)
+
+            # Set cookie and redirect
+            response = redirect('/')
+            expired = datetime.utcnow() + timedelta(days=7)
+            expired_str = expired.strftime("%A %B %D %Y %I:%M:%S")
+            response.set_cookie(
+                'basic_token',
+                token.key,
+                expires=expired_str,
+                max_age=31449600,
+                path='/',
+                samesite='Lax'
+            )
+
+            return response
+
+        except Exception as e:
+            logger.error(f"OAuth2 callback error: {str(e)}")
+            return redirect('/accounts/login/?error=Authentication failed')
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class GoogleOAuth2InitView(View):
+    def get(self, request):
+        try:
+            flow = Flow.from_client_secrets_file(
+                settings.GoogleOAuthConfig.CLIENT_SECRETS_FILE,
+                scopes=['openid', 'https://www.googleapis.com/auth/userinfo.email',
+                        'https://www.googleapis.com/auth/userinfo.profile'],
+                state=secrets.token_urlsafe(16)
+            )
+            flow.redirect_uri = request.build_absolute_uri('/oauth2/callback')
+
+            auth_params = {
+                'access_type': 'offline',
+                'include_granted_scopes': 'true',
+            }
+
+            # Check if this is a returning user
+            if 'last_google_email' in request.session:
+                # For returning users, suggest their last used account but don't force it
+                auth_params['login_hint'] = request.session['last_google_email']
+            else:
+                # For new users, show the consent screen and account selector
+                auth_params['prompt'] = 'consent select_account'
+
+            authorization_url, _ = flow.authorization_url(**auth_params)
+            return redirect(authorization_url)
+
+        except Exception as e:
+            logger.error(f"OAuth2 init error: {str(e)}")
+            return redirect('/accounts/login/?error=Failed to initialize authentication')

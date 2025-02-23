@@ -13,4 +13,5 @@ env.yaml
 #src
 *.sqlite*
 
+client_secrets.json
 #.env

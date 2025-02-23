@@ -1,7 +1,9 @@
 import uuid
 from django.utils import timezone
-
+from core import settings
+from django.contrib.auth import get_user_model
 from home.models import User, Balance, Transaction, UserToken
+from services.mail_service import VPSMailService
 
 
 class AccountRepository:
@@ -11,10 +13,38 @@ class AccountRepository:
     def get_account(self, account_id):
         return self.db.get_account(account_id)
 
-    def create_account(self, account_id):
-        self._create_balance(account_id)
+    def create_account_business_logic(self, user_id):
+        self._create_balance(user_id)
         utr = UserTokenRepository()
-        utr.create_token(account_id, description="Default token", ttl=-1, is_default=True)
+        utr.create_token(user_id, description="Default token", ttl=-1, is_default=True)
+
+    def setup_new_user(self, user, send_email=True):
+        """Helper method to setup a new user account and send welcome email"""
+        self.create_account_business_logic(user.id)
+        if send_email and settings.APPConfig.APP_ROLE != 'admin':
+            VPSMailService().send_register_email(user)
+        return user
+
+    def create_user_from_oauth(self, email, first_name='', last_name='', **extra_fields):
+        """Create a new user from OAuth data with unique username"""
+        User = get_user_model()
+        username = email.split('@')[0]
+        base_username = username
+        counter = 1
+
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            first_name=first_name,
+            last_name=last_name,
+            **extra_fields
+        )
+
+        return self.setup_new_user(user)
 
     def _create_balance(self, account_id):
         user = User.objects.get(id=account_id)

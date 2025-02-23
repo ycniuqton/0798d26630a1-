@@ -138,3 +138,12 @@ class VNCConfig:
     DOMAIN_URL = _data.get("DOMAIN_URL", "localhost")
     PORT = _data.get("PORT", 6081)
     SESSION_DURATION = _data.get("SESSION_DURATION", 30)  # Default 6 hours
+
+
+class GoogleOAuthConfig:
+    _data = config_data.get("GOOGLE_OAUTH2", {})
+
+    CLIENT_ID = _data.get("CLIENT_ID", '')
+    CLIENT_SECRETS_FILE = _data.get("CLIENT_SECRETS_FILE", "client_secrets.json")
+    REDIRECT_URI = _data.get("REDIRECT_URI", "http://localhost:8000/oauth2/callback")
+    INSECURE_TRANSPORT = _data.get("INSECURE_TRANSPORT", '1')
