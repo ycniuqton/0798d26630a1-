@@ -70,8 +70,17 @@ class CustomUserLoginView(UserLoginView):
                 token, created = Token.objects.get_or_create(user=request.user)
                 expired = datetime.utcnow() + timedelta(days=7)
                 expired = expired.strftime("%A %B %D %Y %I:%M:%S")
-                response.headers[
-                    'set-cookie'] = f'basic_token={token.key}; expires={expired}; Max-Age=31449600; Path=/; SameSite=Lax'
+                
+                # Create redirect response to home page
+                response = redirect('/')
+                response.set_cookie(
+                    'basic_token',
+                    token.key,
+                    expires=expired,
+                    max_age=31449600,
+                    path='/',
+                    samesite='Lax'
+                )
             
             return response
             
@@ -80,15 +89,47 @@ class CustomUserLoginView(UserLoginView):
             messages.error(request, 'An error occurred. Please try again.')
             return self.form_invalid(self.get_form())
 
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('/')
+        return super().get(request, *args, **kwargs)
+
 
 def logout_view(request):
-    # Create a response object
-    response = redirect('/accounts/login/')
-
-    # Clear the 'basic_token' cookie
-    response.delete_cookie('basic_token')
-
-    return response
+    try:
+        # Django logout to clear session
+        logout(request)
+        
+        # Create response object
+        response = redirect('/accounts/login/')
+        
+        # Clear all auth-related cookies
+        response.delete_cookie('basic_token')
+        response.delete_cookie('sessionid')
+        response.delete_cookie('csrftoken')
+        
+        # Clear session data
+        request.session.flush()
+        
+        # Add cache control headers to prevent caching
+        response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        response['Pragma'] = 'no-cache'
+        response['Expires'] = '0'
+        
+        # Clear any OAuth related session data
+        if 'last_google_email' in request.session:
+            del request.session['last_google_email']
+        
+        # Invalidate any existing auth tokens
+        if hasattr(request, 'user') and request.user.is_authenticated:
+            Token.objects.filter(user=request.user).delete()
+        
+        return response
+        
+    except Exception as e:
+        logger.error(f"Logout error: {str(e)}")
+        # Even if there's an error, try to redirect to login
+        return redirect('/accounts/login/')
 
 
 from django import forms
@@ -233,6 +274,12 @@ class UserRegistrationView(CreateView):
             )
             return super().form_invalid(form)
 
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect('/')
+        return super().get(request, *args, **kwargs)
+
+
 
 class ConfirmRegistrationView(View):
     def get(self, request, token):
@@ -270,8 +317,26 @@ class ConfirmRegistrationView(View):
             pending.is_confirmed = True
             pending.save()
 
-            # Instead of redirecting to login, show success page
-            return render(request, 'accounts/registration-success.html')
+            # Log the user in
+            login(request, user, backend='django.contrib.auth.backends.ModelBackend')
+
+            # Create auth token
+            token, _ = Token.objects.get_or_create(user=user)
+
+            # Redirect to home with auth token
+            response = redirect('/')
+            expired = datetime.utcnow() + timedelta(days=7)
+            expired_str = expired.strftime("%A %B %D %Y %I:%M:%S")
+            response.set_cookie(
+                'basic_token',
+                token.key,
+                expires=expired_str,
+                max_age=31449600,
+                path='/',
+                samesite='Lax'
+            )
+
+            return response
 
         except PendingRegistration.DoesNotExist:
             # Track failed attempt by IP
