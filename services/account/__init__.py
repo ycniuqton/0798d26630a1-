@@ -38,7 +38,7 @@ class AccountRepository:
         # Check if username exists with LIKE query
         while User.objects.filter(username__startswith=base_username).exists():
             # Generate random suffix: underscore + 5 alphanumeric characters
-            suffix = '_' + ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
+            suffix = '_' + ''.join(random.choices(string.digits, k=5))
             username = base_username + suffix
             
             # Double check if the generated username already exists
