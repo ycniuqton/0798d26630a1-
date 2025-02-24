@@ -25,6 +25,7 @@ class TemplateMapping:
     REGISTER = 'mail/register.html'
     VERIFY_EMAIL = 'mail/verify_email.html'
     CREATE_VPS = 'mail/create_vps.html'
+    CONFIRM_REGISTRATION = 'mail/confirm_registration.html'
 
 
 COMMON_DATA = {
