@@ -4,6 +4,8 @@ from core import settings
 from django.contrib.auth import get_user_model
 from home.models import User, Balance, Transaction, UserToken
 from services.mail_service import VPSMailService
+import random
+import string
 
 
 class AccountRepository:
@@ -25,16 +27,31 @@ class AccountRepository:
             VPSMailService().send_register_email(user)
         return user
 
+    def _generate_unique_username(self, base_username):
+        """
+        Generate a unique username by adding random suffix if the base username exists.
+        The suffix format is '_' followed by 5 random alphanumeric characters.
+        """
+        User = get_user_model()
+        username = base_username
+        
+        # Check if username exists with LIKE query
+        while User.objects.filter(username__startswith=base_username).exists():
+            # Generate random suffix: underscore + 5 alphanumeric characters
+            suffix = '_' + ''.join(random.choices(string.ascii_lowercase + string.digits, k=5))
+            username = base_username + suffix
+            
+            # Double check if the generated username already exists
+            if not User.objects.filter(username=username).exists():
+                break
+        
+        return username
+
     def create_user_from_oauth(self, email, first_name='', last_name='', **extra_fields):
         """Create a new user from OAuth data with unique username"""
         User = get_user_model()
-        username = email.split('@')[0]
-        base_username = username
-        counter = 1
-
-        while User.objects.filter(username=username).exists():
-            username = f"{base_username}{counter}"
-            counter += 1
+        base_username = email.split('@')[0]
+        username = self._generate_unique_username(base_username)
 
         user = User.objects.create_user(
             username=username,
